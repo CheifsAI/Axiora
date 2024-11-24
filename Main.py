@@ -18,3 +18,8 @@ def extract_code(input) :
         result = re.search(r'```.*?\n(.*?)\n```', input, re.DOTALL)
         result = result.group(1) if result else input
         return result
+llama3b = Ollama(model="llama3.2:3b")
+codem = Ollama(model="granite-code:3b")
+def scvpd(path):
+     df = pd.read_csv(path)
+     return df
