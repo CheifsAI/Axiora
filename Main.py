@@ -11,9 +11,9 @@ def nulldrop (dataframe,llm):
     exec(dropping_nulls_code, exec_env)
     updated_df = exec_env["df"]
     return updated_df.info()
-def ques (num,llm):
-    ques = llm.invoke(f"create {num} anlysis questions about {dinf}")
-    return ques
+def quetions_gen (num,llm):
+    questions = llm.invoke(f"create {num} anlysis questions about {dinf}")
+    return questions
 def visual (llm):
     viscode = llm.invoke(f"I already have a dataframe named 'df', Only create matplotlib code for each question in {ques} with the columns {dinf} in one python script")
     visualcode = extract_code(viscode)
