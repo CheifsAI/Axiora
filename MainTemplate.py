@@ -28,8 +28,6 @@ def summerizer(dataframe, llm):
 
 # Drop Nulls
 def drop_nulls(dataframe, llm):
-    data_info = data_infer(dataframe)
-    
     # Prompt and Chain for dropping nulls
     drop_nulls_prompt = '''
     create a code to drop the nulls from the DataFrame named 'df',
@@ -37,15 +35,12 @@ def drop_nulls(dataframe, llm):
     insure that inplace = True, no extra context or reading the file.
     '''
     drop_nulls_template = PromptTemplate(
-        input_variables=["data_info"],
         template=drop_nulls_prompt
     )
     drop_nulls_chain = LLMChain(llm=llm, prompt=drop_nulls_template)
-    
     # Extracting code for dropping nulls
-    drop_nulls_code = extract_code(drop_nulls_chain.run(data_info=data_info))
+    drop_nulls_code = extract_code(drop_nulls_chain.run())
     print("Code for dropping nulls:\n", drop_nulls_code)
-    
     exec_env = {"df": dataframe}
     exec(drop_nulls_code, exec_env)
     updated_df = exec_env["df"]
