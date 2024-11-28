@@ -45,3 +45,28 @@ def drop_nulls(dataframe, llm):
     exec(drop_nulls_code, exec_env)
     updated_df = exec_env["df"]
     return updated_df.info()
+
+
+# Question Generator
+def quetions_gen (num,llm, dataframe):
+    data_info = data_infer(dataframe)
+    
+    # Prompt and Chain for Question Generation
+    question_prompt = '''
+    create {num} anlysis questions about the following data {data_info}
+    '''
+    
+    question_template = PromptTemplate(
+        input_variables=["num", "data_info"],
+        template=question_prompt
+    )
+    
+    question_chain = LLMChain(
+        llm=llm,
+        prompt=question_template
+    )
+    
+    # Generate the questions
+    questions = question_chain.run(num=num, data_info=data_info)
+    
+    print("Generated Questions:\n", questions)
