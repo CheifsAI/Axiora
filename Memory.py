@@ -10,7 +10,7 @@ prompt_template = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            "You are an AI named LEO , you answer questions with simple answers .",
+            "You are a data analyst.",
         ),
         MessagesPlaceholder(variable_name="memory"),
         ("human", "{input}"),
