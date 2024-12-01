@@ -15,6 +15,19 @@ def extract_code(input_text):
     code_lines = code.splitlines()
     cleaned_code = "\n".join(line.strip() for line in code_lines)
     return cleaned_code.strip()
-def csvpd(path):
-    df = pd.read_csv(path)
+import pandas as pd
+import os
+
+def read_file(path):
+    # Get the file extension
+    _, extension = os.path.splitext(path)
+    
+    # Determine the file type and read accordingly
+    if extension == ".csv":
+        df = pd.read_csv(path)
+    elif extension in [".xls", ".xlsx"]:
+        df = pd.read_excel(path)
+    else:
+        raise ValueError(f"Unsupported file format: {extension}")
+    
     return df
