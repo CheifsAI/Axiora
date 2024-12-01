@@ -14,8 +14,8 @@ def nulldrop (dataframe,llm):
 def quetions_gen (num,llm, data_info):
     questions = llm.invoke(f"create {num} anlysis questions about {data_info}")
     return questions
-def visual (dataframe, llm, questions):
+def visual(dataframe, llm, questions):
     data_info = data_infer(dataframe)
-    viscode = llm.invoke(f"I already have a dataframe named 'df', Only create matplotlib code for each question in {questions} with the columns {data_info} in one python script")
+    viscode = llm.invoke(f"I already have a dataframe named 'df'. Only create matplotlib code for each question in {questions} with the columns {data_info} in one python script")
     visualcode = extract_code(viscode)
     return exec(visualcode)

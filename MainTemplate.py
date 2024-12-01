@@ -89,3 +89,33 @@ def quetions_gen (num,llm, dataframe):
     
     # Print the generated questions
     print("Generated Questions:\n", questions)
+
+
+def visual(dataframe, llm, questions):
+    data_info = data_infer(dataframe)
+    
+    # Prompt for creating visualization code
+    visual_prompt = '''
+    I already have a DataFrame named 'df'. Generate **correctly formatted** matplotlib code to answer each question in {questions}.
+    Ensure the code is **indented properly** and follows Python syntax standards.
+    Use the following columns information: {data_info}. Create only the visualization code.
+    '''
+    
+    # Define the prompt template
+    visual_template = PromptTemplate(
+        input_variables=["data_info", "questions"],
+        template=visual_prompt
+    )
+    
+    # Create a chain for generating visualizations
+    visual_chain = LLMChain(llm=llm, prompt=visual_template)
+    
+    # Extracting the visualization code
+    viscode = extract_code(visual_chain.run(data_info=data_info, questions=questions))
+    
+    # Print the generated visualization code
+    print("Generated Visualization Code:\n", viscode)
+    
+    # Execute the visualization code
+    exec_env = {"df": dataframe}
+    exec(viscode, exec_env)
