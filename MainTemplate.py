@@ -1,14 +1,9 @@
-from Models import llama3b
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
-from OprFuncs import csvpd
 from OprFuncs import data_infer, extract_code
 
-
-llm = llama3b
-
 # Analysis Data
-def analysis_data(dataframe, llm):
+def analysis_data(dataframe,llm):
     data_info = data_infer(dataframe)
 
     # Prompt and Chain for Analysis Data
@@ -18,13 +13,13 @@ def analysis_data(dataframe, llm):
     {data_info}
 
     Please analyze the data and provide insights about:
-    1. Key trends and patterns in the supply chain (e.g., delays, high-demand items, etc.).
+    1. Key trends and patterns in the {data_info}.
     2. Any anomalies or outliers in the data.
     3. Recommendations or actionable insights based on the analyzed data.
     '''
     # Define the prompt template
     analysis_template = PromptTemplate(
-        input_variables=["data_info"],
+        input_variables=["data_info","topic"],     
         template=analysis_prompt
     )
     # Create a chain for analysis data
