@@ -16,5 +16,5 @@ def extract_code(input_text):
     cleaned_code = "\n".join(line.strip() for line in code_lines)
     return cleaned_code.strip()
 def csvpd(path):
-     df = pd.read_csv(path)
-     return df
+    df = pd.read_csv(path)
+    return df
