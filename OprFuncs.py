@@ -19,15 +19,11 @@ import pandas as pd
 import os
 
 def read_file(path):
-    # Get the file extension
-    _, extension = os.path.splitext(path)
-    
-    # Determine the file type and read accordingly
+    _, extension = os.path.splitext(path)    
     if extension == ".csv":
         df = pd.read_csv(path)
     elif extension in [".xls", ".xlsx"]:
         df = pd.read_excel(path)
     else:
         raise ValueError(f"Unsupported file format: {extension}")
-    
     return df
