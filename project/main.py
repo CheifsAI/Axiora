@@ -16,7 +16,7 @@ from Custom_Widgets import *
 from Custom_Widgets.QAppSettings import QAppSettings
 ########################################################################
 
-from scr.Functions import GuiFunctions
+from src.Functions import GuiFunctions
 
 ########################################################################
 ## MAIN WINDOW CLASS
