@@ -2,9 +2,7 @@
 ## QT GUI BY SPINN TV(YOUTUBE)
 ########################################################################
 
-########################################################################
-## IMPORTS
-########################################################################
+
 import os
 import sys
 ########################################################################
@@ -18,6 +16,8 @@ from Custom_Widgets import *
 from Custom_Widgets.QAppSettings import QAppSettings
 ########################################################################
 
+from scr.Functions import GuiFunctions
+
 ########################################################################
 ## MAIN WINDOW CLASS
 ########################################################################
@@ -27,13 +27,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        ########################################################################
-        # APPLY JSON STYLESHEET
-        ########################################################################
-        # self = QMainWindow class
-        # self.ui = Ui_MainWindow / user interface class
-        #Use this if you only have one json file named "style.json" inside the root directory, "json" directory or "jsonstyles" folder.
-        # loadJsonStyle(self, self.ui) 
+ 
 
         # Use this to specify your json file(s) path/name
         loadJsonStyle(self, self.ui, jsonFiles = {
@@ -47,14 +41,15 @@ class MainWindow(QMainWindow):
         #######################################################################
         self.show() 
 
-        ########################################################################
-        # UPDATE APP SETTINGS LOADED FROM JSON STYLESHEET 
-        # ITS IMPORTANT TO RUN THIS AFTER SHOWING THE WINDOW
-        # THIS PROCESS WILL RUN ON A SEPARATE THREAD WHEN GENERATING NEW ICONS
-        # TO PREVENT THE WINDOW FROM BEING UNRESPONSIVE
-        ########################################################################
+
         # self = QMainWindow class
         QAppSettings.updateAppSettings(self)
+        
+        
+        
+        self.app_functions = GuiFunctions(self)
+        
+        
 
 ########################################################################
 ## EXECUTE APP

@@ -17,6 +17,12 @@ class GuiFunctions():
         self.main = MainWindow
         self.ui = MainWindow.ui
     
-    
+        #init Apptheme
+        self.intializeAppTheme()
     #initialize app theme
-    
+    def initializeAppTheme(self):
+        """initialize the application theme from setting"""
+        setting = QSettings()
+        current_theme = setting.value("THEME")
+        print("Current Theme is", current_theme)
+        
