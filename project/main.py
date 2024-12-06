@@ -5,6 +5,7 @@
 
 import os
 import sys
+from PySide6 import *
 ########################################################################
 # IMPORT GUI FILE
 from src.ui_interface import *
