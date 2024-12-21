@@ -19,9 +19,6 @@ from Custom_Widgets.QAppSettings import QAppSettings
 
 from src.Functions import GuiFunctions
 
-########################################################################
-## MAIN WINDOW CLASS
-########################################################################
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         QMainWindow.__init__(self)
