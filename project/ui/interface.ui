@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>804</width>
     <height>471</height>
    </rect>
   </property>
@@ -47,7 +47,7 @@
         <widget class="QWidget" name="widget_5" native="true">
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QPushButton" name="pushButton_2">
+           <widget class="QPushButton" name="Home">
             <property name="text">
              <string>Home</string>
             </property>
@@ -58,9 +58,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_3">
+           <widget class="QPushButton" name="Data">
             <property name="text">
-             <string>data</string>
+             <string>Data</string>
             </property>
             <property name="icon">
              <iconset resource="../Qss/icons/_icons.qrc">
@@ -69,7 +69,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_4">
+           <widget class="QPushButton" name="Reborts">
             <property name="text">
              <string>Reborts</string>
             </property>
@@ -80,7 +80,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_5">
+           <widget class="QPushButton" name="Graphs">
             <property name="text">
              <string>Graphs</string>
             </property>
@@ -110,7 +110,7 @@
         <widget class="QWidget" name="widget_6" native="true">
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="QPushButton" name="pushButton_7">
+           <widget class="QPushButton" name="Setting">
             <property name="text">
              <string>Setting</string>
             </property>
@@ -121,7 +121,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_6">
+           <widget class="QPushButton" name="Information">
             <property name="text">
              <string>Information</string>
             </property>
@@ -132,7 +132,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_8">
+           <widget class="QPushButton" name="Help">
             <property name="text">
              <string>Help</string>
             </property>
@@ -168,7 +168,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_9">
+           <widget class="QPushButton" name="CloseLeftSideBar">
             <property name="text">
              <string/>
             </property>
@@ -184,7 +184,7 @@
        <item>
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="currentIndex">
-          <number>2</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="setting">
           <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -599,6 +599,9 @@
              </property>
              <item>
               <widget class="QStackedWidget" name="stackedWidget_2">
+               <property name="currentIndex">
+                <number>3</number>
+               </property>
                <widget class="QWidget" name="home">
                 <layout class="QVBoxLayout" name="verticalLayout_12">
                  <item>
@@ -695,7 +698,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="pushButton_11">
+                 <widget class="QPushButton" name="CloseRightSideBar">
                   <property name="text">
                    <string/>
                   </property>
@@ -710,6 +713,9 @@
              </item>
              <item>
               <widget class="QStackedWidget" name="stackedWidget_3">
+               <property name="currentIndex">
+                <number>1</number>
+               </property>
                <widget class="QWidget" name="notification_2">
                 <layout class="QVBoxLayout" name="verticalLayout_17">
                  <item>
