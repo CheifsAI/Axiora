@@ -3,7 +3,9 @@ import sys
 from PySide6 import *
 ########################################################################
 # IMPORT GUI FILE
-from src.ui_interface import *
+from src.ui_z import *
+
+
 ########################################################################
 
 ########################################################################
@@ -16,9 +18,13 @@ from src.Functions import GuiFunctions
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
-        QMainWindow.__init__(self)
+        super().__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        # This line should set the central widget correctly
+        self.setCentralWidget(self.ui.centralwidget)  # Add this line
+
 
  
 
@@ -48,7 +54,7 @@ class MainWindow(QMainWindow):
 ## EXECUTE APP
 ########################################################################
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
+    app = QCoreApplication(sys.argv)
     ########################################################################
     ## 
     ########################################################################
