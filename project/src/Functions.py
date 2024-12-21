@@ -1,7 +1,3 @@
-#GUI Functions
-import sys
-sys.path.append(r"C:\Users\hasso\AppData\Local\Programs\Python\Python312\Lib")
-
 from Custom_Widgets import *
 from Custom_Widgets.QAppSettings import QAppSettings
 from Custom_Widgets.QCustomTipOverlay import QCustomTipOverlay
