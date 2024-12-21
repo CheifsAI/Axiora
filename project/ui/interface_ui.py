@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(804, 471)
+        MainWindow.resize(823, 471)
         font = QFont()
         font.setPointSize(10)
         MainWindow.setFont(font)
@@ -51,7 +51,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.addWidget(self.pushButton)
 
 
-        self.verticalLayout.addWidget(self.widget_4, 0, Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
+        self.verticalLayout.addWidget(self.widget_4)
 
         self.widget_5 = QWidget(self.left)
         self.widget_5.setObjectName(u"widget_5")
@@ -90,9 +90,9 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.addWidget(self.Graphs)
 
 
-        self.verticalLayout.addWidget(self.widget_5, 0, Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
+        self.verticalLayout.addWidget(self.widget_5)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout.addItem(self.verticalSpacer)
 
@@ -125,10 +125,10 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.Help)
 
 
-        self.verticalLayout.addWidget(self.widget_6, 0, Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignBottom)
+        self.verticalLayout.addWidget(self.widget_6)
 
 
-        self.horizontalLayout.addWidget(self.left, 0, Qt.AlignmentFlag.AlignLeft)
+        self.horizontalLayout.addWidget(self.left)
 
         self.center = QWidget(self.centralwidget)
         self.center.setObjectName(u"center")
@@ -161,7 +161,7 @@ class Ui_MainWindow(object):
         self.setting.setObjectName(u"setting")
         self.verticalLayout_6 = QVBoxLayout(self.setting)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout_6.addItem(self.verticalSpacer_3)
 
@@ -171,14 +171,12 @@ class Ui_MainWindow(object):
         self.verticalLayout_7.setObjectName(u"verticalLayout_7")
         self.label_2 = QLabel(self.widget_2)
         self.label_2.setObjectName(u"label_2")
-        self.label_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout_7.addWidget(self.label_2)
 
         self.frame = QFrame(self.widget_2)
         self.frame.setObjectName(u"frame")
-        self.frame.setFrameShape(QFrame.Shape.StyledPanel)
-        self.frame.setFrameShadow(QFrame.Shadow.Raised)
+        self.frame.setFrameShape(QFrame.NoFrame)
         self.horizontalLayout_3 = QHBoxLayout(self.frame)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.label_3 = QLabel(self.frame)
@@ -195,9 +193,9 @@ class Ui_MainWindow(object):
         self.verticalLayout_7.addWidget(self.frame)
 
 
-        self.verticalLayout_6.addWidget(self.widget_2, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.verticalLayout_6.addWidget(self.widget_2)
 
-        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.verticalLayout_6.addItem(self.verticalSpacer_2)
 
@@ -208,9 +206,8 @@ class Ui_MainWindow(object):
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
         self.label_4 = QLabel(self.information)
         self.label_4.setObjectName(u"label_4")
-        self.label_4.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.verticalLayout_8.addWidget(self.label_4, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.verticalLayout_8.addWidget(self.label_4)
 
         self.stackedWidget.addWidget(self.information)
         self.help = QWidget()
@@ -219,9 +216,8 @@ class Ui_MainWindow(object):
         self.verticalLayout_9.setObjectName(u"verticalLayout_9")
         self.label_5 = QLabel(self.help)
         self.label_5.setObjectName(u"label_5")
-        self.label_5.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.verticalLayout_9.addWidget(self.label_5, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.verticalLayout_9.addWidget(self.label_5)
 
         self.stackedWidget.addWidget(self.help)
 
@@ -248,13 +244,12 @@ class Ui_MainWindow(object):
         self.label_6 = QLabel(self.hedar)
         self.label_6.setObjectName(u"label_6")
 
-        self.horizontalLayout_7.addWidget(self.label_6, 0, Qt.AlignmentFlag.AlignLeft)
+        self.horizontalLayout_7.addWidget(self.label_6)
 
         self.frame_3 = QFrame(self.hedar)
         self.frame_3.setObjectName(u"frame_3")
         self.frame_3.setMaximumSize(QSize(90, 16777215))
-        self.frame_3.setFrameShape(QFrame.Shape.StyledPanel)
-        self.frame_3.setFrameShadow(QFrame.Shadow.Raised)
+        self.frame_3.setFrameShape(QFrame.NoFrame)
         self.horizontalLayout_6 = QHBoxLayout(self.frame_3)
         self.horizontalLayout_6.setSpacing(5)
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
@@ -290,8 +285,7 @@ class Ui_MainWindow(object):
         self.searching.setObjectName(u"searching")
         self.searching.setMinimumSize(QSize(150, 0))
         self.searching.setMaximumSize(QSize(150, 16777215))
-        self.searching.setFrameShape(QFrame.Shape.StyledPanel)
-        self.searching.setFrameShadow(QFrame.Shadow.Raised)
+        self.searching.setFrameShape(QFrame.NoFrame)
         self.horizontalLayout_8 = QHBoxLayout(self.searching)
         self.horizontalLayout_8.setSpacing(0)
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
@@ -302,7 +296,6 @@ class Ui_MainWindow(object):
         self.label_8.setMaximumSize(QSize(16, 16))
         self.label_8.setPixmap(QPixmap(u":/feather/icons/feather/search.png"))
         self.label_8.setScaledContents(True)
-        self.label_8.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.horizontalLayout_8.addWidget(self.label_8)
 
@@ -325,8 +318,7 @@ class Ui_MainWindow(object):
         self.frame_4 = QFrame(self.hedar)
         self.frame_4.setObjectName(u"frame_4")
         self.frame_4.setMinimumSize(QSize(90, 0))
-        self.frame_4.setFrameShape(QFrame.Shape.StyledPanel)
-        self.frame_4.setFrameShadow(QFrame.Shadow.Raised)
+        self.frame_4.setFrameShape(QFrame.NoFrame)
         self.horizontalLayout_9 = QHBoxLayout(self.frame_4)
         self.horizontalLayout_9.setSpacing(0)
         self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
@@ -337,7 +329,7 @@ class Ui_MainWindow(object):
         icon12.addFile(u":/feather/icons/feather/window_minimize.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.minimize.setIcon(icon12)
 
-        self.horizontalLayout_9.addWidget(self.minimize, 0, Qt.AlignmentFlag.AlignLeft)
+        self.horizontalLayout_9.addWidget(self.minimize)
 
         self.restore = QPushButton(self.frame_4)
         self.restore.setObjectName(u"restore")
@@ -356,10 +348,10 @@ class Ui_MainWindow(object):
         self.horizontalLayout_9.addWidget(self.close)
 
 
-        self.horizontalLayout_7.addWidget(self.frame_4, 0, Qt.AlignmentFlag.AlignLeft)
+        self.horizontalLayout_7.addWidget(self.frame_4)
 
 
-        self.verticalLayout_10.addWidget(self.hedar, 0, Qt.AlignmentFlag.AlignTop)
+        self.verticalLayout_10.addWidget(self.hedar)
 
         self.maincontent = QWidget(self.main)
         self.maincontent.setObjectName(u"maincontent")
@@ -386,7 +378,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_12.setObjectName(u"verticalLayout_12")
         self.label_9 = QLabel(self.home)
         self.label_9.setObjectName(u"label_9")
-        self.label_9.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout_12.addWidget(self.label_9)
 
@@ -397,7 +388,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_13.setObjectName(u"verticalLayout_13")
         self.label_10 = QLabel(self.data)
         self.label_10.setObjectName(u"label_10")
-        self.label_10.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout_13.addWidget(self.label_10)
 
@@ -408,7 +398,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_14.setObjectName(u"verticalLayout_14")
         self.label_11 = QLabel(self.report)
         self.label_11.setObjectName(u"label_11")
-        self.label_11.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout_14.addWidget(self.label_11)
 
@@ -419,7 +408,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_15.setObjectName(u"verticalLayout_15")
         self.label_12 = QLabel(self.graphs)
         self.label_12.setObjectName(u"label_12")
-        self.label_12.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout_15.addWidget(self.label_12)
 
@@ -463,7 +451,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_17.setObjectName(u"verticalLayout_17")
         self.label_14 = QLabel(self.notification_2)
         self.label_14.setObjectName(u"label_14")
-        self.label_14.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout_17.addWidget(self.label_14)
 
@@ -474,7 +461,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_18.setObjectName(u"verticalLayout_18")
         self.label_15 = QLabel(self.more_2)
         self.label_15.setObjectName(u"label_15")
-        self.label_15.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout_18.addWidget(self.label_15)
 
@@ -485,7 +471,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_19.setObjectName(u"verticalLayout_19")
         self.label_16 = QLabel(self.profile)
         self.label_16.setObjectName(u"label_16")
-        self.label_16.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout_19.addWidget(self.label_16)
 
@@ -507,8 +492,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.setContentsMargins(5, 5, 5, 5)
         self.frame_2 = QFrame(self.footer)
         self.frame_2.setObjectName(u"frame_2")
-        self.frame_2.setFrameShape(QFrame.Shape.StyledPanel)
-        self.frame_2.setFrameShadow(QFrame.Shadow.Raised)
+        self.frame_2.setFrameShape(QFrame.NoFrame)
         self.horizontalLayout_5 = QHBoxLayout(self.frame_2)
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.label_7 = QLabel(self.frame_2)
@@ -523,7 +507,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.addWidget(self.progressBar)
 
 
-        self.horizontalLayout_4.addWidget(self.frame_2, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
+        self.horizontalLayout_4.addWidget(self.frame_2)
 
         self.size = QFrame(self.footer)
         self.size.setObjectName(u"size")
@@ -533,13 +517,12 @@ class Ui_MainWindow(object):
         sizePolicy2.setHeightForWidth(self.size.sizePolicy().hasHeightForWidth())
         self.size.setSizePolicy(sizePolicy2)
         self.size.setMinimumSize(QSize(15, 15))
-        self.size.setFrameShape(QFrame.Shape.StyledPanel)
-        self.size.setFrameShadow(QFrame.Shadow.Raised)
+        self.size.setFrameShape(QFrame.NoFrame)
 
-        self.horizontalLayout_4.addWidget(self.size, 0, Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignBottom)
+        self.horizontalLayout_4.addWidget(self.size)
 
 
-        self.verticalLayout_10.addWidget(self.footer, 0, Qt.AlignmentFlag.AlignBottom)
+        self.verticalLayout_10.addWidget(self.footer)
 
 
         self.horizontalLayout.addWidget(self.main)
@@ -591,6 +574,6 @@ class Ui_MainWindow(object):
         self.label_14.setText(QCoreApplication.translate("MainWindow", u"Notifications", None))
         self.label_15.setText(QCoreApplication.translate("MainWindow", u"More", None))
         self.label_16.setText(QCoreApplication.translate("MainWindow", u"Profile", None))
-        self.label_7.setText(QCoreApplication.translate("MainWindow", u"Progress", None))
+        self.label_7.setText(QCoreApplication.translate("MainWindow", u"xxxxxx", None))
     # retranslateUi
 
