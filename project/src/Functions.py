@@ -3,7 +3,7 @@
 from Custom_Widgets import *
 from Custom_Widgets.QAppSettings import QAppSettings
 from Custom_Widgets.QCustomTipOverlay import QCustomTipOverlay
-from Custom_Widgets.QCustomLoadingIndicators import QCustomLoadingIndicators
+#from Custom_Widgets.QCustomLoadingIndicators import QCustomLoadingIndicators
 
 
 from Pyside6.QtCore import QSettings, QTimer
