@@ -567,13 +567,13 @@ class Ui_MainWindow(object):
         self.close.setText("")
         self.label_9.setText(QCoreApplication.translate("MainWindow", u"Home", None))
         self.label_10.setText(QCoreApplication.translate("MainWindow", u"Data", None))
-        self.label_11.setText(QCoreApplication.translate("MainWindow", u"Rebort", None))
+        self.label_11.setText(QCoreApplication.translate("MainWindow", u"Report", None))
         self.label_12.setText(QCoreApplication.translate("MainWindow", u"Graphs", None))
         self.label_13.setText(QCoreApplication.translate("MainWindow", u"Right Menu", None))
         self.CloseRightSideBar.setText("")
         self.label_14.setText(QCoreApplication.translate("MainWindow", u"Notifications", None))
         self.label_15.setText(QCoreApplication.translate("MainWindow", u"More", None))
         self.label_16.setText(QCoreApplication.translate("MainWindow", u"Profile", None))
-        self.label_7.setText(QCoreApplication.translate("MainWindow", u"xxxxxx", None))
+        self.label_7.setText(QCoreApplication.translate("MainWindow", u"progress", None))
     # retranslateUi
 
