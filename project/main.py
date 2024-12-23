@@ -1,19 +1,9 @@
-import os
+
 import sys
-from PySide6 import *
-########################################################################
-# IMPORT GUI FILE
-from src.ui_z import *
-
-
-########################################################################
-
-########################################################################
-# IMPORT Custom widgets
+from PySide6.QtWidgets import QApplication, QMainWindow
+from src.design_ui import Ui_MainWindow  # Assuming this is the UI from Qt Designer
 from Custom_Widgets import *
 from Custom_Widgets.QAppSettings import QAppSettings
-########################################################################
-
 from src.Functions import GuiFunctions
 
 class MainWindow(QMainWindow):
@@ -21,46 +11,31 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-
-        # This line should set the central widget correctly
-        self.setCentralWidget(self.ui.centralwidget)  # Add this line
-
-
- 
-
-        # Use this to specify your json file(s) path/name
-        loadJsonStyle(self, self.ui, jsonFiles = {
-            "json-styles/style.json"
-            }) 
-
-        ########################################################################
-
-        #######################################################################
-        # SHOW WINDOW
-        #######################################################################
-        self.show() 
-
-
-        # self = QMainWindow class
+        
+        # Set the central widget
+        self.setCentralWidget(self.ui.centralwidget)
+        
+        # Load JSON style
+        loadJsonStyle(self, self.ui, jsonFiles={"json-styles/style.json"})
+        
+        # Show the window
+        self.show()
+        
+        # Update app settings
         QAppSettings.updateAppSettings(self)
         
-        
-        
+        # Set up custom functions
         self.app_functions = GuiFunctions(self)
-        
-        
 
-########################################################################
-## EXECUTE APP
-########################################################################
+# Main execution
 if __name__ == "__main__":
-    app = QCoreApplication(sys.argv)
-    ########################################################################
-    ## 
-    ########################################################################
+    # Make sure QApplication is initialized before any UI elements are created
+    app = QApplication(sys.argv)  # This must come first!
+    
+    # Now create and show the main window
     window = MainWindow()
     window.show()
-    sys.exit(app.exec_())
-########################################################################
-## END===>
-########################################################################  
+    
+    # Start the event loop
+    sys.exit(app.exec())
+# End of file
