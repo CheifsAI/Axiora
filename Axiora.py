@@ -1,4 +1,3 @@
-
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow
 from src.design_ui import Ui_MainWindow  # Assuming this is the UI from Qt Designer
