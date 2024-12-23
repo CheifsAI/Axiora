@@ -574,6 +574,6 @@ class Ui_MainWindow(object):
         self.label_14.setText(QCoreApplication.translate("MainWindow", u"Notifications", None))
         self.label_15.setText(QCoreApplication.translate("MainWindow", u"More", None))
         self.label_16.setText(QCoreApplication.translate("MainWindow", u"Profile", None))
-        self.label_7.setText(QCoreApplication.translate("MainWindow", u"progress", None))
+        self.label_7.setText(QCoreApplication.translate("MainWindow", u"Progress", None))
     # retranslateUi
 
