@@ -73,13 +73,13 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_3.addWidget(self.Data)
 
-        self.Reborts = QPushButton(self.widget_5)
-        self.Reborts.setObjectName(u"Reborts")
+        self.Reports = QPushButton(self.widget_5)
+        self.Reports.setObjectName(u"Reports")
         icon3 = QIcon()
         icon3.addFile(u":/feather/icons/feather/printer.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.Reborts.setIcon(icon3)
+        self.Reports.setIcon(icon3)
 
-        self.verticalLayout_3.addWidget(self.Reborts)
+        self.verticalLayout_3.addWidget(self.Reports)
 
         self.Graphs = QPushButton(self.widget_5)
         self.Graphs.setObjectName(u"Graphs")
@@ -544,7 +544,7 @@ class Ui_MainWindow(object):
         self.pushButton.setText("")
         self.Home.setText(QCoreApplication.translate("MainWindow", u"Home", None))
         self.Data.setText(QCoreApplication.translate("MainWindow", u"Data", None))
-        self.Reborts.setText(QCoreApplication.translate("MainWindow", u"Reborts", None))
+        self.Reports.setText(QCoreApplication.translate("MainWindow", u"Reports", None))
         self.Graphs.setText(QCoreApplication.translate("MainWindow", u"Graphs", None))
         self.Setting.setText(QCoreApplication.translate("MainWindow", u"Setting", None))
         self.Information.setText(QCoreApplication.translate("MainWindow", u"Information", None))
