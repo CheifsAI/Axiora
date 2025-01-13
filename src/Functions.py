@@ -17,10 +17,26 @@ class GuiFunctions():
     
         #init Apptheme
         self.initializeAppTheme()
+        
     #initialize app theme
     def initializeAppTheme(self):
         """initialize the application theme from setting"""
         setting = QSettings()
         current_theme = setting.value("THEME")
-        print("Current Theme is", current_theme)
+        # print("Current theme is", current_theme)
+        
+        # Add theme to the theme list
+        self.populateThemeList(current_theme)
+
+    def populateThemeList(self, current_theme):
+            """Populate the list from available app themes"""
+            theme_count = -1  # Initialize the theme counter
+            for theme in self.ui.themes:
+                self.ui.comboBox.addItem(theme.name, theme.name)
+                
+                # Check default theme/current theme
+                if theme.defaultTheme or theme.name == current_theme:
+                    self.ui.comboBox.setCurrentIndex(theme_count)  # Select the theme
+
+
         
