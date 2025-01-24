@@ -45,7 +45,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.pushButton = QPushButton(self.widget_4)
         self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.clicked.connect(csvpd)
         icon = QIcon()
         icon.addFile(u":/feather/icons/feather/align-justify.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.pushButton.setIcon(icon)
@@ -72,6 +71,13 @@ class Ui_MainWindow(object):
         icon2 = QIcon()
         icon2.addFile(u":/feather/icons/feather/list.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.Data.setIcon(icon2)
+        self.pushButton.clicked.connect(self.DataPushHandler)
+    def DataPushHandler(self):
+        self.openDialogBox()
+    def openDialogBox(self):
+        filename = QFileDialog.getOpenFileName()
+        path = filename[0]
+        print(path)
 
         self.verticalLayout_3.addWidget(self.Data)
 
