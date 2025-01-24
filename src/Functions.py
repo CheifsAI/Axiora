@@ -36,7 +36,4 @@ class GuiFunctions():
                 
                 # Check default theme/current theme
                 if theme.defaultTheme or theme.name == current_theme:
-                    self.ui.comboBox.setCurrentIndex(theme_count)  # Select the theme
-
-
-        
+                    self.ui.comboBox.setCurrentIndex(theme_count)  # Select the theme        

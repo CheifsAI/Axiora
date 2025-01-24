@@ -18,7 +18,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QHBoxLayout,
     QLabel, QLineEdit, QMainWindow, QProgressBar,
     QPushButton, QSizePolicy, QSpacerItem, QStackedWidget,
-    QVBoxLayout, QWidget)
+    QVBoxLayout, QWidget) 
+from OprFuncs import csvpd
 #import _icons_rc
 
 class Ui_MainWindow(object):
@@ -44,6 +45,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.pushButton = QPushButton(self.widget_4)
         self.pushButton.setObjectName(u"pushButton")
+        self.pushButton.clicked.connect(csvpd)
         icon = QIcon()
         icon.addFile(u":/feather/icons/feather/align-justify.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.pushButton.setIcon(icon)
