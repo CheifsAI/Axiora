@@ -10,7 +10,7 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        
+
         # Set the central widget
         self.setCentralWidget(self.ui.centralwidget)
         

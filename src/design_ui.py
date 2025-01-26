@@ -71,13 +71,6 @@ class Ui_MainWindow(object):
         icon2 = QIcon()
         icon2.addFile(u":/feather/icons/feather/list.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.Data.setIcon(icon2)
-        self.pushButton.clicked.connect(self.DataPushHandler)
-    def DataPushHandler(self):
-        self.openDialogBox()
-    def openDialogBox(self):
-        filename = QFileDialog.getOpenFileName()
-        path = filename[0]
-        print(path)
 
         self.verticalLayout_3.addWidget(self.Data)
 
