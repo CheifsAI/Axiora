@@ -1,0 +1,247 @@
+QWidget {
+    border-radius: 10px;
+    background-color: #FFFFFF;
+}
+
+AnalyticsDashoard {
+    background-color: #F5F5F5;
+}
+
+SidePanel {
+    min-width: 246px;
+    max-width: 246px;
+    background-color: #FFFFFF;
+    padding-top: 43px;
+    padding-left: 20px;
+    /* padding-right: 38px; */
+}
+
+SidePanel QLabel#tesla_label {
+    min-width: 140px;
+    max-width: 140px;
+    min-height: 17px;
+    max-height: 17px;
+    padding-left: 20px;
+}
+
+SidePanel QLabel#tesla_label:hover {
+    background-color: #F5F5F5;
+}
+
+SidePanelButton {
+    min-width: 193px;
+    max-width: 193px;
+    min-height: 46px;
+    max-height: 46px;
+    color: #FFFFFF;
+}
+
+SidePanelButton QLabel {
+    background-color: transparent;
+    color: #1B59F8;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+SidePanelButton QLabel#icon {
+    min-width: 24px;
+    max-width: 24px;
+    min-height: 24px;
+    max-height: 24px;
+}
+
+SidePanelButton QLabel#selected {
+    color: #1B59F8;
+}
+
+SidePanelButton QLabel#non_selected {
+    color: #4c4c4c;
+}
+
+SidePanelButton:pressed {
+    background-color: rgba(27, 90, 248, 0.4);
+    color: #1B59F8;
+}
+
+SidePanelButton:checked {
+    background-color: rgba(27, 90, 248, 0.1);
+    color: #1B59F8;
+}
+
+SidePanel QLabel#supported {
+    color: #4c4c4c;
+    font-size: 18px;
+    font-weight: bold;
+    padding-left: 20px;
+}
+
+Body {
+    background-color: #F5F5F5;
+    color: #000000;
+    border-radius: 30px;
+    margin-top: 10px;
+    margin-left: 34px;
+    margin-right: 54px;
+}
+
+Body QLabel#reports {
+    background-color: transparent;
+    color: #000000;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+Body QLabel#download_pixmap,
+Body QLabel#download {
+    background-color: transparent;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+Body HLine {
+    background-color: #4c4c4c98;
+    max-height: 1px;
+}
+
+BodyContentFrame,
+BodyContentFrame QFrame#frame {
+    background-color: transparent;
+    /* background-color: pink; */
+}
+
+DropdownButton {
+    min-height: 49px;
+    border-radius: 15px;
+}
+
+DropdownButton:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+DropdownButton:pressed {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+DropdownButton QLabel {
+    font-size: 16px;
+    background-color: transparent;
+}
+
+TimeFrameDialog QLabel#label,
+PeopleFrameDialog QLabel#label,
+DropdownButton QLabel#label {
+    max-width: 78px;
+    font-size: 16px;
+}
+
+TimeFrameDialog QLabel#text,
+PeopleFrameDialog QLabel#text,
+DropdownButton QLabel#text {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+DropdownDialog {
+    border-radius: 15px;
+}
+
+DropdownDialog QWidget#widget {
+    background-color: white;
+    border-radius: 15px;
+
+}
+
+DropdownDialog HLine {
+    background-color: #4c4c4c98;
+    max-height: 1px;
+}
+
+TimeFrameDialog QPushButton {
+    min-height: 38px;
+    font-size: 16px;
+    text-align: left;
+    padding-left: 15px;
+}
+
+TimeFrameDialog QPushButton:hover,
+TimeFrameDialog QPushButton:checked {
+    background-color: #F2F7FF;
+    font-weight: 700;
+}
+
+PeopleFrameDialog QPushButton#clear {
+    padding: 5px;
+}
+
+PeopleFrameDialog QPushButton#clear:hover,
+PeopleFrameDialog QPushButton#clear:pressed {
+    background-color: #F0F0F0;
+}
+
+PeopleFrameDialog ItemButton {
+    padding: 2px;
+    background-color: #F0F0F0;
+    min-height: 30px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+PeopleFrameDialog QLineEdit {
+    padding: 5px;
+    border: none;
+    border-radius: 0px;
+    border-bottom: 1px solid #000000;
+    font-size: 16px;
+}
+
+PeopleFrameDialog QGroupBox {
+    padding-top: 20px;
+    font-size: 16px;
+}
+
+PeopleFrameDialog QGroupBox:title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 3px;
+    color: #9098A3;
+    font-size: 14px;
+}
+
+PeopleFrameDialog QRadioButton {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+PeopleFrameDialog QRadioButton::indicator {
+    width: 20px;
+    height: 20px;
+}
+
+PeopleFrameDialog QRadioButton::indicator::unchecked {
+    image: url(./svgs/radio_button_unchecked.svg);
+}
+
+PeopleFrameDialog QRadioButton::indicator::checked {
+    image: url(./svgs/radio_button_checked.svg);
+}
+
+SmallCard {
+    min-height: 152.4px;
+    max-height: 152.4px;
+}
+
+SmallCard QLabel#title {
+    font-size: 14px;
+}
+
+SmallCard QLabel#value {
+    font-size: 26px;
+    font-weight: bold;
+}
+
+ActivityCard {
+    min-width: 556px;
+    max-width: 556px;
+    min-height: 322px;
+    max-height: 322px;
+}
