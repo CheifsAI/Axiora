@@ -1,7 +1,11 @@
+# Ignore any folder named logs
+logs/
+
+# Ignore any folder named __pycache__
+__pycache__/
+
+# Ignore any file with .pyc extension
 *.pyc
-**/__pycache__
-**/logs
+
+# Ignore any file with .log extension
 *.log
-/logs
-**/logs/
-logs/custom_widgets.log
