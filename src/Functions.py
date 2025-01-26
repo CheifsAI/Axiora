@@ -41,6 +41,6 @@ class GuiFunctions():
     def setup_connections(self):
          self.main_window.ui.Data.clicked.connect(self.handle_data_button)
     def handle_data_button(self):
-         fname, _ = QFileDialog.getOpenFileName(self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)") # Second parameter is default location
-         if fname:
-            print(fname)
+         fpath, _ = QFileDialog.getOpenFileName(self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)") # Second parameter is default location
+         if fpath:
+            return fpath
