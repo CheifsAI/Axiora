@@ -27,8 +27,8 @@ class AnalyticsDashoard(QFrame):
     #     print(QCursor.pos())
     #     return super().event(event)
 
-    def mousePressEvent(self, event: QMouseEvent) -> None:
-        return QApplication.instance().quit()
+    #def mousePressEvent(self, event: QMouseEvent) -> None:
+     #   return QApplication.instance().quit()
 
     def showEvent(self, event: QShowEvent) -> None:
         return super().showEvent(event)

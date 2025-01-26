@@ -17,7 +17,7 @@ CODING_WIDTH = 1540
 CODING_HEIGHT = 900
 
 STYLE_QSS = ""
-STYLE_QSS = open("style.qss").read()
+STYLE_QSS = open("UI2/style.qss").read()
 
 
 def scale_width(width: int):
