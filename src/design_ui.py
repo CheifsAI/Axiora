@@ -219,7 +219,6 @@ class Ui_MainWindow(object):
         self.label_5.setObjectName(u"label_5")
 
         self.verticalLayout_9.addWidget(self.label_5)
-
         self.stackedWidget.addWidget(self.ModelsWidget)
 
         self.verticalLayout_5.addWidget(self.stackedWidget)
