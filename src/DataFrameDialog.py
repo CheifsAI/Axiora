@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton, QHBoxLayout
 import pandas as pd
-#from Models import llama3b
+from Models import llama3b
 from Main import drop_nulls,analysis_data
 class DataFrameDialog(QDialog):
     def __init__(self, df, parent=None):
@@ -8,7 +8,7 @@ class DataFrameDialog(QDialog):
         self.df = df  # Store the DataFrame
         self.setWindowTitle("DataFrame Viewer")
         self.setGeometry(100, 100, 600, 400)
-        
+        self.model = llama3b
         # Create layout
         layout = QVBoxLayout()
         
@@ -33,7 +33,7 @@ class DataFrameDialog(QDialog):
         self.summarize_button = QPushButton("Summarize")
         #self.summarize_button.clicked.connect(self.analysis_data(df,model))
         self.clean_button = QPushButton("Clean Data")
-        #self.clean_button.clicked.connect(self.drop_nulls(df,model))
+        self.clean_button.clicked.connect(self.drop_nulls_handler)
 
         button_layout.addWidget(self.summarize_button)
         button_layout.addWidget(self.clean_button)        
@@ -50,3 +50,8 @@ class DataFrameDialog(QDialog):
         self.summary_dialog = DataFrameDialog(summary, self)
         self.summary_dialog.setWindowTitle("Data Summary")
         self.summary_dialog.show()
+    def drop_nulls_handler(self):
+        result = drop_nulls(self.df,self.model)
+        self.cleaned_dialog = DataFrameDialog(result, self)
+        self.cleaned_dialog.setWindowTitle("Data Cleaned")
+        self.cleaned_dialog.show()

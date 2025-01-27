@@ -40,7 +40,7 @@ def drop_nulls(dataframe, llm):
     # Prompt and Chain for dropping nulls
     drop_nulls_prompt = '''
     create a code to drop the nulls from the DataFrame named 'df',
-    only include the dropping part,
+    only include the dropping part and importing pandas,
     insure that inplace = True, no extra context or reading the file.
     '''
     # Define the prompt template
