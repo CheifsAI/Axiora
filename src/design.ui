@@ -132,9 +132,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="Help">
+           <widget class="QPushButton" name="Models">
             <property name="text">
-             <string>Help</string>
+             <string>Models</string>
             </property>
             <property name="icon">
              <iconset resource="../Qss/icons/_icons.qrc">

@@ -117,13 +117,13 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.Information)
 
-        self.Help = QPushButton(self.widget_6)
-        self.Help.setObjectName(u"Help")
+        self.Models = QPushButton(self.widget_6)
+        self.Models.setObjectName(u"Models")
         icon7 = QIcon()
         icon7.addFile(u":/feather/icons/feather/help-circle.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.Help.setIcon(icon7)
+        self.Models.setIcon(icon7)
 
-        self.verticalLayout_2.addWidget(self.Help)
+        self.verticalLayout_2.addWidget(self.Models)
 
 
         self.verticalLayout.addWidget(self.widget_6)
@@ -211,16 +211,16 @@ class Ui_MainWindow(object):
         self.verticalLayout_8.addWidget(self.label_4)
 
         self.stackedWidget.addWidget(self.information)
-        self.help = QWidget()
-        self.help.setObjectName(u"help")
-        self.verticalLayout_9 = QVBoxLayout(self.help)
+        self.ModelsWidget = QWidget()
+        self.ModelsWidget.setObjectName(u"ModelsWidget")
+        self.verticalLayout_9 = QVBoxLayout(self.ModelsWidget)
         self.verticalLayout_9.setObjectName(u"verticalLayout_9")
-        self.label_5 = QLabel(self.help)
+        self.label_5 = QLabel(self.ModelsWidget)
         self.label_5.setObjectName(u"label_5")
 
         self.verticalLayout_9.addWidget(self.label_5)
 
-        self.stackedWidget.addWidget(self.help)
+        self.stackedWidget.addWidget(self.ModelsWidget)
 
         self.verticalLayout_5.addWidget(self.stackedWidget)
 
@@ -549,13 +549,13 @@ class Ui_MainWindow(object):
         self.Graphs.setText(QCoreApplication.translate("MainWindow", u"Graphs", None))
         self.Setting.setText(QCoreApplication.translate("MainWindow", u"Setting", None))
         self.Information.setText(QCoreApplication.translate("MainWindow", u"Information", None))
-        self.Help.setText(QCoreApplication.translate("MainWindow", u"Help", None))
+        self.Models.setText(QCoreApplication.translate("MainWindow", u"Models", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Center Menu", None))
         self.CloseLeftSideBar.setText("")
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Setting", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"Themes", None))
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"Information", None))
-        self.label_5.setText(QCoreApplication.translate("MainWindow", u"Help", None))
+        self.label_5.setText(QCoreApplication.translate("MainWindow", u"Models", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"Axiora", None))
         self.notification.setText("")
         self.more.setText("")
