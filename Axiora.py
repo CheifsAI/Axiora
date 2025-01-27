@@ -4,14 +4,14 @@ from src.design_ui import Ui_MainWindow  # Assuming this is the UI from Qt Desig
 from Custom_Widgets import *
 from Custom_Widgets.QAppSettings import QAppSettings
 from src.Functions import GuiFunctions
-
+from Models import llama3b
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-
+        self.model = llama3b
         # Set the central widget
         self.setCentralWidget(self.ui.centralwidget)
         
