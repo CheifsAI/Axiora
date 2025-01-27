@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton, QHBoxLayout
 import pandas as pd
-from Models import llama3b
-from Main import drop_nulls
+#from Models import llama3b
+from Main import drop_nulls,analysis_data
 class DataFrameDialog(QDialog):
     def __init__(self, df, parent=None):
         super().__init__(parent)
@@ -25,15 +25,21 @@ class DataFrameDialog(QDialog):
         
         # Add the table to the layout
         layout.addWidget(self.table)
+
+
+        button_layout = QHBoxLayout()
         
         # Create a "Summarize" button
         self.summarize_button = QPushButton("Summarize")
-        self.summarize_button.clicked.connect(self.summarize_data)
+        #self.summarize_button.clicked.connect(self.analysis_data(df,model))
         self.clean_button = QPushButton("Clean Data")
-      #  self.clean_button.clicked.connect(self.)
-        layout.addWidget(self.summarize_button)
-        
-        # Set the layout for the dialog
+        #self.clean_button.clicked.connect(self.drop_nulls(df,model))
+
+        button_layout.addWidget(self.summarize_button)
+        button_layout.addWidget(self.clean_button)        
+
+        layout.addLayout(button_layout)
+
         self.setLayout(layout)
     
     def summarize_data(self):
