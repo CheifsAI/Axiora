@@ -1,14 +1,15 @@
 from Custom_Widgets import *
 from Custom_Widgets.QAppSettings import QAppSettings
 from Custom_Widgets.QCustomTipOverlay import QCustomTipOverlay
-#from Custom_Widgets.QCustomLoadingIndicators import QCustomLoadingIndicators
-
 from PySide6.QtCore import QSettings, QTimer
 from PySide6.QtGui import QColor, QFont, QFontDatabase
 from PySide6.QtWidgets import QGraphicsDropShadowEffect
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QPushButton, QLabel
 from PyQt5 import uic
+from OprFuncs import csvpd
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton
+from src.DataFrameDialog import DataFrameDialog
 
 
 class GuiFunctions():
@@ -43,4 +44,8 @@ class GuiFunctions():
     def handle_data_button(self):
          fpath, _ = QFileDialog.getOpenFileName(self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)") # Second parameter is default location
          if fpath:
-            return fpath
+            df = csvpd(fpath)
+        
+        # Open a new window to display the DataFrame
+            self.data_frame_dialog = DataFrameDialog(df, self.main_window)
+            self.data_frame_dialog.show()

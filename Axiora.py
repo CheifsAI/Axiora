@@ -5,6 +5,7 @@ from Custom_Widgets import *
 from Custom_Widgets.QAppSettings import QAppSettings
 from src.Functions import GuiFunctions
 
+
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
