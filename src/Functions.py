@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QGraphicsDropShadowEffect
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QPushButton, QLabel
 from PyQt5 import uic
-from OprFuncs import csvpd
+from OprFuncs import read_file
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton
 from src.DataFrameDialog import DataFrameDialog
 
@@ -44,7 +44,7 @@ class GuiFunctions():
     def handle_data_button(self):
          fpath, _ = QFileDialog.getOpenFileName(self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)") # Second parameter is default location
          if fpath:
-            df = csvpd(fpath)
+            df = read_file(fpath)
         
         # Open a new window to display the DataFrame
             self.data_frame_dialog = DataFrameDialog(df, self.main_window)
