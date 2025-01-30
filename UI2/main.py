@@ -1,5 +1,5 @@
 from main_page import *
-#from Functions2 import GuiFunctions
+from FunctionsAB import GuiFunctions
 
 class Application(QApplication):
     def __init__(self) -> None:
@@ -11,7 +11,7 @@ class Application(QApplication):
 
         self.setStyleSheet(STYLE_QSS)
 
- #       self.app_functions = GuiFunctions(self)
+        self.app_functions = GuiFunctions(self.win)
 
 app = Application()
 

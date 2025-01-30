@@ -1,6 +1,7 @@
 from buttons import *
 from cards import *
-
+#from src.Functions import DataFrameDialog
+#from OprFuncs import read_file
 
 class SidePanel(Card):
     def __init__(self):
@@ -27,11 +28,11 @@ class SidePanel(Card):
         )
         main_lay.addWidget(reports_button)
 
-        library_button = SidePanelButton(
+        self.library_button = SidePanelButton(
             "./svgs/library.svg",
             "library",
         )
-        main_lay.addWidget(library_button)
+        main_lay.addWidget(self.library_button)
 
         people_button = SidePanelButton(
             "./svgs/people.svg",
