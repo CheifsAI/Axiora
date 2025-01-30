@@ -27,7 +27,7 @@ def analysis_data(dataframe,llm):
     
 
     # Run the analysis chain on the provided data
-    analysis = analysis_chain.invoke(data_info=data_info)
+    analysis = analysis_chain.run(data_info=data_info)
     
     #print analysis
     return("Analysis Data:\n", analysis)

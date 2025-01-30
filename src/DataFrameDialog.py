@@ -46,6 +46,9 @@ class DataFrameDialog(QDialog):
         data_summary = analysis_data(self.df,self.model)
         if hasattr(self.parent(), "summary_label"):
             self.parent().summary_label.setText(data_summary)
+            print(data_summary)
+        else :
+            print("fuck you")
 
         # Close the current dialog
         self.close()
