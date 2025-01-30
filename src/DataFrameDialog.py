@@ -31,7 +31,7 @@ class DataFrameDialog(QDialog):
         
         # Create a "Summarize" button
         self.summarize_button = QPushButton("Summarize")
-        #self.summarize_button.clicked.connect(self.analysis_data(df,model))
+        self.summarize_button.clicked.connect(self.summarize_data_handler)
         self.clean_button = QPushButton("Clean Data")
         self.clean_button.clicked.connect(self.drop_nulls_handler)
 
@@ -42,6 +42,21 @@ class DataFrameDialog(QDialog):
 
         self.setLayout(layout)
     
+    def summarize_data_handler(self):
+        data_summary = analysis_data(self.df,self.model)
+        if hasattr(self.parent(), "summary_label"):
+            self.parent().summary_label.setText(data_summary)
+
+        # Close the current dialog
+        self.close()
+
+    def drop_nulls_handler(self):
+        result = drop_nulls(self.df,self.model)
+        self.cleaned_dialog = DataFrameDialog(result, self)
+        self.cleaned_dialog.setWindowTitle("Data Cleaned")
+        self.cleaned_dialog.show()
+
+
     def summarize_data(self):
         # Perform summarization (e.g., calculate mean, max, min, etc.)
         summary = self.df.describe()
@@ -50,8 +65,3 @@ class DataFrameDialog(QDialog):
         self.summary_dialog = DataFrameDialog(summary, self)
         self.summary_dialog.setWindowTitle("Data Summary")
         self.summary_dialog.show()
-    def drop_nulls_handler(self):
-        result = drop_nulls(self.df,self.model)
-        self.cleaned_dialog = DataFrameDialog(result, self)
-        self.cleaned_dialog.setWindowTitle("Data Cleaned")
-        self.cleaned_dialog.show()
