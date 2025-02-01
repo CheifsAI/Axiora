@@ -874,7 +874,7 @@ Button */
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="btn_widgets">
+                 <widget class="QPushButton" name="btn_data">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1871,7 +1871,7 @@ background-position: center;
 background-repeat: no-repeat;</string>
                       </property>
                      </widget>
-                     <widget class="QWidget" name="widgets">
+                     <widget class="QWidget" name="data_page">
                       <property name="styleSheet">
                        <string notr="true">b</string>
                       </property>
@@ -1892,7 +1892,7 @@ background-repeat: no-repeat;</string>
                         <number>10</number>
                        </property>
                        <item>
-                        <widget class="QFrame" name="row_1">
+                        <widget class="QFrame" name="import_data_row1">
                          <property name="frameShape">
                           <enum>QFrame::Shape::StyledPanel</enum>
                          </property>
@@ -1980,7 +1980,7 @@ background-repeat: no-repeat;</string>
                                    <string notr="true"/>
                                   </property>
                                   <property name="text">
-                                   <string>FILE BOX</string>
+                                   <string>Import Data</string>
                                   </property>
                                  </widget>
                                 </item>
@@ -2052,7 +2052,7 @@ background-repeat: no-repeat;</string>
                                    </widget>
                                   </item>
                                   <item row="1" column="0" colspan="2">
-                                   <widget class="QLabel" name="labelVersion_3">
+                                   <widget class="QLabel" name="import_data_dialog">
                                     <property name="styleSheet">
                                      <string notr="true">color: rgb(113, 126, 149);</string>
                                     </property>
@@ -2291,7 +2291,7 @@ background-repeat: no-repeat;</string>
                          </layout>
                         </widget>
                        </item>
-                       <item>
+                       <item alignment="Qt::AlignmentFlag::AlignBottom">
                         <widget class="QFrame" name="row_3">
                          <property name="minimumSize">
                           <size>
@@ -2322,7 +2322,7 @@ background-repeat: no-repeat;</string>
                            <number>0</number>
                           </property>
                           <item>
-                           <widget class="QTableWidget" name="tableWidget">
+                           <widget class="QTableWidget" name="tableData">
                             <property name="sizePolicy">
                              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                               <horstretch>0</horstretch>
@@ -2579,131 +2579,6 @@ background-repeat: no-repeat;</string>
                             <attribute name="verticalHeaderStretchLastSection">
                              <bool>true</bool>
                             </attribute>
-                            <row>
-                             <property name="text">
-                              <string>New Row</string>
-                             </property>
-                             <property name="font">
-                              <font>
-                               <family>Segoe UI</family>
-                              </font>
-                             </property>
-                            </row>
-                            <row>
-                             <property name="text">
-                              <string>New Row</string>
-                             </property>
-                            </row>
-                            <row>
-                             <property name="text">
-                              <string>New Row</string>
-                             </property>
-                            </row>
-                            <row>
-                             <property name="text">
-                              <string>New Row</string>
-                             </property>
-                            </row>
-                            <row>
-                             <property name="text">
-                              <string>New Row</string>
-                             </property>
-                            </row>
-                            <row>
-                             <property name="text">
-                              <string>New Row</string>
-                             </property>
-                            </row>
-                            <row>
-                             <property name="text">
-                              <string>New Row</string>
-                             </property>
-                            </row>
-                            <row>
-                             <property name="text">
-                              <string>New Row</string>
-                             </property>
-                            </row>
-                            <row>
-                             <property name="text">
-                              <string>New Row</string>
-                             </property>
-                            </row>
-                            <row>
-                             <property name="text">
-                              <string>New Row</string>
-                             </property>
-                            </row>
-                            <row>
-                             <property name="text">
-                              <string>New Row</string>
-                             </property>
-                            </row>
-                            <row>
-                             <property name="text">
-                              <string>New Row</string>
-                             </property>
-                            </row>
-                            <row>
-                             <property name="text">
-                              <string>New Row</string>
-                             </property>
-                            </row>
-                            <row>
-                             <property name="text">
-                              <string>New Row</string>
-                             </property>
-                            </row>
-                            <row>
-                             <property name="text">
-                              <string>New Row</string>
-                             </property>
-                            </row>
-                            <row>
-                             <property name="text">
-                              <string>New Row</string>
-                             </property>
-                            </row>
-                            <column>
-                             <property name="text">
-                              <string>0</string>
-                             </property>
-                            </column>
-                            <column>
-                             <property name="text">
-                              <string>1</string>
-                             </property>
-                            </column>
-                            <column>
-                             <property name="text">
-                              <string>2</string>
-                             </property>
-                            </column>
-                            <column>
-                             <property name="text">
-                              <string>3</string>
-                             </property>
-                            </column>
-                            <item row="0" column="0">
-                             <property name="text">
-                              <string>Test</string>
-                             </property>
-                            </item>
-                            <item row="0" column="1">
-                             <property name="text">
-                              <string>Text</string>
-                             </property>
-                            </item>
-                            <item row="0" column="2">
-                             <property name="text">
-                              <string>Cell</string>
-                             </property>
-                            </item>
-                            <item row="0" column="3">
-                             <property name="text">
-                              <string>Line</string>
-                             </property>
-                            </item>
                            </widget>
                           </item>
                          </layout>

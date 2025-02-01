@@ -10,7 +10,7 @@ from PyQt5 import uic
 from OprFuncs import read_file
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton
 from src.DataFrameDialog import DataFrameDialog
-
+#from modules.ui_main import Ui_MainWindow
 
 class GuiFunctions():
     def __init__(self,MainWindow):
@@ -45,7 +45,17 @@ class GuiFunctions():
          fpath, _ = QFileDialog.getOpenFileName(self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)") # Second parameter is default location
          if fpath:
             df = read_file(fpath)
-        
+            print(fpath)
+            self.table = self.main_window.ui.tableData
+            self.table.setRowCount(df.shape[0])  # Set number of rows
+            self.table.setColumnCount(df.shape[1])  # Set number of columns
+            self.table.setHorizontalHeaderLabels(df.columns)  # Set column headers
+            header = self.table.horizontalHeader()
+            header.setStyleSheet("QHeaderView::section { background-color: lightgray; }")
+            # Populate the table with data
+            for i in range(df.shape[0]):
+                for j in range(df.shape[1]):
+                    self.table.setItem(i, j, QTableWidgetItem(str(df.iat[i, j])))
         # Open a new window to display the DataFrame
-            self.data_frame_dialog = DataFrameDialog(df, self.main_window)
-            self.data_frame_dialog.show()
+            #self.data_frame_dialog = DataFrameDialog(df, self.main_window)
+            #self.data_frame_dialog.show()
