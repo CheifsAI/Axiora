@@ -1,0 +1,362 @@
+2025-01-30 15:23:47,275 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:23:47,288 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:23:47,652 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:23:47,654 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:23:48,023 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:23:48,024 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:23:48,306 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:23:48,307 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:23:48,610 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:23:48,610 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:23:48,894 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:23:48,895 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:23:49,169 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:23:49,170 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:23:49,782 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 15:23:50,215 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 15:23:50,527 - INFO - Checking icons for qt designer app.
+2025-01-30 15:23:50,846 - INFO - all icons have been checked and missing icons generated!
+2025-01-30 15:24:16,756 - DEBUG - connect_tcp.started host='127.0.0.1' port=11434 local_address=None timeout=None socket_options=None
+2025-01-30 15:24:16,757 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x0000015940893F50>
+2025-01-30 15:24:16,758 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-30 15:24:16,758 - DEBUG - send_request_headers.complete
+2025-01-30 15:24:16,758 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-30 15:24:16,759 - DEBUG - send_request_body.complete
+2025-01-30 15:24:16,759 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-30 15:24:21,341 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/x-ndjson'), (b'Date', b'Thu, 30 Jan 2025 13:24:21 GMT'), (b'Transfer-Encoding', b'chunked')])
+2025-01-30 15:24:21,341 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/generate "HTTP/1.1 200 OK"
+2025-01-30 15:24:21,342 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-30 15:24:22,354 - DEBUG - receive_response_body.complete
+2025-01-30 15:24:22,355 - DEBUG - response_closed.started
+2025-01-30 15:24:22,355 - DEBUG - response_closed.complete
+2025-01-30 15:26:01,179 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:26:01,182 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:26:01,762 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:26:01,763 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:26:02,214 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:26:02,214 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:26:02,659 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:26:02,660 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:26:02,998 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:26:02,999 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:26:03,325 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:26:03,326 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:26:03,636 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:26:03,637 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:26:04,151 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 15:26:04,850 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 15:26:05,171 - INFO - Checking icons for qt designer app.
+2025-01-30 15:26:05,557 - INFO - all icons have been checked and missing icons generated!
+2025-01-30 15:28:31,403 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:28:31,407 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:28:31,788 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:28:31,789 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:28:32,098 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:28:32,098 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:28:32,386 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:28:32,386 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:28:32,684 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:28:32,685 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:28:32,977 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:28:32,977 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:28:33,259 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:28:33,259 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:34:48,802 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:34:48,805 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:34:49,323 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:34:49,323 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:34:49,616 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:34:49,617 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:34:49,897 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:34:49,899 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:34:50,180 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:34:50,180 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:34:50,481 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:34:50,482 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:34:50,868 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:34:50,868 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:35:25,085 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:35:25,087 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:35:25,408 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:35:25,410 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:35:25,695 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:35:25,696 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:35:25,974 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:35:25,974 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:35:26,263 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:35:26,305 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:35:26,599 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:35:26,600 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:35:26,918 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:35:26,918 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:36:39,916 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:36:39,919 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:36:40,262 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:36:40,263 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:36:40,560 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:36:40,561 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:36:40,857 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:36:40,858 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:36:41,137 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:36:41,137 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:36:41,445 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:36:41,446 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:36:41,739 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:36:41,739 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:38:15,809 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:38:15,811 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:38:16,111 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:38:16,112 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:38:16,407 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:38:16,409 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:38:16,715 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:38:16,715 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:38:16,999 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:38:17,000 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:38:17,309 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:38:17,310 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:38:17,595 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:38:17,595 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:38:18,116 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 15:38:18,411 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 15:38:18,703 - INFO - Checking icons for qt designer app.
+2025-01-30 15:38:19,065 - INFO - all icons have been checked and missing icons generated!
+2025-01-30 15:39:06,871 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:39:06,873 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:39:07,202 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:39:07,202 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:39:07,514 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:39:07,515 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:39:07,832 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:39:07,833 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:39:08,127 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:39:08,128 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:39:08,451 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:39:08,452 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:39:08,753 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:39:08,754 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:39:09,331 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 15:39:09,643 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 15:39:09,955 - INFO - Checking icons for qt designer app.
+2025-01-30 15:39:10,262 - INFO - all icons have been checked and missing icons generated!
+2025-01-30 15:51:18,259 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:51:18,260 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:51:18,562 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:51:18,562 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:51:18,843 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:51:18,843 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:51:19,152 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:51:19,152 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:51:19,471 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:51:19,471 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:51:19,864 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:51:19,866 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:51:20,190 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:51:20,191 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:51:20,716 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 15:51:21,030 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 15:51:21,311 - INFO - Checking icons for qt designer app.
+2025-01-30 15:51:21,616 - INFO - all icons have been checked and missing icons generated!
+2025-01-30 15:54:38,219 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:54:38,221 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:54:38,554 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:54:38,555 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:54:38,839 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:54:38,840 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:54:39,126 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:54:39,126 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:54:39,425 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:54:39,425 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:54:39,739 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:54:39,741 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:54:40,032 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 15:54:40,033 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 15:54:40,573 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 15:54:40,916 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 15:54:41,364 - INFO - Checking icons for qt designer app.
+2025-01-30 15:54:41,698 - INFO - all icons have been checked and missing icons generated!
+2025-01-30 16:03:47,565 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:03:47,568 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:03:48,126 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:03:48,127 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:03:48,569 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:03:48,570 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:03:48,940 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:03:48,941 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:03:49,254 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:03:49,255 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:03:49,573 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:03:49,574 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:03:49,895 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:03:49,896 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:03:50,443 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 16:03:50,758 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 16:03:51,052 - INFO - Checking icons for qt designer app.
+2025-01-30 16:03:51,427 - INFO - all icons have been checked and missing icons generated!
+2025-01-30 16:04:09,024 - DEBUG - connect_tcp.started host='127.0.0.1' port=11434 local_address=None timeout=None socket_options=None
+2025-01-30 16:04:09,026 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x0000027F4C4AE9F0>
+2025-01-30 16:04:09,026 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-30 16:04:09,027 - DEBUG - send_request_headers.complete
+2025-01-30 16:04:09,027 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-30 16:04:09,027 - DEBUG - send_request_body.complete
+2025-01-30 16:04:09,027 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-30 16:04:18,779 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/x-ndjson'), (b'Date', b'Thu, 30 Jan 2025 14:04:18 GMT'), (b'Transfer-Encoding', b'chunked')])
+2025-01-30 16:04:18,780 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/generate "HTTP/1.1 200 OK"
+2025-01-30 16:04:18,780 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-30 16:05:24,321 - DEBUG - receive_response_body.complete
+2025-01-30 16:05:24,321 - DEBUG - response_closed.started
+2025-01-30 16:05:24,321 - DEBUG - response_closed.complete
+2025-01-30 16:09:25,162 - DEBUG - close.started
+2025-01-30 16:09:25,162 - DEBUG - close.complete
+2025-01-30 16:09:25,163 - DEBUG - connect_tcp.started host='127.0.0.1' port=11434 local_address=None timeout=None socket_options=None
+2025-01-30 16:09:25,163 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x0000027F5478D4C0>
+2025-01-30 16:09:25,163 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-30 16:09:25,163 - DEBUG - send_request_headers.complete
+2025-01-30 16:09:25,163 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-30 16:09:25,163 - DEBUG - send_request_body.complete
+2025-01-30 16:09:25,163 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-30 16:09:29,005 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/x-ndjson'), (b'Date', b'Thu, 30 Jan 2025 14:09:29 GMT'), (b'Transfer-Encoding', b'chunked')])
+2025-01-30 16:09:29,005 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/generate "HTTP/1.1 200 OK"
+2025-01-30 16:09:29,006 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-30 16:09:59,638 - DEBUG - receive_response_body.complete
+2025-01-30 16:09:59,638 - DEBUG - response_closed.started
+2025-01-30 16:09:59,638 - DEBUG - response_closed.complete
+2025-01-30 16:12:21,715 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:12:21,717 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:12:22,044 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:12:22,045 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:12:22,328 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:12:22,328 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:12:22,609 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:12:22,610 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:12:22,905 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:12:22,906 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:12:23,188 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:12:23,188 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:12:23,470 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:12:23,471 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:19:05,839 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:19:05,840 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:19:06,145 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:19:06,145 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:19:06,427 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:19:06,428 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:19:06,713 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:19:06,714 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:19:06,993 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:19:06,993 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:19:07,275 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:19:07,276 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:19:07,555 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:19:07,556 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:28:41,158 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:28:41,160 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:28:41,467 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:28:41,467 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:28:41,749 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:28:41,749 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:28:42,043 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:28:42,044 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:28:42,327 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:28:42,329 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:28:42,609 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:28:42,610 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:28:42,886 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:28:42,887 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:28:43,556 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 16:28:43,867 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 16:28:44,174 - INFO - Checking icons for qt designer app.
+2025-01-30 16:28:44,475 - INFO - all icons have been checked and missing icons generated!
+2025-01-30 16:29:49,973 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:29:49,976 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:29:50,312 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:29:50,313 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:29:50,666 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:29:50,667 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:29:50,999 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:29:51,000 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:29:51,318 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:29:51,319 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:29:51,639 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:29:51,639 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:29:51,934 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:29:51,934 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:29:52,530 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 16:29:52,842 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 16:29:53,120 - INFO - Checking icons for qt designer app.
+2025-01-30 16:29:53,459 - INFO - all icons have been checked and missing icons generated!
+2025-01-30 16:30:00,096 - DEBUG - connect_tcp.started host='127.0.0.1' port=11434 local_address=None timeout=None socket_options=None
+2025-01-30 16:30:00,104 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x0000025944BEC1A0>
+2025-01-30 16:30:00,105 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-30 16:30:00,106 - DEBUG - send_request_headers.complete
+2025-01-30 16:30:00,106 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-30 16:30:00,106 - DEBUG - send_request_body.complete
+2025-01-30 16:30:00,106 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-30 16:30:09,810 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/x-ndjson'), (b'Date', b'Thu, 30 Jan 2025 14:30:09 GMT'), (b'Transfer-Encoding', b'chunked')])
+2025-01-30 16:30:09,812 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/generate "HTTP/1.1 200 OK"
+2025-01-30 16:30:09,812 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-30 16:30:49,059 - DEBUG - receive_response_body.complete
+2025-01-30 16:30:49,059 - DEBUG - response_closed.started
+2025-01-30 16:30:49,059 - DEBUG - response_closed.complete
+2025-01-30 16:32:48,761 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:32:48,764 - DEBUG - load_verify_locations cafile='c:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:32:49,258 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:32:49,259 - DEBUG - load_verify_locations cafile='c:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:32:49,541 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:32:49,542 - DEBUG - load_verify_locations cafile='c:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:32:49,837 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:32:49,838 - DEBUG - load_verify_locations cafile='c:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:32:50,127 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:32:50,129 - DEBUG - load_verify_locations cafile='c:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:32:50,416 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:32:50,417 - DEBUG - load_verify_locations cafile='c:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:32:50,697 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 16:32:50,698 - DEBUG - load_verify_locations cafile='c:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 16:32:51,413 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 16:32:51,706 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 16:32:51,991 - INFO - Checking icons for qt designer app.
+2025-01-30 16:32:52,285 - INFO - all icons have been checked and missing icons generated!
+2025-01-30 16:32:59,444 - DEBUG - connect_tcp.started host='127.0.0.1' port=11434 local_address=None timeout=None socket_options=None
+2025-01-30 16:32:59,445 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002D68D76C860>
+2025-01-30 16:32:59,445 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-30 16:32:59,446 - DEBUG - send_request_headers.complete
+2025-01-30 16:32:59,446 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-30 16:32:59,446 - DEBUG - send_request_body.complete
+2025-01-30 16:32:59,446 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-30 16:32:59,715 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/x-ndjson'), (b'Date', b'Thu, 30 Jan 2025 14:32:59 GMT'), (b'Transfer-Encoding', b'chunked')])
+2025-01-30 16:32:59,717 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/generate "HTTP/1.1 200 OK"
+2025-01-30 16:32:59,718 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-30 16:33:33,142 - DEBUG - receive_response_body.complete
+2025-01-30 16:33:33,143 - DEBUG - response_closed.started
+2025-01-30 16:33:33,143 - DEBUG - response_closed.complete
+2025-01-30 22:22:51,006 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 22:22:51,038 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 22:22:51,434 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 22:22:51,435 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 22:22:51,754 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 22:22:51,755 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 22:22:52,082 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 22:22:52,083 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 22:22:52,387 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 22:22:52,388 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 22:22:52,685 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 22:22:52,685 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 22:22:52,980 - DEBUG - load_ssl_context verify=True cert=None trust_env=True http2=False
+2025-01-30 22:22:52,981 - DEBUG - load_verify_locations cafile='C:\\Users\\hasso\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\site-packages\\certifi\\cacert.pem'
+2025-01-30 22:22:53,720 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 22:22:54,197 - INFO - Checking icons for My-theme theme. Icons color: #FFFFFF
+2025-01-30 22:22:54,497 - INFO - Checking icons for qt designer app.
+2025-01-30 22:22:55,275 - INFO - all icons have been checked and missing icons generated!
+2025-01-30 22:23:20,654 - DEBUG - connect_tcp.started host='127.0.0.1' port=11434 local_address=None timeout=None socket_options=None
+2025-01-30 22:23:20,656 - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x00000229A522FE30>
+2025-01-30 22:23:20,657 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-01-30 22:23:20,658 - DEBUG - send_request_headers.complete
+2025-01-30 22:23:20,658 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-01-30 22:23:20,658 - DEBUG - send_request_body.complete
+2025-01-30 22:23:20,658 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-01-30 22:23:30,368 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/x-ndjson'), (b'Date', b'Thu, 30 Jan 2025 20:23:30 GMT'), (b'Transfer-Encoding', b'chunked')])
+2025-01-30 22:23:30,369 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/generate "HTTP/1.1 200 OK"
+2025-01-30 22:23:30,369 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-01-30 22:23:56,728 - DEBUG - receive_response_body.complete
+2025-01-30 22:23:56,728 - DEBUG - response_closed.started
+2025-01-30 22:23:56,728 - DEBUG - response_closed.complete
