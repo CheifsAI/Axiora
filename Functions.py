@@ -40,7 +40,7 @@ class GuiFunctions():
                 if theme.defaultTheme or theme.name == current_theme:
                     self.ui.comboBox.setCurrentIndex(theme_count)  # Select the theme        
     def setup_connections(self):
-         self.main_window.ui.openfile_btn.clicked.connect(self.handle_data_button)
+         self.main_window.ui.Data.clicked.connect(self.handle_data_button)
     def handle_data_button(self):
          fpath, _ = QFileDialog.getOpenFileName(self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)") # Second parameter is default location
          if fpath:
