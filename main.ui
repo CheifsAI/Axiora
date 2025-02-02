@@ -1862,7 +1862,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                       <string notr="true">background: transparent;</string>
                      </property>
                      <property name="currentIndex">
-                      <number>1</number>
+                      <number>2</number>
                      </property>
                      <widget class="QWidget" name="home">
                       <property name="styleSheet">
@@ -2588,8 +2588,15 @@ background-repeat: no-repeat;</string>
                      </widget>
                      <widget class="QWidget" name="new_page">
                       <layout class="QVBoxLayout" name="verticalLayout_20">
+                       <item alignment="Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop">
+                        <widget class="QPushButton" name="pushButton">
+                         <property name="text">
+                          <string>Summerize</string>
+                         </property>
+                        </widget>
+                       </item>
                        <item>
-                        <widget class="QLabel" name="label">
+                        <widget class="QLabel" name="SummerizationText">
                          <property name="text">
                           <string>NEW PAGE TEST</string>
                          </property>
