@@ -2596,7 +2596,27 @@ background-repeat: no-repeat;</string>
                         </widget>
                        </item>
                        <item>
-                        <widget class="QWidget" name="widget_summary" native="true"/>
+                        <widget class="QWidget" name="widget_summary" native="true">
+                         <widget class="QTextEdit" name="summary_text">
+                          <property name="geometry">
+                           <rect>
+                            <x>0</x>
+                            <y>0</y>
+                            <width>1156</width>
+                            <height>271</height>
+                           </rect>
+                          </property>
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="readOnly">
+                           <bool>true</bool>
+                          </property>
+                         </widget>
+                        </widget>
                        </item>
                        <item>
                         <widget class="QWidget" name="widget_qu" native="true"/>

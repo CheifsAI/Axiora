@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplicat
     QScrollArea, QScrollBar, QSizePolicy, QSlider,
     QStackedWidget, QTableWidget, QTableWidgetItem, QTextEdit,
     QVBoxLayout, QWidget)
-import modules.resources_rc
+import resources_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -600,7 +600,7 @@ class Ui_MainWindow(object):
         font1 = QFont()
         font1.setFamilies([u"Segoe UI Semibold"])
         font1.setPointSize(12)
-        #font1.setWeight(QFont.)
+        font1.setWeight(QFont.)
         font1.setItalic(False)
         self.titleLeftApp.setFont(font1)
         self.titleLeftApp.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
@@ -1344,6 +1344,15 @@ class Ui_MainWindow(object):
 
         self.widget_summary = QWidget(self.new_page)
         self.widget_summary.setObjectName(u"widget_summary")
+        self.summary_text = QTextEdit(self.widget_summary)
+        self.summary_text.setObjectName(u"summary_text")
+        self.summary_text.setGeometry(QRect(0, 0, 1156, 271))
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.summary_text.sizePolicy().hasHeightForWidth())
+        self.summary_text.setSizePolicy(sizePolicy4)
+        self.summary_text.setReadOnly(True)
 
         self.verticalLayout_20.addWidget(self.widget_summary)
 
