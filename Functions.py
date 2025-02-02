@@ -14,6 +14,7 @@ from PySide6.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetIt
 from Main import analysis_data
 #from PyQt5.QtWidgets import QMenu, QAction
 from Models import *
+from markdown import markdown
 
 class GuiFunctions():
     def __init__(self,MainWindow):
@@ -66,9 +67,9 @@ class GuiFunctions():
             #self.data_frame_dialog = DataFrameDialog(df, self.main_window)
             #self.data_frame_dialog.show()
     def handle_sum_btn(self):
-        self.summary = analysis_data(dataframe=self.df,llm=self.llm)
+        self.summary = markdown(analysis_data(dataframe=self.df,llm=self.llm))
         self.summary_text = self.main_window.ui.summary_text
-        self.summary_text.setText(self.summary)
+        self.summary_text.setMarkdown(self.summary)
         print(self.summary)
     def handle_btn_LLMs(self):
         #menu = QMenu()
