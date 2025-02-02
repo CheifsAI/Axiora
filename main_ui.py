@@ -28,7 +28,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1280, 720)
+        MainWindow.resize(1366, 842)
         MainWindow.setMinimumSize(QSize(940, 560))
         self.styleSheet = QWidget(MainWindow)
         self.styleSheet.setObjectName(u"styleSheet")
@@ -1353,13 +1353,16 @@ class Ui_MainWindow(object):
         sizePolicy4.setHeightForWidth(self.summary_text.sizePolicy().hasHeightForWidth())
         self.summary_text.setSizePolicy(sizePolicy4)
         self.summary_text.setReadOnly(True)
+        self.widget_qu = QWidget(self.widget_summary)
+        self.widget_qu.setObjectName(u"widget_qu")
+        self.widget_qu.setEnabled(True)
+        self.widget_qu.setGeometry(QRect(-10, 260, 1171, 141))
+        self.textEdit_2 = QTextEdit(self.widget_qu)
+        self.textEdit_2.setObjectName(u"textEdit_2")
+        self.textEdit_2.setGeometry(QRect(11, 30, 1151, 401))
+        self.textEdit_2.setReadOnly(True)
 
         self.verticalLayout_20.addWidget(self.widget_summary)
-
-        self.widget_qu = QWidget(self.new_page)
-        self.widget_qu.setObjectName(u"widget_qu")
-
-        self.verticalLayout_20.addWidget(self.widget_qu)
 
         self.stackedWidget.addWidget(self.new_page)
 
