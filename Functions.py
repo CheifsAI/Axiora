@@ -67,6 +67,8 @@ class GuiFunctions():
             #self.data_frame_dialog.show()
     def handle_sum_btn(self):
         self.summary = analysis_data(dataframe=self.df,llm=self.llm)
+        self.summary_text = self.main_window.ui.summary_text
+        self.summary_text.setText(self.summary)
         print(self.summary)
     def handle_btn_LLMs(self):
         #menu = QMenu()
