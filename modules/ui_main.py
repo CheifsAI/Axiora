@@ -20,15 +20,15 @@ from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplicat
     QHBoxLayout, QHeaderView, QLabel, QLineEdit,
     QMainWindow, QPlainTextEdit, QPushButton, QRadioButton,
     QScrollArea, QScrollBar, QSizePolicy, QSlider,
-    QStackedWidget, QTableWidget, QTableWidgetItem, QTextEdit,
-    QVBoxLayout, QWidget)
+    QStackedWidget, QTableView, QTableWidget, QTableWidgetItem,
+    QTextEdit, QVBoxLayout, QWidget)
 import modules.resources_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1366, 842)
+        MainWindow.resize(940, 675)
         MainWindow.setMinimumSize(QSize(940, 560))
         self.styleSheet = QWidget(MainWindow)
         self.styleSheet.setObjectName(u"styleSheet")
@@ -1187,7 +1187,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 222, 222))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 278, 222))
         self.scrollAreaWidgetContents.setStyleSheet(u" QScrollBar:vertical {\n"
 "	border: none;\n"
 "    background: rgb(52, 59, 72);\n"
@@ -1335,34 +1335,29 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.data_page)
         self.new_page = QWidget()
         self.new_page.setObjectName(u"new_page")
+        sizePolicy3.setHeightForWidth(self.new_page.sizePolicy().hasHeightForWidth())
+        self.new_page.setSizePolicy(sizePolicy3)
         self.verticalLayout_20 = QVBoxLayout(self.new_page)
         self.verticalLayout_20.setObjectName(u"verticalLayout_20")
         self.sum_btn = QPushButton(self.new_page)
         self.sum_btn.setObjectName(u"sum_btn")
 
-        self.verticalLayout_20.addWidget(self.sum_btn)
+        self.verticalLayout_20.addWidget(self.sum_btn, 0, Qt.AlignmentFlag.AlignTop)
 
-        self.widget_summary = QWidget(self.new_page)
-        self.widget_summary.setObjectName(u"widget_summary")
-        self.summary_text = QTextEdit(self.widget_summary)
-        self.summary_text.setObjectName(u"summary_text")
-        self.summary_text.setGeometry(QRect(0, 0, 1156, 271))
-        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
-        sizePolicy4.setHorizontalStretch(0)
-        sizePolicy4.setVerticalStretch(0)
-        sizePolicy4.setHeightForWidth(self.summary_text.sizePolicy().hasHeightForWidth())
-        self.summary_text.setSizePolicy(sizePolicy4)
-        self.summary_text.setReadOnly(True)
-        self.widget_qu = QWidget(self.widget_summary)
-        self.widget_qu.setObjectName(u"widget_qu")
-        self.widget_qu.setEnabled(True)
-        self.widget_qu.setGeometry(QRect(-10, 260, 1171, 141))
-        self.textEdit_2 = QTextEdit(self.widget_qu)
-        self.textEdit_2.setObjectName(u"textEdit_2")
-        self.textEdit_2.setGeometry(QRect(11, 30, 1151, 401))
-        self.textEdit_2.setReadOnly(True)
+        self.gridLayout_3 = QGridLayout()
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.tableView = QTableView(self.new_page)
+        self.tableView.setObjectName(u"tableView")
 
-        self.verticalLayout_20.addWidget(self.widget_summary)
+        self.gridLayout_3.addWidget(self.tableView, 0, 1, 1, 1)
+
+        self.tableView_2 = QTableView(self.new_page)
+        self.tableView_2.setObjectName(u"tableView_2")
+
+        self.gridLayout_3.addWidget(self.tableView_2, 1, 1, 1, 1)
+
+
+        self.verticalLayout_20.addLayout(self.gridLayout_3)
 
         self.stackedWidget.addWidget(self.new_page)
 

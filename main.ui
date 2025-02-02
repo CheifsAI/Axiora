@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1366</width>
-    <height>842</height>
+    <width>940</width>
+    <height>675</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -2166,7 +2166,7 @@ background-repeat: no-repeat;</string>
                                 <rect>
                                  <x>0</x>
                                  <y>0</y>
-                                 <width>222</width>
+                                 <width>278</width>
                                  <height>222</height>
                                 </rect>
                                </property>
@@ -2587,8 +2587,14 @@ background-repeat: no-repeat;</string>
                       </layout>
                      </widget>
                      <widget class="QWidget" name="new_page">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <layout class="QVBoxLayout" name="verticalLayout_20">
-                       <item>
+                       <item alignment="Qt::AlignmentFlag::AlignTop">
                         <widget class="QPushButton" name="sum_btn">
                          <property name="text">
                           <string>Summerize</string>
@@ -2596,53 +2602,14 @@ background-repeat: no-repeat;</string>
                         </widget>
                        </item>
                        <item>
-                        <widget class="QWidget" name="widget_summary" native="true">
-                         <widget class="QTextEdit" name="summary_text">
-                          <property name="geometry">
-                           <rect>
-                            <x>0</x>
-                            <y>0</y>
-                            <width>1156</width>
-                            <height>271</height>
-                           </rect>
-                          </property>
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="readOnly">
-                           <bool>true</bool>
-                          </property>
-                         </widget>
-                         <widget class="QWidget" name="widget_qu" native="true">
-                          <property name="enabled">
-                           <bool>true</bool>
-                          </property>
-                          <property name="geometry">
-                           <rect>
-                            <x>-10</x>
-                            <y>260</y>
-                            <width>1171</width>
-                            <height>141</height>
-                           </rect>
-                          </property>
-                          <widget class="QTextEdit" name="textEdit_2">
-                           <property name="geometry">
-                            <rect>
-                             <x>11</x>
-                             <y>30</y>
-                             <width>1151</width>
-                             <height>401</height>
-                            </rect>
-                           </property>
-                           <property name="readOnly">
-                            <bool>true</bool>
-                           </property>
-                          </widget>
-                         </widget>
-                        </widget>
+                        <layout class="QGridLayout" name="gridLayout_3">
+                         <item row="0" column="1">
+                          <widget class="QTableView" name="tableView"/>
+                         </item>
+                         <item row="1" column="1">
+                          <widget class="QTableView" name="tableView_2"/>
+                         </item>
+                        </layout>
                        </item>
                       </layout>
                      </widget>
