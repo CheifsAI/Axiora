@@ -1335,7 +1335,7 @@ Button */
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="btn_adjustments">
+                 <widget class="QPushButton" name="btn_LLMs">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -2166,7 +2166,7 @@ background-repeat: no-repeat;</string>
                                 <rect>
                                  <x>0</x>
                                  <y>0</y>
-                                 <width>326</width>
+                                 <width>222</width>
                                  <height>222</height>
                                 </rect>
                                </property>
@@ -2588,7 +2588,7 @@ background-repeat: no-repeat;</string>
                      </widget>
                      <widget class="QWidget" name="new_page">
                       <layout class="QVBoxLayout" name="verticalLayout_20">
-                       <item alignment="Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop">
+                       <item>
                         <widget class="QPushButton" name="sum_btn">
                          <property name="text">
                           <string>Summerize</string>
@@ -2596,14 +2596,10 @@ background-repeat: no-repeat;</string>
                         </widget>
                        </item>
                        <item>
-                        <widget class="QLabel" name="SummerizationText">
-                         <property name="text">
-                          <string>NEW PAGE TEST</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignmentFlag::AlignCenter</set>
-                         </property>
-                        </widget>
+                        <widget class="QWidget" name="widget_summary" native="true"/>
+                       </item>
+                       <item>
+                        <widget class="QWidget" name="widget_qu" native="true"/>
                        </item>
                       </layout>
                      </widget>

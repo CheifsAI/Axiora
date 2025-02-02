@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetIt
 #from src.DataFrameDialog import DataFrameDialog
 #from modules.ui_main import Ui_MainWindow
 from Main import analysis_data
-from PyQt5.QtWidgets import QMenu, QAction
+#from PyQt5.QtWidgets import QMenu, QAction
 from Models import *
 
 class GuiFunctions():
@@ -68,5 +68,5 @@ class GuiFunctions():
     def handle_sum_btn(self):
         self.summary = analysis_data(llm=self.llm,df=self.df)
     def handle_btn_LLMs(self):
-        menu = QMenu()
+        #menu = QMenu()
         print("Clicked LLM")
