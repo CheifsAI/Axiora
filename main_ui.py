@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplicat
     QHBoxLayout, QHeaderView, QLabel, QLineEdit,
     QMainWindow, QPlainTextEdit, QPushButton, QRadioButton,
     QScrollArea, QScrollBar, QSizePolicy, QSlider,
-    QStackedWidget, QTableView, QTableWidget, QTableWidgetItem,
+    QStackedWidget, QTabWidget, QTableWidget, QTableWidgetItem,
     QTextEdit, QVBoxLayout, QWidget)
 import resources_rc
 
@@ -28,7 +28,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(940, 675)
+        MainWindow.resize(940, 678)
         MainWindow.setMinimumSize(QSize(940, 560))
         self.styleSheet = QWidget(MainWindow)
         self.styleSheet.setObjectName(u"styleSheet")
@@ -1187,7 +1187,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 278, 222))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 222, 222))
         self.scrollAreaWidgetContents.setStyleSheet(u" QScrollBar:vertical {\n"
 "	border: none;\n"
 "    background: rgb(52, 59, 72);\n"
@@ -1342,22 +1342,21 @@ class Ui_MainWindow(object):
         self.sum_btn = QPushButton(self.new_page)
         self.sum_btn.setObjectName(u"sum_btn")
 
-        self.verticalLayout_20.addWidget(self.sum_btn, 0, Qt.AlignmentFlag.AlignTop)
+        self.verticalLayout_20.addWidget(self.sum_btn)
 
-        self.gridLayout_3 = QGridLayout()
-        self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.tableView = QTableView(self.new_page)
-        self.tableView.setObjectName(u"tableView")
+        self.tabWidget = QTabWidget(self.new_page)
+        self.tabWidget.setObjectName(u"tabWidget")
+        self.tabWidget.setTabShape(QTabWidget.TabShape.Rounded)
+        self.tabWidget.setUsesScrollButtons(True)
+        self.tabWidget.setDocumentMode(True)
+        self.tab = QWidget()
+        self.tab.setObjectName(u"tab")
+        self.tabWidget.addTab(self.tab, "")
+        self.qq = QWidget()
+        self.qq.setObjectName(u"qq")
+        self.tabWidget.addTab(self.qq, "")
 
-        self.gridLayout_3.addWidget(self.tableView, 0, 1, 1, 1)
-
-        self.tableView_2 = QTableView(self.new_page)
-        self.tableView_2.setObjectName(u"tableView_2")
-
-        self.gridLayout_3.addWidget(self.tableView_2, 1, 1, 1, 1)
-
-
-        self.verticalLayout_20.addLayout(self.gridLayout_3)
+        self.verticalLayout_20.addWidget(self.tabWidget)
 
         self.stackedWidget.addWidget(self.new_page)
 
@@ -1502,6 +1501,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
         self.stackedWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -1574,6 +1574,11 @@ class Ui_MainWindow(object):
         self.commandLinkButton.setText(QCoreApplication.translate("MainWindow", u"Link Button", None))
         self.commandLinkButton.setDescription(QCoreApplication.translate("MainWindow", u"Link description", None))
         self.sum_btn.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))
+#if QT_CONFIG(accessibility)
+        self.tabWidget.setAccessibleDescription("")
+#endif // QT_CONFIG(accessibility)
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"summerize", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.qq), QCoreApplication.translate("MainWindow", u"questions", None))
         self.btn_message.setText(QCoreApplication.translate("MainWindow", u"Message", None))
         self.btn_print.setText(QCoreApplication.translate("MainWindow", u"Print", None))
         self.btn_logout.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
