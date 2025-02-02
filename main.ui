@@ -2589,7 +2589,7 @@ background-repeat: no-repeat;</string>
                      <widget class="QWidget" name="new_page">
                       <layout class="QVBoxLayout" name="verticalLayout_20">
                        <item alignment="Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop">
-                        <widget class="QPushButton" name="pushButton">
+                        <widget class="QPushButton" name="sum_btn">
                          <property name="text">
                           <string>Summerize</string>
                          </property>

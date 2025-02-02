@@ -41,6 +41,7 @@ class GuiFunctions():
           #          self.ui.comboBox.setCurrentIndex(theme_count)  # Select the theme        
     def setup_connections(self):
          self.main_window.ui.openfile_btn.clicked.connect(self.handle_data_button)
+         self.main_window.ui.sum_btn.clicked.connect(self.handle_sum_btn)
     def handle_data_button(self):
          fpath, _ = QFileDialog.getOpenFileName(self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)") # Second parameter is default location
          if fpath:
@@ -59,3 +60,5 @@ class GuiFunctions():
         # Open a new window to display the DataFrame
             #self.data_frame_dialog = DataFrameDialog(df, self.main_window)
             #self.data_frame_dialog.show()
+    def handle_sum_btn(self):
+        print("sum btn clicked")

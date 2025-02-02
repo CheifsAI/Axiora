@@ -1337,10 +1337,10 @@ class Ui_MainWindow(object):
         self.new_page.setObjectName(u"new_page")
         self.verticalLayout_20 = QVBoxLayout(self.new_page)
         self.verticalLayout_20.setObjectName(u"verticalLayout_20")
-        self.pushButton = QPushButton(self.new_page)
-        self.pushButton.setObjectName(u"pushButton")
+        self.sum_btn = QPushButton(self.new_page)
+        self.sum_btn.setObjectName(u"sum_btn")
 
-        self.verticalLayout_20.addWidget(self.pushButton, 0, Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
+        self.verticalLayout_20.addWidget(self.sum_btn, 0, Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
 
         self.SummerizationText = QLabel(self.new_page)
         self.SummerizationText.setObjectName(u"SummerizationText")
@@ -1562,7 +1562,7 @@ class Ui_MainWindow(object):
 
         self.commandLinkButton.setText(QCoreApplication.translate("MainWindow", u"Link Button", None))
         self.commandLinkButton.setDescription(QCoreApplication.translate("MainWindow", u"Link description", None))
-        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))
+        self.sum_btn.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))
         self.SummerizationText.setText(QCoreApplication.translate("MainWindow", u"NEW PAGE TEST", None))
         self.btn_message.setText(QCoreApplication.translate("MainWindow", u"Message", None))
         self.btn_print.setText(QCoreApplication.translate("MainWindow", u"Print", None))
