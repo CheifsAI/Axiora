@@ -30,7 +30,7 @@ def analysis_data(dataframe,llm):
     analysis = analysis_chain.run(data_info=data_info)
     
     #print analysis
-    return("Analysis Data:\n", analysis)
+    return(analysis)
     
 
 # Drop Nulls

@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplicat
     QScrollArea, QScrollBar, QSizePolicy, QSlider,
     QStackedWidget, QTableWidget, QTableWidgetItem, QTextEdit,
     QVBoxLayout, QWidget)
-import resources_rc
+import modules.resources_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -839,17 +839,17 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_11.addWidget(self.btn_share)
 
-        self.btn_adjustments = QPushButton(self.extraTopMenu)
-        self.btn_adjustments.setObjectName(u"btn_adjustments")
-        sizePolicy.setHeightForWidth(self.btn_adjustments.sizePolicy().hasHeightForWidth())
-        self.btn_adjustments.setSizePolicy(sizePolicy)
-        self.btn_adjustments.setMinimumSize(QSize(0, 45))
-        self.btn_adjustments.setFont(font)
-        self.btn_adjustments.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.btn_adjustments.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.btn_adjustments.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-equalizer.png);")
+        self.btn_LLMs = QPushButton(self.extraTopMenu)
+        self.btn_LLMs.setObjectName(u"btn_LLMs")
+        sizePolicy.setHeightForWidth(self.btn_LLMs.sizePolicy().hasHeightForWidth())
+        self.btn_LLMs.setSizePolicy(sizePolicy)
+        self.btn_LLMs.setMinimumSize(QSize(0, 45))
+        self.btn_LLMs.setFont(font)
+        self.btn_LLMs.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.btn_LLMs.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.btn_LLMs.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-equalizer.png);")
 
-        self.verticalLayout_11.addWidget(self.btn_adjustments)
+        self.verticalLayout_11.addWidget(self.btn_LLMs)
 
         self.btn_more = QPushButton(self.extraTopMenu)
         self.btn_more.setObjectName(u"btn_more")
@@ -1513,7 +1513,7 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.extraCloseColumnBtn.setText("")
         self.btn_share.setText(QCoreApplication.translate("MainWindow", u"Share", None))
-        self.btn_adjustments.setText(QCoreApplication.translate("MainWindow", u"Adjustments", None))
+        self.btn_LLMs.setText(QCoreApplication.translate("MainWindow", u"LLMs", None))
         self.btn_more.setText(QCoreApplication.translate("MainWindow", u"More", None))
         self.textEdit.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
