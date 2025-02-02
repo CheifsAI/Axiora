@@ -6,10 +6,10 @@ from PySide6.QtGui import QColor, QFont, QFontDatabase
 from PySide6.QtWidgets import QGraphicsDropShadowEffect
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QPushButton, QLabel
-from PyQt5 import uic
+#from PyQt5 import uic
 from OprFuncs import read_file
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton
-from src.DataFrameDialog import DataFrameDialog
+#from src.DataFrameDialog import DataFrameDialog
 #from modules.ui_main import Ui_MainWindow
 
 class GuiFunctions():
