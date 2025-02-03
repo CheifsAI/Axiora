@@ -838,42 +838,6 @@ Button */
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="QPushButton" name="btn_home">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>45</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <family>Segoe UI</family>
-                    <pointsize>10</pointsize>
-                    <italic>false</italic>
-                    <bold>false</bold>
-                   </font>
-                  </property>
-                  <property name="cursor">
-                   <cursorShape>PointingHandCursor</cursorShape>
-                  </property>
-                  <property name="layoutDirection">
-                   <enum>Qt::LayoutDirection::LeftToRight</enum>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">background-image: url(:/icons/images/icons/cil-home.png);</string>
-                  </property>
-                  <property name="text">
-                   <string>Home</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
                  <widget class="QPushButton" name="btn_data">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -905,7 +869,11 @@ Button */
                    <string notr="true">background-image: url(:/icons/images/icons/cil-gamepad.png);</string>
                   </property>
                   <property name="text">
-                   <string>Widgets</string>
+                   <string>Data</string>
+                  </property>
+                  <property name="icon">
+                   <iconset>
+                    <normaloff>data-collection.png</normaloff>data-collection.png</iconset>
                   </property>
                  </widget>
                 </item>
@@ -942,6 +910,42 @@ Button */
                   </property>
                   <property name="text">
                    <string>New</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btn_home">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>45</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>10</pointsize>
+                    <italic>false</italic>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LayoutDirection::LeftToRight</enum>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">background-image: url(:/icons/images/icons/cil-home.png);</string>
+                  </property>
+                  <property name="text">
+                   <string>Home</string>
                   </property>
                  </widget>
                 </item>
@@ -1862,7 +1866,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                       <string notr="true">background: transparent;</string>
                      </property>
                      <property name="currentIndex">
-                      <number>1</number>
+                      <number>2</number>
                      </property>
                      <widget class="QWidget" name="home">
                       <property name="styleSheet">
@@ -2425,33 +2429,6 @@ background-repeat: no-repeat;</string>
                          <property name="documentMode">
                           <bool>true</bool>
                          </property>
-                         <widget class="QWidget" name="Summerize_tab">
-                          <attribute name="title">
-                           <string>Summerize</string>
-                          </attribute>
-                          <layout class="QGridLayout" name="gridLayout_5">
-                           <item row="0" column="0">
-                            <widget class="QWidget" name="sum_widget" native="true">
-                             <layout class="QGridLayout" name="gridLayout_6">
-                              <item row="1" column="0">
-                               <widget class="QTextEdit" name="summary_text">
-                                <property name="readOnly">
-                                 <bool>true</bool>
-                                </property>
-                               </widget>
-                              </item>
-                              <item row="0" column="0">
-                               <widget class="QPushButton" name="sum_btn">
-                                <property name="text">
-                                 <string>Summerize</string>
-                                </property>
-                               </widget>
-                              </item>
-                             </layout>
-                            </widget>
-                           </item>
-                          </layout>
-                         </widget>
                          <widget class="QWidget" name="Questions_tap">
                           <attribute name="title">
                            <string>Questions</string>
@@ -2481,6 +2458,33 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                <widget class="QPushButton" name="qu_btn">
                                 <property name="text">
                                  <string>Questions</string>
+                                </property>
+                               </widget>
+                              </item>
+                             </layout>
+                            </widget>
+                           </item>
+                          </layout>
+                         </widget>
+                         <widget class="QWidget" name="Summerize_tab">
+                          <attribute name="title">
+                           <string>Summerize</string>
+                          </attribute>
+                          <layout class="QGridLayout" name="gridLayout_5">
+                           <item row="0" column="0">
+                            <widget class="QWidget" name="sum_widget" native="true">
+                             <layout class="QGridLayout" name="gridLayout_6">
+                              <item row="0" column="0">
+                               <widget class="QPushButton" name="sum_btn">
+                                <property name="text">
+                                 <string>Summerize</string>
+                                </property>
+                               </widget>
+                              </item>
+                              <item row="1" column="0">
+                               <widget class="QTextEdit" name="summary_text">
+                                <property name="readOnly">
+                                 <bool>true</bool>
                                 </property>
                                </widget>
                               </item>

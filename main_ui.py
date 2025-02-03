@@ -659,18 +659,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_8.setSpacing(0)
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
         self.verticalLayout_8.setContentsMargins(0, 0, 0, 0)
-        self.btn_home = QPushButton(self.topMenu)
-        self.btn_home.setObjectName(u"btn_home")
-        sizePolicy.setHeightForWidth(self.btn_home.sizePolicy().hasHeightForWidth())
-        self.btn_home.setSizePolicy(sizePolicy)
-        self.btn_home.setMinimumSize(QSize(0, 45))
-        self.btn_home.setFont(font)
-        self.btn_home.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.btn_home.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.btn_home.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-home.png);")
-
-        self.verticalLayout_8.addWidget(self.btn_home)
-
         self.btn_data = QPushButton(self.topMenu)
         self.btn_data.setObjectName(u"btn_data")
         sizePolicy.setHeightForWidth(self.btn_data.sizePolicy().hasHeightForWidth())
@@ -680,6 +668,9 @@ class Ui_MainWindow(object):
         self.btn_data.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.btn_data.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.btn_data.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-gamepad.png);")
+        icon = QIcon()
+        icon.addFile(u"data-collection.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.btn_data.setIcon(icon)
 
         self.verticalLayout_8.addWidget(self.btn_data)
 
@@ -694,6 +685,18 @@ class Ui_MainWindow(object):
         self.btn_new.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-file.png);")
 
         self.verticalLayout_8.addWidget(self.btn_new)
+
+        self.btn_home = QPushButton(self.topMenu)
+        self.btn_home.setObjectName(u"btn_home")
+        sizePolicy.setHeightForWidth(self.btn_home.sizePolicy().hasHeightForWidth())
+        self.btn_home.setSizePolicy(sizePolicy)
+        self.btn_home.setMinimumSize(QSize(0, 45))
+        self.btn_home.setFont(font)
+        self.btn_home.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.btn_home.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.btn_home.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-home.png);")
+
+        self.verticalLayout_8.addWidget(self.btn_home)
 
         self.btn_save = QPushButton(self.topMenu)
         self.btn_save.setObjectName(u"btn_save")
@@ -796,9 +799,9 @@ class Ui_MainWindow(object):
         self.extraCloseColumnBtn.setMinimumSize(QSize(28, 28))
         self.extraCloseColumnBtn.setMaximumSize(QSize(28, 28))
         self.extraCloseColumnBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        icon = QIcon()
-        icon.addFile(u":/icons/images/icons/icon_close.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.extraCloseColumnBtn.setIcon(icon)
+        icon1 = QIcon()
+        icon1.addFile(u":/icons/images/icons/icon_close.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.extraCloseColumnBtn.setIcon(icon1)
         self.extraCloseColumnBtn.setIconSize(QSize(20, 20))
 
         self.extraTopLayout.addWidget(self.extraCloseColumnBtn, 0, 2, 1, 1)
@@ -956,9 +959,9 @@ class Ui_MainWindow(object):
         self.settingsTopBtn.setMinimumSize(QSize(28, 28))
         self.settingsTopBtn.setMaximumSize(QSize(28, 28))
         self.settingsTopBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        icon1 = QIcon()
-        icon1.addFile(u":/icons/images/icons/icon_settings.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.settingsTopBtn.setIcon(icon1)
+        icon2 = QIcon()
+        icon2.addFile(u":/icons/images/icons/icon_settings.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.settingsTopBtn.setIcon(icon2)
         self.settingsTopBtn.setIconSize(QSize(20, 20))
 
         self.horizontalLayout_2.addWidget(self.settingsTopBtn)
@@ -968,9 +971,9 @@ class Ui_MainWindow(object):
         self.minimizeAppBtn.setMinimumSize(QSize(28, 28))
         self.minimizeAppBtn.setMaximumSize(QSize(28, 28))
         self.minimizeAppBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        icon2 = QIcon()
-        icon2.addFile(u":/icons/images/icons/icon_minimize.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.minimizeAppBtn.setIcon(icon2)
+        icon3 = QIcon()
+        icon3.addFile(u":/icons/images/icons/icon_minimize.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.minimizeAppBtn.setIcon(icon3)
         self.minimizeAppBtn.setIconSize(QSize(20, 20))
 
         self.horizontalLayout_2.addWidget(self.minimizeAppBtn)
@@ -987,9 +990,9 @@ class Ui_MainWindow(object):
         font3.setStyleStrategy(QFont.PreferDefault)
         self.maximizeRestoreAppBtn.setFont(font3)
         self.maximizeRestoreAppBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        icon3 = QIcon()
-        icon3.addFile(u":/icons/images/icons/icon_maximize.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.maximizeRestoreAppBtn.setIcon(icon3)
+        icon4 = QIcon()
+        icon4.addFile(u":/icons/images/icons/icon_maximize.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.maximizeRestoreAppBtn.setIcon(icon4)
         self.maximizeRestoreAppBtn.setIconSize(QSize(20, 20))
 
         self.horizontalLayout_2.addWidget(self.maximizeRestoreAppBtn)
@@ -999,7 +1002,7 @@ class Ui_MainWindow(object):
         self.closeAppBtn.setMinimumSize(QSize(28, 28))
         self.closeAppBtn.setMaximumSize(QSize(28, 28))
         self.closeAppBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.closeAppBtn.setIcon(icon)
+        self.closeAppBtn.setIcon(icon1)
         self.closeAppBtn.setIconSize(QSize(20, 20))
 
         self.horizontalLayout_2.addWidget(self.closeAppBtn)
@@ -1109,9 +1112,9 @@ class Ui_MainWindow(object):
         self.openfile_btn.setFont(font)
         self.openfile_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.openfile_btn.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        icon4 = QIcon()
-        icon4.addFile(u":/icons/images/icons/cil-folder-open.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.openfile_btn.setIcon(icon4)
+        icon5 = QIcon()
+        icon5.addFile(u":/icons/images/icons/cil-folder-open.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.openfile_btn.setIcon(icon5)
 
         self.gridLayout.addWidget(self.openfile_btn, 0, 1, 1, 1)
 
@@ -1240,29 +1243,6 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabShape(QTabWidget.TabShape.Rounded)
         self.tabWidget.setUsesScrollButtons(True)
         self.tabWidget.setDocumentMode(True)
-        self.Summerize_tab = QWidget()
-        self.Summerize_tab.setObjectName(u"Summerize_tab")
-        self.gridLayout_5 = QGridLayout(self.Summerize_tab)
-        self.gridLayout_5.setObjectName(u"gridLayout_5")
-        self.sum_widget = QWidget(self.Summerize_tab)
-        self.sum_widget.setObjectName(u"sum_widget")
-        self.gridLayout_6 = QGridLayout(self.sum_widget)
-        self.gridLayout_6.setObjectName(u"gridLayout_6")
-        self.summary_text = QTextEdit(self.sum_widget)
-        self.summary_text.setObjectName(u"summary_text")
-        self.summary_text.setReadOnly(True)
-
-        self.gridLayout_6.addWidget(self.summary_text, 1, 0, 1, 1)
-
-        self.sum_btn = QPushButton(self.sum_widget)
-        self.sum_btn.setObjectName(u"sum_btn")
-
-        self.gridLayout_6.addWidget(self.sum_btn, 0, 0, 1, 1)
-
-
-        self.gridLayout_5.addWidget(self.sum_widget, 0, 0, 1, 1)
-
-        self.tabWidget.addTab(self.Summerize_tab, "")
         self.Questions_tap = QWidget()
         self.Questions_tap.setObjectName(u"Questions_tap")
         self.gridLayout_3 = QGridLayout(self.Questions_tap)
@@ -1286,6 +1266,29 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addWidget(self.qu_widget, 1, 0, 1, 1)
 
         self.tabWidget.addTab(self.Questions_tap, "")
+        self.Summerize_tab = QWidget()
+        self.Summerize_tab.setObjectName(u"Summerize_tab")
+        self.gridLayout_5 = QGridLayout(self.Summerize_tab)
+        self.gridLayout_5.setObjectName(u"gridLayout_5")
+        self.sum_widget = QWidget(self.Summerize_tab)
+        self.sum_widget.setObjectName(u"sum_widget")
+        self.gridLayout_6 = QGridLayout(self.sum_widget)
+        self.gridLayout_6.setObjectName(u"gridLayout_6")
+        self.sum_btn = QPushButton(self.sum_widget)
+        self.sum_btn.setObjectName(u"sum_btn")
+
+        self.gridLayout_6.addWidget(self.sum_btn, 0, 0, 1, 1)
+
+        self.summary_text = QTextEdit(self.sum_widget)
+        self.summary_text.setObjectName(u"summary_text")
+        self.summary_text.setReadOnly(True)
+
+        self.gridLayout_6.addWidget(self.summary_text, 1, 0, 1, 1)
+
+
+        self.gridLayout_5.addWidget(self.sum_widget, 0, 0, 1, 1)
+
+        self.tabWidget.addTab(self.Summerize_tab, "")
 
         self.verticalLayout_20.addWidget(self.tabWidget)
 
@@ -1431,7 +1434,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(2)
         self.tabWidget.setCurrentIndex(1)
 
 
@@ -1443,9 +1446,9 @@ class Ui_MainWindow(object):
         self.titleLeftApp.setText(QCoreApplication.translate("MainWindow", u"PyDracula", None))
         self.titleLeftDescription.setText(QCoreApplication.translate("MainWindow", u"Modern GUI / Flat Style", None))
         self.toggleButton.setText(QCoreApplication.translate("MainWindow", u"Hide", None))
-        self.btn_home.setText(QCoreApplication.translate("MainWindow", u"Home", None))
-        self.btn_data.setText(QCoreApplication.translate("MainWindow", u"Widgets", None))
+        self.btn_data.setText(QCoreApplication.translate("MainWindow", u"Data", None))
         self.btn_new.setText(QCoreApplication.translate("MainWindow", u"New", None))
+        self.btn_home.setText(QCoreApplication.translate("MainWindow", u"Home", None))
         self.btn_save.setText(QCoreApplication.translate("MainWindow", u"Save", None))
         self.btn_exit.setText(QCoreApplication.translate("MainWindow", u"Exit", None))
         self.toggleLeftBox.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
@@ -1500,8 +1503,6 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(accessibility)
         self.tabWidget.setAccessibleDescription("")
 #endif // QT_CONFIG(accessibility)
-        self.sum_btn.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.Summerize_tab), QCoreApplication.translate("MainWindow", u"Summerize", None))
         self.qu_text.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -1512,6 +1513,8 @@ class Ui_MainWindow(object):
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
         self.qu_btn.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Questions_tap), QCoreApplication.translate("MainWindow", u"Questions", None))
+        self.sum_btn.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.Summerize_tab), QCoreApplication.translate("MainWindow", u"Summerize", None))
         self.btn_message.setText(QCoreApplication.translate("MainWindow", u"Message", None))
         self.btn_print.setText(QCoreApplication.translate("MainWindow", u"Print", None))
         self.btn_logout.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
