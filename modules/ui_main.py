@@ -22,13 +22,13 @@ from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplicat
     QScrollArea, QScrollBar, QSizePolicy, QSlider,
     QStackedWidget, QTabWidget, QTableWidget, QTableWidgetItem,
     QTextEdit, QVBoxLayout, QWidget)
-import resources_rc
+import modules.resources_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(940, 678)
+        MainWindow.resize(940, 675)
         MainWindow.setMinimumSize(QSize(940, 560))
         self.styleSheet = QWidget(MainWindow)
         self.styleSheet.setObjectName(u"styleSheet")
@@ -1344,22 +1344,57 @@ class Ui_MainWindow(object):
         self.new_page.setSizePolicy(sizePolicy3)
         self.verticalLayout_20 = QVBoxLayout(self.new_page)
         self.verticalLayout_20.setObjectName(u"verticalLayout_20")
-        self.sum_btn = QPushButton(self.new_page)
-        self.sum_btn.setObjectName(u"sum_btn")
-
-        self.verticalLayout_20.addWidget(self.sum_btn)
-
         self.tabWidget = QTabWidget(self.new_page)
         self.tabWidget.setObjectName(u"tabWidget")
         self.tabWidget.setTabShape(QTabWidget.TabShape.Rounded)
         self.tabWidget.setUsesScrollButtons(True)
         self.tabWidget.setDocumentMode(True)
-        self.tab = QWidget()
-        self.tab.setObjectName(u"tab")
-        self.tabWidget.addTab(self.tab, "")
-        self.qq = QWidget()
-        self.qq.setObjectName(u"qq")
-        self.tabWidget.addTab(self.qq, "")
+        self.Summerize_tab = QWidget()
+        self.Summerize_tab.setObjectName(u"Summerize_tab")
+        self.gridLayout_5 = QGridLayout(self.Summerize_tab)
+        self.gridLayout_5.setObjectName(u"gridLayout_5")
+        self.sum_widget = QWidget(self.Summerize_tab)
+        self.sum_widget.setObjectName(u"sum_widget")
+        self.gridLayout_6 = QGridLayout(self.sum_widget)
+        self.gridLayout_6.setObjectName(u"gridLayout_6")
+        self.summary_text = QTextEdit(self.sum_widget)
+        self.summary_text.setObjectName(u"summary_text")
+        self.summary_text.setReadOnly(True)
+
+        self.gridLayout_6.addWidget(self.summary_text, 1, 0, 1, 1)
+
+        self.sum_btn = QPushButton(self.sum_widget)
+        self.sum_btn.setObjectName(u"sum_btn")
+
+        self.gridLayout_6.addWidget(self.sum_btn, 0, 0, 1, 1)
+
+
+        self.gridLayout_5.addWidget(self.sum_widget, 0, 0, 1, 1)
+
+        self.tabWidget.addTab(self.Summerize_tab, "")
+        self.Questions_tap = QWidget()
+        self.Questions_tap.setObjectName(u"Questions_tap")
+        self.gridLayout_3 = QGridLayout(self.Questions_tap)
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.qu_widget = QWidget(self.Questions_tap)
+        self.qu_widget.setObjectName(u"qu_widget")
+        self.gridLayout_4 = QGridLayout(self.qu_widget)
+        self.gridLayout_4.setObjectName(u"gridLayout_4")
+        self.qu_text = QTextEdit(self.qu_widget)
+        self.qu_text.setObjectName(u"qu_text")
+        self.qu_text.setReadOnly(True)
+
+        self.gridLayout_4.addWidget(self.qu_text, 1, 0, 1, 1)
+
+        self.qu_btn = QPushButton(self.qu_widget)
+        self.qu_btn.setObjectName(u"qu_btn")
+
+        self.gridLayout_4.addWidget(self.qu_btn, 0, 0, 1, 1)
+
+
+        self.gridLayout_3.addWidget(self.qu_widget, 1, 0, 1, 1)
+
+        self.tabWidget.addTab(self.Questions_tap, "")
 
         self.verticalLayout_20.addWidget(self.tabWidget)
 
@@ -1505,7 +1540,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(2)
         self.tabWidget.setCurrentIndex(1)
 
 
@@ -1579,12 +1614,21 @@ class Ui_MainWindow(object):
         self.commandLinkButton.setText(QCoreApplication.translate("MainWindow", u"Link Button", None))
         self.commandLinkButton.setDescription(QCoreApplication.translate("MainWindow", u"Link description", None))
         self.clean_data_btn.setText(QCoreApplication.translate("MainWindow", u"Clean Data", None))
-        self.sum_btn.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))
 #if QT_CONFIG(accessibility)
         self.tabWidget.setAccessibleDescription("")
 #endif // QT_CONFIG(accessibility)
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"summerize", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.qq), QCoreApplication.translate("MainWindow", u"questions", None))
+        self.sum_btn.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.Summerize_tab), QCoreApplication.translate("MainWindow", u"Summerize", None))
+        self.qu_text.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"hr { height: 1px; border-width: 0; }\n"
+"li.unchecked::marker { content: \"\\2610\"; }\n"
+"li.checked::marker { content: \"\\2612\"; }\n"
+"</style></head><body style=\" font-family:'Segoe UI'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
+        self.qu_btn.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.Questions_tap), QCoreApplication.translate("MainWindow", u"Questions", None))
         self.btn_message.setText(QCoreApplication.translate("MainWindow", u"Message", None))
         self.btn_print.setText(QCoreApplication.translate("MainWindow", u"Print", None))
         self.btn_logout.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
