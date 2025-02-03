@@ -1,6 +1,6 @@
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
-from OprFuncs import data_infer, extract_code
+from OprFuncs import data_infer, extract_code, extract_questions
 
 # Analysis Data
 def analysis_data(dataframe,llm):
@@ -30,7 +30,7 @@ def analysis_data(dataframe,llm):
     analysis = analysis_chain.run(data_info=data_info)
     
     #print analysis
-    print("Analysis Data:\n", analysis)
+    return(analysis)
     
 
 # Drop Nulls
@@ -40,7 +40,7 @@ def drop_nulls(dataframe, llm):
     # Prompt and Chain for dropping nulls
     drop_nulls_prompt = '''
     create a code to drop the nulls from the DataFrame named 'df',
-    only include the dropping part,
+    only include the dropping part and importing pandas,
     insure that inplace = True, no extra context or reading the file.
     '''
     # Define the prompt template
@@ -61,7 +61,7 @@ def drop_nulls(dataframe, llm):
     exec_env = {"df": dataframe}
     exec(drop_nulls_code, exec_env)
     updated_df = exec_env["df"]
-    return updated_df.info()
+    return updated_df
 
 
 # Question Generator
@@ -87,8 +87,10 @@ def quetions_gen (num,llm, dataframe):
     # Generate the questions
     questions = question_chain.run(num=num, data_info=data_info)
     
+    questions_list = extract_questions(questions)
+    
     # Print the generated questions
-    print("Generated Questions:\n", questions)
+    return(questions_list)
 
 
 def visual(dataframe, llm, questions):
