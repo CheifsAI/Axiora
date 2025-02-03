@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplicat
     QScrollArea, QScrollBar, QSizePolicy, QSlider,
     QStackedWidget, QTabWidget, QTableWidget, QTableWidgetItem,
     QTextEdit, QVBoxLayout, QWidget)
-import modules.resources_rc
+import resources_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -1187,7 +1187,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 222, 222))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 278, 222))
         self.scrollAreaWidgetContents.setStyleSheet(u" QScrollBar:vertical {\n"
 "	border: none;\n"
 "    background: rgb(52, 59, 72);\n"
@@ -1247,6 +1247,11 @@ class Ui_MainWindow(object):
         self.horizontalSlider.setOrientation(Qt.Orientation.Horizontal)
 
         self.gridLayout_2.addWidget(self.horizontalSlider, 2, 0, 1, 2)
+
+        self.clean_data_btn = QPushButton(self.row_2)
+        self.clean_data_btn.setObjectName(u"clean_data_btn")
+
+        self.gridLayout_2.addWidget(self.clean_data_btn, 0, 6, 1, 1)
 
 
         self.verticalLayout_19.addLayout(self.gridLayout_2)
@@ -1500,7 +1505,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(2)
+        self.stackedWidget.setCurrentIndex(1)
         self.tabWidget.setCurrentIndex(1)
 
 
@@ -1573,6 +1578,7 @@ class Ui_MainWindow(object):
 
         self.commandLinkButton.setText(QCoreApplication.translate("MainWindow", u"Link Button", None))
         self.commandLinkButton.setDescription(QCoreApplication.translate("MainWindow", u"Link description", None))
+        self.clean_data_btn.setText(QCoreApplication.translate("MainWindow", u"Clean Data", None))
         self.sum_btn.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))
 #if QT_CONFIG(accessibility)
         self.tabWidget.setAccessibleDescription("")
