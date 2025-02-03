@@ -1,8 +1,7 @@
-from Main import summerizer, nulldrop
-from OprFuncs import csvpd
-from Main import drop_nulls
+from Main import *
 from Models import llama3b
-df = csvpd("Test_Datasets\WorldCupMatches.csv")
-#summerizer(df,llama3b)
-#nulldrop(df,llama3b)
-drop_nulls(df,llama3b)
+from OprFuncs import read_file
+df = read_file("Test_Datasets\supply_chain_data.csv")
+analysis_data(df,llama3b)
+questions = quetions_gen(4,llama3b,df)
+visual(df,llama3b,questions)
