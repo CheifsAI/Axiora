@@ -61,7 +61,7 @@ def drop_nulls(dataframe, llm):
     exec_env = {"df": dataframe}
     exec(drop_nulls_code, exec_env)
     updated_df = exec_env["df"]
-    return updated_df.info()
+    return updated_df
 
 
 # Question Generator

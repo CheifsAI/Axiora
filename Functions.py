@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QGraphicsDropShadowEffect, QApplication, QMainWind
 import sys
 #from PyQt5 import uic
 from OprFuncs import read_file
-from Main import analysis_data
+from Main import *
 #from PyQt5.QtWidgets import QMenu, QAction
 from Models import *
 from markdown import markdown
@@ -22,6 +22,7 @@ class GuiFunctions():
          self.main_window.ui.openfile_btn.clicked.connect(self.handle_data_button)
          self.main_window.ui.sum_btn.clicked.connect(self.handle_sum_btn)
          self.main_window.ui.btn_LLMs.clicked.connect(self.handle_btn_LLMs)
+         self.main_window.ui.clean_data_btn.clicked.connect(self.handle_clean_data_btn)
     def handle_data_button(self):
          fpath, _ = QFileDialog.getOpenFileName(self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)") # Second parameter is default location
          if fpath:
@@ -32,7 +33,7 @@ class GuiFunctions():
             self.table.setColumnCount(self.df.shape[1])  # Set number of columns
             self.table.setHorizontalHeaderLabels(self.df.columns)  # Set column headers
             header = self.table.horizontalHeader()
-            header.setStyleSheet("QHeaderView::section { background-color: lightgray; }")
+            #header.setStyleSheet("QHeaderView::section { background-color: lightgray; }")
             # Populate the table with data
             for i in range(self.df.shape[0]):
                 for j in range(self.df.shape[1]):
@@ -45,3 +46,15 @@ class GuiFunctions():
     def handle_btn_LLMs(self):
         #menu = QMenu()
         print("Clicked LLM")
+    def handle_clean_data_btn(self):
+        self.cleaned_df = drop_nulls(dataframe=self.df,llm=self.llm)
+        self.table = self.main_window.ui.tableData
+        self.table.setRowCount(self.cleaned_df.shape[0])  # Set number of rows
+        self.table.setColumnCount(self.cleaned_df.shape[1])  # Set number of columns
+        self.table.setHorizontalHeaderLabels(self.cleaned_df.columns)  # Set column headers
+        header = self.table.horizontalHeader()
+        #header.setStyleSheet("QHeaderView::section { background-color: lightgray; }")
+        # Populate the table with data
+        for i in range(self.cleaned_df.shape[0]):
+            for j in range(self.cleaned_df.shape[1]):
+                self.table.setItem(i, j, QTableWidgetItem(str(self.cleaned_df.iat[i, j])))
