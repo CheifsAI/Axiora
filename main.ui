@@ -1862,7 +1862,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                       <string notr="true">background: transparent;</string>
                      </property>
                      <property name="currentIndex">
-                      <number>2</number>
+                      <number>1</number>
                      </property>
                      <widget class="QWidget" name="home">
                       <property name="styleSheet">
@@ -2013,7 +2013,10 @@ background-repeat: no-repeat;</string>
                                      <string notr="true">background-color: rgb(33, 37, 43);</string>
                                     </property>
                                     <property name="text">
-                                     <string/>
+                                     <string>File Path</string>
+                                    </property>
+                                    <property name="readOnly">
+                                     <bool>true</bool>
                                     </property>
                                     <property name="placeholderText">
                                      <string>Type here</string>
