@@ -1,6 +1,6 @@
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
-from OprFuncs import data_infer, extract_code
+from OprFuncs import data_infer, extract_code, extract_questions
 
 # Analysis Data
 def analysis_data(dataframe,llm):
@@ -87,8 +87,10 @@ def quetions_gen (num,llm, dataframe):
     # Generate the questions
     questions = question_chain.run(num=num, data_info=data_info)
     
+    questions_list = extract_questions(questions)
+    
     # Print the generated questions
-    print("Generated Questions:\n", questions)
+    return(questions_list)
 
 
 def visual(dataframe, llm, questions):
