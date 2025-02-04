@@ -11,3 +11,4 @@ __pycache__/
 *.log
 df_info.txt
 main.ui.autosave
+test.ipynb
