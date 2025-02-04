@@ -1,12 +1,16 @@
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from OprFuncs import data_infer, extract_code, extract_questions
+from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 class DataAnalyzer:
     def __init__(self,dataframe,llm):
         self.dataframe = dataframe
         self.llm = llm
         self.data_info = data_infer(dataframe)
+        self.memory = []
+
 # Analysis Data
     def analysis_data(self):
         data_info = self.data_info
@@ -33,10 +37,37 @@ class DataAnalyzer:
 
         # Run the analysis chain on the provided data
         analysis = analysis_chain.run(data_info=data_info)
-        
-        #print analysis
-        return(analysis)
-        
+    def analysis_data(self):
+        data_info = self.data_info
+
+        # Prompt and Chain for Analysis Data
+        analysis_prompt = '''
+        You are a data analyst. You are provided with a dataset about {data_info}
+        Here is the dataset structure:
+        {data_info}
+
+        Please analyze the data and provide insights about:
+        1. Key trends and patterns in the {data_info}.
+        2. Any anomalies or outliers in the data.
+        3. Recommendations or actionable insights based on the analyzed data.
+        '''
+        # Define the prompt template
+        analysis_template = PromptTemplate(
+            input_variables=["data_info"],
+            template=analysis_prompt
+        )
+        # Create a chain for analysis data
+        analysis_chain = LLMChain(llm=self.llm, prompt=analysis_template)
+
+        # Run the analysis chain on the provided data
+        analysis = analysis_chain.run(data_info=data_info)
+
+        # Log the interaction in memory
+        self.memory.append(HumanMessage(content=analysis_prompt))
+        self.memory.append(AIMessage(content=analysis))
+
+        # Return the analysis
+        return analysis        
 
     # Drop Nulls
     def drop_nulls(self):
@@ -61,6 +92,9 @@ class DataAnalyzer:
         
         # Print the code for dropping nulls
         print("Code for dropping nulls:\n", drop_nulls_code)
+
+        self.memory.append(HumanMessage(content=drop_nulls_prompt))
+        self.memory.append(AIMessage(content=drop_nulls_code))
         
         # Drop null values from the data
         exec_env = {"df": self.dataframe}
@@ -93,9 +127,11 @@ class DataAnalyzer:
         questions = question_chain.run(num=num, data_info=data_info)
         
         questions_list = extract_questions(questions)
-        
+
+        self.memory.append(HumanMessage(content=question_prompt))
+        self.memory.append(AIMessage(content="\n".join(questions_list)))      
         # Print the generated questions
-        return(questions_list)
+        return questions_list
 
 
     def visual(self, questions):
@@ -122,7 +158,33 @@ class DataAnalyzer:
         
         # Print the generated visualization code
         print("Generated Visualization Code:\n", viscode)
-        
+
+        self.memory.append(HumanMessage(content=visual_prompt))
+        self.memory.append(AIMessage(content=viscode))
+
         # Execute the visualization code
         exec_env = {"df": self.dataframe}
         exec(viscode, exec_env)
+
+    def chat(self):
+        prompt_template = ChatPromptTemplate.from_messages(
+            [
+                (
+                    "system",
+                    "You are a data analyst.",
+                    ),
+                    MessagesPlaceholder(variable_name="memory"),
+                    ("human", "{input}"),
+                    ]
+                    )
+        chain = prompt_template | self.llm
+
+        while True:
+            question = input("You: ")
+            if question == "done":
+                return
+            # response = llm.invoke(question)
+            response = chain.invoke({"input": question, "memory":self.memory})
+            self.memory.append(HumanMessage(content=question))
+            self.memory.append(AIMessage(content=response))
+            print("AI:" + response)
