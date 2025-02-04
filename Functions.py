@@ -24,6 +24,7 @@ class GuiFunctions():
          self.main_window.ui.sum_btn.clicked.connect(self.handle_sum_btn)
          self.main_window.ui.btn_LLMs.clicked.connect(self.handle_btn_LLMs)
          self.main_window.ui.clean_data_btn.clicked.connect(self.handle_clean_data_btn)
+
     def handle_data_button(self):
         fpath, _ = QFileDialog.getOpenFileName(
             self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)"
@@ -61,9 +62,11 @@ class GuiFunctions():
         self.summary_text = self.main_window.ui.summary_text
         self.summary_text.setMarkdown(self.summary)
         print(self.summary)
+
     def handle_btn_LLMs(self):
         #menu = QMenu()
         print("Clicked LLM")
+
     def handle_clean_data_btn(self):
         self.cleaned_df = self.analyzer.drop_nulls()
         self.table = self.main_window.ui.tableData
@@ -76,3 +79,7 @@ class GuiFunctions():
         for i in range(self.cleaned_df.shape[0]):
             for j in range(self.cleaned_df.shape[1]):
                 self.table.setItem(i, j, QTableWidgetItem(str(self.cleaned_df.iat[i, j])))
+    
+# result = quetions_gen(llm=llm,dataframe=df1,num=2)
+# for i, question in enumerate(result, 1):
+#    print(markdown(question))
