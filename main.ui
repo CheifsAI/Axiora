@@ -1894,7 +1894,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                   </size>
                                  </property>
                                  <property name="text">
-                                  <string>aaaaaaaaaaaaa</string>
+                                  <string/>
                                  </property>
                                  <property name="placeholderText">
                                   <string>Enter your message here</string>

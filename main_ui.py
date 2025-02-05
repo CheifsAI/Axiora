@@ -1552,7 +1552,7 @@ class Ui_MainWindow(object):
         self.groupBox_7.setTitle("")
         self.groupBox_8.setTitle("")
         self.label_3.setText("")
-        self.lineEdit_3.setText(QCoreApplication.translate("MainWindow", u"aaaaaaaaaaaaa", None))
+        self.lineEdit_3.setText("")
         self.lineEdit_3.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter your message here", None))
         self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"Send", None))
         self.labelBoxBlenderInstalation.setText(QCoreApplication.translate("MainWindow", u"Import Data", None))
