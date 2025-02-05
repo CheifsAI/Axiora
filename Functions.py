@@ -37,8 +37,6 @@ class GuiFunctions():
             self.df = read_file(fpath)
             self.analyzer = DataAnalyzer(dataframe=self.df,llm=self.llm)
 
-            print("Columns:", self.df.columns)  # Debugging
-
             # Convert index to a column
             self.df.insert(0, "Index", self.df.index)
 
@@ -90,4 +88,25 @@ class GuiFunctions():
         self.num_qu = self.ques_num_list.itemText(index)
         return self.num_qu
     def handle_qu_btn(self):
+        # Generate questions
         self.g_questions = self.analyzer.quetions_gen(self.num_qu)
+        
+        if self.g_questions:
+            scrollAreaWidgetContents = self.main_window.ui.scrollAreaWidgetContents
+            qu_layout = self.main_window.ui.qu_layout
+            while qu_layout.count():
+                item = qu_layout.takeAt(0)
+                widget = item.widget()
+                if widget:
+                    widget.deleteLater()
+            
+            # Add a checkbox for each question in g_questions
+            for i, question in enumerate(self.g_questions):
+                checkBox = QCheckBox(parent = scrollAreaWidgetContents)  # Create a new QCheckBox
+                checkBox.setObjectName(f"checkBox_{i}")  # Set a unique object name
+                checkBox.setText(question)  # Set the checkbox text to the question
+                qu_layout.addWidget(checkBox)  # Add the checkbox to the layout
+            
+            # Set the layout for the scroll area widget contents
+            scrollAreaWidgetContents.setLayout(qu_layout)
+            self.scrollArea.setWidget(scrollAreaWidgetContents)
