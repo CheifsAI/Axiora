@@ -17,13 +17,15 @@ class GuiFunctions():
         self.main_window = MainWindow
         self.ui = MainWindow.ui
         self.llm = llama3b
-        
         self.setup_connections()
+
     def setup_connections(self):
          self.main_window.ui.openfile_btn.clicked.connect(self.handle_data_button)
          self.main_window.ui.sum_btn.clicked.connect(self.handle_sum_btn)
          self.main_window.ui.btn_LLMs.clicked.connect(self.handle_btn_LLMs)
          self.main_window.ui.clean_data_btn.clicked.connect(self.handle_clean_data_btn)
+         self.main_window.ui.qu_num_list.currentIndexChanged.connect(self.handle_qu_num)
+         self.main_window.ui.qu_btn.clicked.connect(self.handle_qu_btn)
 
     def handle_data_button(self):
         fpath, _ = QFileDialog.getOpenFileName(
@@ -83,3 +85,9 @@ class GuiFunctions():
 # result = quetions_gen(llm=llm,dataframe=df1,num=2)
 # for i, question in enumerate(result, 1):
 #    print(markdown(question))
+    def handle_qu_num(self,index):
+        self.ques_num_list = self.main_window.ui.qu_num_list
+        self.num_qu = self.ques_num_list.itemText(index)
+        return self.num_qu
+    def handle_qu_btn(self):
+        self.g_questions = self.analyzer.quetions_gen(self.num_qu)

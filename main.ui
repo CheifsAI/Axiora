@@ -2501,7 +2501,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                </widget>
                               </item>
                               <item row="1" column="0">
-                               <widget class="QComboBox" name="comboBox">
+                               <widget class="QComboBox" name="qu_num_list">
                                 <property name="placeholderText">
                                  <string comment="Number of questions" extracomment="Number of questions">Number of questions</string>
                                 </property>

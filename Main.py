@@ -11,32 +11,6 @@ class DataAnalyzer:
         self.data_info = data_infer(dataframe)
         self.memory = []
 
-# Analysis Data
-    def analysis_data(self):
-        data_info = self.data_info
-
-        # Prompt and Chain for Analysis Data
-        analysis_prompt = '''
-        You are a data analyst. You are provided with a dataset about {data_info}
-        Here is the dataset structure:
-        {data_info}
-
-        Please analyze the data and provide insights about:
-        1. Key trends and patterns in the {data_info}.
-        2. Any anomalies or outliers in the data.
-        3. Recommendations or actionable insights based on the analyzed data.
-        '''
-        # Define the prompt template
-        analysis_template = PromptTemplate(
-            input_variables=["data_info","topic"],     
-            template=analysis_prompt
-        )
-        # Create a chain for analysis data
-        analysis_chain = LLMChain(llm=self.llm, prompt=analysis_template)
-        
-
-        # Run the analysis chain on the provided data
-        analysis = analysis_chain.run(data_info=data_info)
     def analysis_data(self):
         data_info = self.data_info
 
