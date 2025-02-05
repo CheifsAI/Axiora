@@ -16,10 +16,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QFrame,
-    QGridLayout, QHBoxLayout, QHeaderView, QLabel,
-    QLineEdit, QMainWindow, QPushButton, QSizePolicy,
-    QStackedWidget, QTabWidget, QTableWidget, QTableWidgetItem,
-    QTextEdit, QVBoxLayout, QWidget)
+    QGridLayout, QGroupBox, QHBoxLayout, QHeaderView,
+    QLabel, QLineEdit, QMainWindow, QPushButton,
+    QSizePolicy, QStackedWidget, QTabWidget, QTableWidget,
+    QTableWidgetItem, QTextEdit, QVBoxLayout, QWidget)
 import resources_rc
 
 class Ui_MainWindow(object):
@@ -598,7 +598,7 @@ class Ui_MainWindow(object):
         font1 = QFont()
         font1.setFamilies([u"Segoe UI Semibold"])
         font1.setPointSize(12)
-       # font1.setWeight(QFont.)
+        #font1.setWeight(QFont.)
         font1.setItalic(False)
         self.titleLeftApp.setFont(font1)
         self.titleLeftApp.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
@@ -1043,10 +1043,125 @@ class Ui_MainWindow(object):
         self.stackedWidget.setStyleSheet(u"background: transparent;")
         self.home = QWidget()
         self.home.setObjectName(u"home")
-        self.home.setStyleSheet(u"background-image: url(:/images/images/images/PyDracula_vertical.png);\n"
-"background-position: center;\n"
-"background-repeat: no-repeat;")
+        self.home.setStyleSheet(u"")
+        self.gridLayout_7 = QGridLayout(self.home)
+        self.gridLayout_7.setObjectName(u"gridLayout_7")
+        self.groupBox_4 = QGroupBox(self.home)
+        self.groupBox_4.setObjectName(u"groupBox_4")
+        self.verticalLayout_23 = QVBoxLayout(self.groupBox_4)
+        self.verticalLayout_23.setObjectName(u"verticalLayout_23")
+        self.groupBox_7 = QGroupBox(self.groupBox_4)
+        self.groupBox_7.setObjectName(u"groupBox_7")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.MinimumExpanding)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.groupBox_7.sizePolicy().hasHeightForWidth())
+        self.groupBox_7.setSizePolicy(sizePolicy3)
+
+        self.verticalLayout_23.addWidget(self.groupBox_7)
+
+        self.horizontalLayout_13 = QHBoxLayout()
+        self.horizontalLayout_13.setSpacing(6)
+        self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
+        self.horizontalLayout_13.setContentsMargins(9, -1, 9, -1)
+        self.groupBox_8 = QGroupBox(self.groupBox_4)
+        self.groupBox_8.setObjectName(u"groupBox_8")
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.groupBox_8.sizePolicy().hasHeightForWidth())
+        self.groupBox_8.setSizePolicy(sizePolicy4)
+        self.horizontalLayout_11 = QHBoxLayout(self.groupBox_8)
+        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
+        self.label_3 = QLabel(self.groupBox_8)
+        self.label_3.setObjectName(u"label_3")
+        self.label_3.setPixmap(QPixmap(u":/icons/images/icons/cil-link.png"))
+
+        self.horizontalLayout_11.addWidget(self.label_3)
+
+        self.lineEdit_3 = QLineEdit(self.groupBox_8)
+        self.lineEdit_3.setObjectName(u"lineEdit_3")
+        self.lineEdit_3.setMinimumSize(QSize(0, 30))
+
+        self.horizontalLayout_11.addWidget(self.lineEdit_3)
+
+        self.pushButton_3 = QPushButton(self.groupBox_8)
+        self.pushButton_3.setObjectName(u"pushButton_3")
+        self.pushButton_3.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
+        self.pushButton_3.setStyleSheet(u"background-color: rgb(64, 39, 255);")
+        icon5 = QIcon()
+        icon5.addFile(u"images/icons/arrow-34-24.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.pushButton_3.setIcon(icon5)
+
+        self.horizontalLayout_11.addWidget(self.pushButton_3)
+
+
+        self.horizontalLayout_13.addWidget(self.groupBox_8)
+
+
+        self.verticalLayout_23.addLayout(self.horizontalLayout_13)
+
+
+        self.gridLayout_7.addWidget(self.groupBox_4, 0, 0, 1, 1)
+
         self.stackedWidget.addWidget(self.home)
+        self.home_2 = QWidget()
+        self.home_2.setObjectName(u"home_2")
+        self.gridLayout_2 = QGridLayout(self.home_2)
+        self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.groupBox = QGroupBox(self.home_2)
+        self.groupBox.setObjectName(u"groupBox")
+        self.verticalLayout_21 = QVBoxLayout(self.groupBox)
+        self.verticalLayout_21.setSpacing(6)
+        self.verticalLayout_21.setObjectName(u"verticalLayout_21")
+        self.verticalLayout_21.setContentsMargins(0, 0, -1, 0)
+        self.groupBox_2 = QGroupBox(self.groupBox)
+        self.groupBox_2.setObjectName(u"groupBox_2")
+        sizePolicy3.setHeightForWidth(self.groupBox_2.sizePolicy().hasHeightForWidth())
+        self.groupBox_2.setSizePolicy(sizePolicy3)
+
+        self.verticalLayout_21.addWidget(self.groupBox_2)
+
+        self.horizontalLayout_8 = QHBoxLayout()
+        self.horizontalLayout_8.setSpacing(6)
+        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
+        self.horizontalLayout_8.setContentsMargins(9, -1, 9, -1)
+        self.groupBox_3 = QGroupBox(self.groupBox)
+        self.groupBox_3.setObjectName(u"groupBox_3")
+        sizePolicy4.setHeightForWidth(self.groupBox_3.sizePolicy().hasHeightForWidth())
+        self.groupBox_3.setSizePolicy(sizePolicy4)
+        self.horizontalLayout_6 = QHBoxLayout(self.groupBox_3)
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
+        self.label = QLabel(self.groupBox_3)
+        self.label.setObjectName(u"label")
+        self.label.setPixmap(QPixmap(u":/icons/images/icons/cil-link.png"))
+
+        self.horizontalLayout_6.addWidget(self.label)
+
+        self.lineEdit = QLineEdit(self.groupBox_3)
+        self.lineEdit.setObjectName(u"lineEdit")
+        self.lineEdit.setMinimumSize(QSize(0, 30))
+
+        self.horizontalLayout_6.addWidget(self.lineEdit)
+
+        self.pushButton = QPushButton(self.groupBox_3)
+        self.pushButton.setObjectName(u"pushButton")
+        self.pushButton.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
+        self.pushButton.setStyleSheet(u"background-color: rgb(95, 89, 255);")
+        self.pushButton.setIcon(icon5)
+
+        self.horizontalLayout_6.addWidget(self.pushButton)
+
+
+        self.horizontalLayout_8.addWidget(self.groupBox_3)
+
+
+        self.verticalLayout_21.addLayout(self.horizontalLayout_8)
+
+
+        self.gridLayout_2.addWidget(self.groupBox, 0, 0, 1, 1)
+
+        self.stackedWidget.addWidget(self.home_2)
         self.data_page = QWidget()
         self.data_page.setObjectName(u"data_page")
         self.data_page.setStyleSheet(u"b")
@@ -1112,9 +1227,9 @@ class Ui_MainWindow(object):
         self.openfile_btn.setFont(font)
         self.openfile_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.openfile_btn.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        icon5 = QIcon()
-        icon5.addFile(u":/icons/images/icons/cil-folder-open.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.openfile_btn.setIcon(icon5)
+        icon6 = QIcon()
+        icon6.addFile(u":/icons/images/icons/cil-folder-open.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.openfile_btn.setIcon(icon6)
 
         self.gridLayout.addWidget(self.openfile_btn, 0, 1, 1, 1)
 
@@ -1164,11 +1279,11 @@ class Ui_MainWindow(object):
         self.horizontalLayout_12.setContentsMargins(0, 0, 0, 0)
         self.tableData = QTableWidget(self.row_3)
         self.tableData.setObjectName(u"tableData")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.tableData.sizePolicy().hasHeightForWidth())
-        self.tableData.setSizePolicy(sizePolicy3)
+        sizePolicy5 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy5.setHorizontalStretch(0)
+        sizePolicy5.setVerticalStretch(0)
+        sizePolicy5.setHeightForWidth(self.tableData.sizePolicy().hasHeightForWidth())
+        self.tableData.setSizePolicy(sizePolicy5)
         palette = QPalette()
         brush = QBrush(QColor(221, 221, 221, 255))
         brush.setStyle(Qt.SolidPattern)
@@ -1234,8 +1349,8 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.data_page)
         self.new_page = QWidget()
         self.new_page.setObjectName(u"new_page")
-        sizePolicy3.setHeightForWidth(self.new_page.sizePolicy().hasHeightForWidth())
-        self.new_page.setSizePolicy(sizePolicy3)
+        sizePolicy5.setHeightForWidth(self.new_page.sizePolicy().hasHeightForWidth())
+        self.new_page.setSizePolicy(sizePolicy5)
         self.verticalLayout_20 = QVBoxLayout(self.new_page)
         self.verticalLayout_20.setObjectName(u"verticalLayout_20")
         self.tabWidget = QTabWidget(self.new_page)
@@ -1434,8 +1549,8 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(2)
-        self.tabWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -1494,6 +1609,19 @@ class Ui_MainWindow(object):
         self.closeAppBtn.setToolTip(QCoreApplication.translate("MainWindow", u"Close", None))
 #endif // QT_CONFIG(tooltip)
         self.closeAppBtn.setText("")
+        self.groupBox_4.setTitle("")
+        self.groupBox_7.setTitle("")
+        self.groupBox_8.setTitle("")
+        self.label_3.setText("")
+        self.lineEdit_3.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter your message here", None))
+        self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"Send", None))
+        self.groupBox.setTitle("")
+        self.groupBox_2.setTitle("")
+        self.groupBox_3.setTitle("")
+        self.label.setText("")
+        self.lineEdit.setText("")
+        self.lineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter your message here", None))
+        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"send", None))
         self.labelBoxBlenderInstalation.setText(QCoreApplication.translate("MainWindow", u"Import Data", None))
         self.path_location.setText(QCoreApplication.translate("MainWindow", u"File Path", None))
         self.path_location.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type here", None))
