@@ -1314,21 +1314,6 @@ class Ui_MainWindow(object):
 
         self.gridLayout_4.addWidget(self.qu_btn, 1, 1, 1, 1)
 
-        self.qu_num_list = QComboBox(self.qu_widget)
-        self.qu_num_list.addItem(u"1")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.setObjectName(u"qu_num_list")
-
-        self.gridLayout_4.addWidget(self.qu_num_list, 1, 0, 1, 1)
-
         self.done_btn = QPushButton(self.qu_widget)
         self.done_btn.setObjectName(u"done_btn")
 
@@ -1343,6 +1328,23 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
         self.gridLayout_4.addWidget(self.scrollArea, 3, 0, 1, 2)
+
+        self.qu_num_list = QComboBox(self.qu_widget)
+        self.qu_num_list.addItem("")
+        self.qu_num_list.addItem("")
+        self.qu_num_list.addItem("")
+        self.qu_num_list.addItem("")
+        self.qu_num_list.addItem("")
+        self.qu_num_list.addItem("")
+        self.qu_num_list.addItem("")
+        self.qu_num_list.addItem("")
+        self.qu_num_list.addItem("")
+        self.qu_num_list.addItem("")
+        self.qu_num_list.setObjectName(u"qu_num_list")
+        self.qu_num_list.setEditable(True)
+        self.qu_num_list.setCurrentText(u"Number of questions")
+
+        self.gridLayout_4.addWidget(self.qu_num_list, 1, 0, 1, 1)
 
 
         self.gridLayout_3.addWidget(self.qu_widget, 2, 0, 1, 1)
@@ -1592,6 +1594,8 @@ class Ui_MainWindow(object):
         self.tabWidget.setAccessibleDescription("")
 #endif // QT_CONFIG(accessibility)
         self.qu_btn.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
+        self.done_btn.setText(QCoreApplication.translate("MainWindow", u"Done", None))
+        self.qu_num_list.setItemText(0, QCoreApplication.translate("MainWindow", u"1", u"1"))
         self.qu_num_list.setItemText(1, QCoreApplication.translate("MainWindow", u"2", None))
         self.qu_num_list.setItemText(2, QCoreApplication.translate("MainWindow", u"3", None))
         self.qu_num_list.setItemText(3, QCoreApplication.translate("MainWindow", u"4", None))
@@ -1602,8 +1606,6 @@ class Ui_MainWindow(object):
         self.qu_num_list.setItemText(8, QCoreApplication.translate("MainWindow", u"9", None))
         self.qu_num_list.setItemText(9, QCoreApplication.translate("MainWindow", u"10", None))
 
-        self.qu_num_list.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Number of questions", u"Number of questions"))
-        self.done_btn.setText(QCoreApplication.translate("MainWindow", u"Done", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Questions_tap), QCoreApplication.translate("MainWindow", u"Questions", None))
         self.sum_btn.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Summerize_tab), QCoreApplication.translate("MainWindow", u"Summerize", None))
