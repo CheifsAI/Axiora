@@ -2507,7 +2507,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                 </property>
                                 <item>
                                  <property name="text">
-                                  <string>1</string>
+                                  <string notr="true" comment="Number of questions" extracomment="Number of questions">1</string>
                                  </property>
                                 </item>
                                 <item>
@@ -2895,7 +2895,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                    </font>
                   </property>
                   <property name="text">
-                   <string>By: Wanderson M. Pimenta</string>
+                   <string>By: Cheifs AI</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
@@ -2905,7 +2905,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                 <item>
                  <widget class="QLabel" name="version">
                   <property name="text">
-                   <string>v1.0.3</string>
+                   <string>v1.0</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>

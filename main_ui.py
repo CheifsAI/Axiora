@@ -1315,7 +1315,7 @@ class Ui_MainWindow(object):
         self.gridLayout_4.addWidget(self.qu_btn, 1, 1, 1, 1)
 
         self.qu_num_list = QComboBox(self.qu_widget)
-        self.qu_num_list.addItem("")
+        self.qu_num_list.addItem(u"1")
         self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
@@ -1592,7 +1592,6 @@ class Ui_MainWindow(object):
         self.tabWidget.setAccessibleDescription("")
 #endif // QT_CONFIG(accessibility)
         self.qu_btn.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
-        self.qu_num_list.setItemText(0, QCoreApplication.translate("MainWindow", u"1", None))
         self.qu_num_list.setItemText(1, QCoreApplication.translate("MainWindow", u"2", None))
         self.qu_num_list.setItemText(2, QCoreApplication.translate("MainWindow", u"3", None))
         self.qu_num_list.setItemText(3, QCoreApplication.translate("MainWindow", u"4", None))
@@ -1611,7 +1610,7 @@ class Ui_MainWindow(object):
         self.btn_message.setText(QCoreApplication.translate("MainWindow", u"Message", None))
         self.btn_print.setText(QCoreApplication.translate("MainWindow", u"Print", None))
         self.btn_logout.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
-        self.creditsLabel.setText(QCoreApplication.translate("MainWindow", u"By: Wanderson M. Pimenta", None))
-        self.version.setText(QCoreApplication.translate("MainWindow", u"v1.0.3", None))
+        self.creditsLabel.setText(QCoreApplication.translate("MainWindow", u"By: Cheifs AI", None))
+        self.version.setText(QCoreApplication.translate("MainWindow", u"v1.0", None))
     # retranslateUi
 
