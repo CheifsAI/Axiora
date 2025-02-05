@@ -187,4 +187,4 @@ class DataAnalyzer:
             response = chain.invoke({"input": question, "memory":self.memory})
             self.memory.append(HumanMessage(content=question))
             self.memory.append(AIMessage(content=response))
-            print("AI:" + response)
+            return response
