@@ -18,16 +18,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QComboBox,
     QFrame, QGridLayout, QGroupBox, QHBoxLayout,
     QHeaderView, QLabel, QLineEdit, QMainWindow,
-    QPushButton, QSizePolicy, QStackedWidget, QTabWidget,
-    QTableWidget, QTableWidgetItem, QTextEdit, QVBoxLayout,
-    QWidget)
+    QPushButton, QScrollArea, QSizePolicy, QStackedWidget,
+    QTabWidget, QTableWidget, QTableWidgetItem, QTextEdit,
+    QVBoxLayout, QWidget)
 import resources_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(940, 675)
+        MainWindow.resize(940, 758)
         MainWindow.setMinimumSize(QSize(940, 560))
         self.styleSheet = QWidget(MainWindow)
         self.styleSheet.setObjectName(u"styleSheet")
@@ -1309,8 +1309,12 @@ class Ui_MainWindow(object):
         self.qu_widget.setObjectName(u"qu_widget")
         self.gridLayout_4 = QGridLayout(self.qu_widget)
         self.gridLayout_4.setObjectName(u"gridLayout_4")
+        self.qu_btn = QPushButton(self.qu_widget)
+        self.qu_btn.setObjectName(u"qu_btn")
+
+        self.gridLayout_4.addWidget(self.qu_btn, 1, 1, 1, 1)
+
         self.comboBox = QComboBox(self.qu_widget)
-        self.comboBox.addItem("")
         self.comboBox.addItem("")
         self.comboBox.addItem("")
         self.comboBox.addItem("")
@@ -1325,21 +1329,20 @@ class Ui_MainWindow(object):
 
         self.gridLayout_4.addWidget(self.comboBox, 1, 0, 1, 1)
 
-        self.qu_btn = QPushButton(self.qu_widget)
-        self.qu_btn.setObjectName(u"qu_btn")
-
-        self.gridLayout_4.addWidget(self.qu_btn, 1, 1, 1, 1)
-
-        self.qu_text = QTextEdit(self.qu_widget)
-        self.qu_text.setObjectName(u"qu_text")
-        self.qu_text.setReadOnly(True)
-
-        self.gridLayout_4.addWidget(self.qu_text, 3, 0, 1, 2)
-
         self.done_btn = QPushButton(self.qu_widget)
         self.done_btn.setObjectName(u"done_btn")
 
         self.gridLayout_4.addWidget(self.done_btn, 4, 0, 1, 2)
+
+        self.scrollArea = QScrollArea(self.qu_widget)
+        self.scrollArea.setObjectName(u"scrollArea")
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollAreaWidgetContents = QWidget()
+        self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 770, 458))
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+
+        self.gridLayout_4.addWidget(self.scrollArea, 3, 0, 1, 2)
 
 
         self.gridLayout_3.addWidget(self.qu_widget, 2, 0, 1, 1)
@@ -1588,28 +1591,19 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(accessibility)
         self.tabWidget.setAccessibleDescription("")
 #endif // QT_CONFIG(accessibility)
-        self.comboBox.setItemText(0, QCoreApplication.translate("MainWindow", u"Number of qestions", None))
-        self.comboBox.setItemText(1, QCoreApplication.translate("MainWindow", u"1", None))
-        self.comboBox.setItemText(2, QCoreApplication.translate("MainWindow", u"2", None))
-        self.comboBox.setItemText(3, QCoreApplication.translate("MainWindow", u"3", None))
-        self.comboBox.setItemText(4, QCoreApplication.translate("MainWindow", u"4", None))
-        self.comboBox.setItemText(5, QCoreApplication.translate("MainWindow", u"5", None))
-        self.comboBox.setItemText(6, QCoreApplication.translate("MainWindow", u"6", None))
-        self.comboBox.setItemText(7, QCoreApplication.translate("MainWindow", u"7", None))
-        self.comboBox.setItemText(8, QCoreApplication.translate("MainWindow", u"8", None))
-        self.comboBox.setItemText(9, QCoreApplication.translate("MainWindow", u"9", None))
-        self.comboBox.setItemText(10, QCoreApplication.translate("MainWindow", u"10", None))
-
-        self.comboBox.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Number of qestions", u"Number of qestions"))
         self.qu_btn.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
-        self.qu_text.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"hr { height: 1px; border-width: 0; }\n"
-"li.unchecked::marker { content: \"\\2610\"; }\n"
-"li.checked::marker { content: \"\\2612\"; }\n"
-"</style></head><body style=\" font-family:'Segoe UI'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
+        self.comboBox.setItemText(0, QCoreApplication.translate("MainWindow", u"1", None))
+        self.comboBox.setItemText(1, QCoreApplication.translate("MainWindow", u"2", None))
+        self.comboBox.setItemText(2, QCoreApplication.translate("MainWindow", u"3", None))
+        self.comboBox.setItemText(3, QCoreApplication.translate("MainWindow", u"4", None))
+        self.comboBox.setItemText(4, QCoreApplication.translate("MainWindow", u"5", None))
+        self.comboBox.setItemText(5, QCoreApplication.translate("MainWindow", u"6", None))
+        self.comboBox.setItemText(6, QCoreApplication.translate("MainWindow", u"7", None))
+        self.comboBox.setItemText(7, QCoreApplication.translate("MainWindow", u"8", None))
+        self.comboBox.setItemText(8, QCoreApplication.translate("MainWindow", u"9", None))
+        self.comboBox.setItemText(9, QCoreApplication.translate("MainWindow", u"10", None))
+
+        self.comboBox.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Number of questions", u"Number of questions"))
         self.done_btn.setText(QCoreApplication.translate("MainWindow", u"Done", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Questions_tap), QCoreApplication.translate("MainWindow", u"Questions", None))
         self.sum_btn.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))
