@@ -2494,7 +2494,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                             <widget class="QWidget" name="qu_widget" native="true">
                              <layout class="QGridLayout" name="gridLayout_4">
                               <item row="1" column="0">
-                               <widget class="QComboBox" name="comboBox">
+                               <widget class="QComboBox" name="qu_num_list">
                                 <property name="placeholderText">
                                  <string comment="Number of qestions" extracomment="Number of qestions">Number of qestions</string>
                                 </property>
