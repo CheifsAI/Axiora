@@ -636,88 +636,48 @@ Button */
             <property name="frameShadow">
              <enum>QFrame::Shadow::Raised</enum>
             </property>
-            <widget class="QFrame" name="topLogo">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>5</y>
-               <width>42</width>
-               <height>42</height>
-              </rect>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>42</width>
-               <height>42</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>42</width>
-               <height>42</height>
-              </size>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::Shape::NoFrame</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Shadow::Raised</enum>
-             </property>
-            </widget>
-            <widget class="QLabel" name="titleLeftApp">
-             <property name="geometry">
-              <rect>
-               <x>70</x>
-               <y>8</y>
-               <width>160</width>
-               <height>20</height>
-              </rect>
-             </property>
-             <property name="font">
-              <font>
-               <family>Segoe UI Semibold</family>
-               <pointsize>12</pointsize>
-               <italic>false</italic>
-               <fontweight></fontweight>
-              </font>
-             </property>
-             <property name="text">
-              <string>PyDracula</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
-             </property>
-            </widget>
-            <widget class="QLabel" name="titleLeftDescription">
-             <property name="geometry">
-              <rect>
-               <x>70</x>
-               <y>27</y>
-               <width>160</width>
-               <height>16</height>
-              </rect>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>16</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <family>Segoe UI</family>
-               <pointsize>8</pointsize>
-               <italic>false</italic>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Modern GUI / Flat Style</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
-             </property>
-            </widget>
+            <layout class="QGridLayout" name="gridLayout_8">
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_2">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>100</horstretch>
+                 <verstretch>100</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>50</width>
+                 <height>40</height>
+                </size>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Shadow::Raised</enum>
+               </property>
+               <property name="lineWidth">
+                <number>0</number>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="pixmap">
+                <pixmap resource="resources.qrc">:/icons/images/images/logo axuira.png</pixmap>
+               </property>
+               <property name="scaledContents">
+                <bool>true</bool>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignCenter</set>
+               </property>
+               <property name="wordWrap">
+                <bool>false</bool>
+               </property>
+               <property name="margin">
+                <number>3</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
           <item>
@@ -1590,7 +1550,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                    </font>
                   </property>
                   <property name="text">
-                   <string>PyDracula APP - Theme with colors based on Dracula for Python.</string>
+                   <string>Axiora</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
