@@ -15,11 +15,12 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QFrame,
-    QGridLayout, QGroupBox, QHBoxLayout, QHeaderView,
-    QLabel, QLineEdit, QMainWindow, QPushButton,
-    QSizePolicy, QStackedWidget, QTabWidget, QTableWidget,
-    QTableWidgetItem, QTextEdit, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QComboBox,
+    QFrame, QGridLayout, QGroupBox, QHBoxLayout,
+    QHeaderView, QLabel, QLineEdit, QMainWindow,
+    QPushButton, QSizePolicy, QStackedWidget, QTabWidget,
+    QTableWidget, QTableWidgetItem, QTextEdit, QVBoxLayout,
+    QWidget)
 import resources_rc
 
 class Ui_MainWindow(object):
@@ -1237,30 +1238,32 @@ class Ui_MainWindow(object):
         brush2.setStyle(Qt.NoBrush)
         palette.setBrush(QPalette.Active, QPalette.Base, brush2)
         palette.setBrush(QPalette.Active, QPalette.Window, brush1)
+        brush3 = QBrush(QColor(221, 221, 221, 128))
+        brush3.setStyle(Qt.SolidPattern)
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
-        palette.setBrush(QPalette.Active, QPalette.PlaceholderText, brush)
+        palette.setBrush(QPalette.Active, QPalette.PlaceholderText, brush3)
 #endif
         palette.setBrush(QPalette.Inactive, QPalette.WindowText, brush)
         palette.setBrush(QPalette.Inactive, QPalette.Button, brush1)
         palette.setBrush(QPalette.Inactive, QPalette.Text, brush)
         palette.setBrush(QPalette.Inactive, QPalette.ButtonText, brush)
-        brush3 = QBrush(QColor(0, 0, 0, 255))
-        brush3.setStyle(Qt.NoBrush)
-        palette.setBrush(QPalette.Inactive, QPalette.Base, brush3)
+        brush4 = QBrush(QColor(0, 0, 0, 255))
+        brush4.setStyle(Qt.NoBrush)
+        palette.setBrush(QPalette.Inactive, QPalette.Base, brush4)
         palette.setBrush(QPalette.Inactive, QPalette.Window, brush1)
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
-        palette.setBrush(QPalette.Inactive, QPalette.PlaceholderText, brush)
+        palette.setBrush(QPalette.Inactive, QPalette.PlaceholderText, brush3)
 #endif
         palette.setBrush(QPalette.Disabled, QPalette.WindowText, brush)
         palette.setBrush(QPalette.Disabled, QPalette.Button, brush1)
         palette.setBrush(QPalette.Disabled, QPalette.Text, brush)
         palette.setBrush(QPalette.Disabled, QPalette.ButtonText, brush)
-        brush4 = QBrush(QColor(0, 0, 0, 255))
-        brush4.setStyle(Qt.NoBrush)
-        palette.setBrush(QPalette.Disabled, QPalette.Base, brush4)
+        brush5 = QBrush(QColor(0, 0, 0, 255))
+        brush5.setStyle(Qt.NoBrush)
+        palette.setBrush(QPalette.Disabled, QPalette.Base, brush5)
         palette.setBrush(QPalette.Disabled, QPalette.Window, brush1)
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
-        palette.setBrush(QPalette.Disabled, QPalette.PlaceholderText, brush)
+        palette.setBrush(QPalette.Disabled, QPalette.PlaceholderText, brush3)
 #endif
         self.tableData.setPalette(palette)
         self.tableData.setFrameShape(QFrame.Shape.NoFrame)
@@ -1306,19 +1309,40 @@ class Ui_MainWindow(object):
         self.qu_widget.setObjectName(u"qu_widget")
         self.gridLayout_4 = QGridLayout(self.qu_widget)
         self.gridLayout_4.setObjectName(u"gridLayout_4")
-        self.qu_text = QTextEdit(self.qu_widget)
-        self.qu_text.setObjectName(u"qu_text")
-        self.qu_text.setReadOnly(True)
+        self.comboBox = QComboBox(self.qu_widget)
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.setObjectName(u"comboBox")
 
-        self.gridLayout_4.addWidget(self.qu_text, 1, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.comboBox, 1, 0, 1, 1)
 
         self.qu_btn = QPushButton(self.qu_widget)
         self.qu_btn.setObjectName(u"qu_btn")
 
-        self.gridLayout_4.addWidget(self.qu_btn, 0, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.qu_btn, 1, 1, 1, 1)
+
+        self.qu_text = QTextEdit(self.qu_widget)
+        self.qu_text.setObjectName(u"qu_text")
+        self.qu_text.setReadOnly(True)
+
+        self.gridLayout_4.addWidget(self.qu_text, 3, 0, 1, 2)
+
+        self.done_btn = QPushButton(self.qu_widget)
+        self.done_btn.setObjectName(u"done_btn")
+
+        self.gridLayout_4.addWidget(self.done_btn, 4, 0, 1, 2)
 
 
-        self.gridLayout_3.addWidget(self.qu_widget, 1, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.qu_widget, 2, 0, 1, 1)
 
         self.tabWidget.addTab(self.Questions_tap, "")
         self.Summerize_tab = QWidget()
@@ -1489,7 +1513,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(3)
         self.tabWidget.setCurrentIndex(0)
 
 
@@ -1564,6 +1588,20 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(accessibility)
         self.tabWidget.setAccessibleDescription("")
 #endif // QT_CONFIG(accessibility)
+        self.comboBox.setItemText(0, QCoreApplication.translate("MainWindow", u"Number of qestions", None))
+        self.comboBox.setItemText(1, QCoreApplication.translate("MainWindow", u"1", None))
+        self.comboBox.setItemText(2, QCoreApplication.translate("MainWindow", u"2", None))
+        self.comboBox.setItemText(3, QCoreApplication.translate("MainWindow", u"3", None))
+        self.comboBox.setItemText(4, QCoreApplication.translate("MainWindow", u"4", None))
+        self.comboBox.setItemText(5, QCoreApplication.translate("MainWindow", u"5", None))
+        self.comboBox.setItemText(6, QCoreApplication.translate("MainWindow", u"6", None))
+        self.comboBox.setItemText(7, QCoreApplication.translate("MainWindow", u"7", None))
+        self.comboBox.setItemText(8, QCoreApplication.translate("MainWindow", u"8", None))
+        self.comboBox.setItemText(9, QCoreApplication.translate("MainWindow", u"9", None))
+        self.comboBox.setItemText(10, QCoreApplication.translate("MainWindow", u"10", None))
+
+        self.comboBox.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Number of qestions", u"Number of qestions"))
+        self.qu_btn.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
         self.qu_text.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -1572,7 +1610,7 @@ class Ui_MainWindow(object):
 "li.checked::marker { content: \"\\2612\"; }\n"
 "</style></head><body style=\" font-family:'Segoe UI'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
-        self.qu_btn.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
+        self.done_btn.setText(QCoreApplication.translate("MainWindow", u"Done", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Questions_tap), QCoreApplication.translate("MainWindow", u"Questions", None))
         self.sum_btn.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Summerize_tab), QCoreApplication.translate("MainWindow", u"Summerize", None))
