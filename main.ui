@@ -2493,44 +2493,19 @@ li.checked::marker { content: &quot;\2612&quot;; }
                            <item row="2" column="0">
                             <widget class="QWidget" name="qu_widget" native="true">
                              <layout class="QGridLayout" name="gridLayout_4">
-                              <item row="1" column="1">
-                               <widget class="QPushButton" name="qu_btn">
-                                <property name="text">
-                                 <string>Questions</string>
-                                </property>
-                               </widget>
-                              </item>
-                              <item row="4" column="0" colspan="2">
-                               <widget class="QPushButton" name="done_btn">
-                                <property name="text">
-                                 <string>Done</string>
-                                </property>
-                               </widget>
-                              </item>
-                              <item row="3" column="0" colspan="2">
-                               <widget class="QScrollArea" name="scrollArea">
-                                <property name="widgetResizable">
-                                 <bool>true</bool>
-                                </property>
-                                <widget class="QWidget" name="scrollAreaWidgetContents">
-                                 <property name="geometry">
-                                  <rect>
-                                   <x>0</x>
-                                   <y>0</y>
-                                   <width>770</width>
-                                   <height>458</height>
-                                  </rect>
-                                 </property>
-                                </widget>
-                               </widget>
-                              </item>
                               <item row="1" column="0">
                                <widget class="QComboBox" name="qu_num_list">
+                                <property name="autoFillBackground">
+                                 <bool>false</bool>
+                                </property>
                                 <property name="editable">
                                  <bool>true</bool>
                                 </property>
                                 <property name="currentText">
-                                 <string notr="true" comment="Number of questions" extracomment="Number of questions">Number of questions</string>
+                                 <string>Number of questionsla</string>
+                                </property>
+                                <property name="duplicatesEnabled">
+                                 <bool>true</bool>
                                 </property>
                                 <item>
                                  <property name="text">
@@ -2582,6 +2557,42 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                   <string>10</string>
                                  </property>
                                 </item>
+                               </widget>
+                              </item>
+                              <item row="1" column="1">
+                               <widget class="QPushButton" name="qu_btn">
+                                <property name="text">
+                                 <string>Questions</string>
+                                </property>
+                               </widget>
+                              </item>
+                              <item row="4" column="0" colspan="2">
+                               <widget class="QPushButton" name="done_btn">
+                                <property name="text">
+                                 <string>Done</string>
+                                </property>
+                               </widget>
+                              </item>
+                              <item row="3" column="0" colspan="2">
+                               <widget class="QScrollArea" name="scrollArea">
+                                <property name="widgetResizable">
+                                 <bool>true</bool>
+                                </property>
+                                <widget class="QWidget" name="scrollAreaWidgetContents">
+                                 <property name="geometry">
+                                  <rect>
+                                   <x>0</x>
+                                   <y>0</y>
+                                   <width>770</width>
+                                   <height>458</height>
+                                  </rect>
+                                 </property>
+                                 <layout class="QGridLayout" name="gridLayout_9">
+                                  <item row="0" column="0">
+                                   <layout class="QVBoxLayout" name="qu_layout"/>
+                                  </item>
+                                 </layout>
+                                </widget>
                                </widget>
                               </item>
                              </layout>
