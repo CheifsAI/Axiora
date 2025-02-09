@@ -110,3 +110,57 @@ class GuiFunctions():
             # Set the layout for the scroll area widget contents
             scrollAreaWidgetContents.setLayout(qu_layout)
             self.scrollArea.setWidget(scrollAreaWidgetContents)
+            
+            
+# Functions.py
+
+class ChatHandler:
+    def __init__(self):
+        # Initialize the chat handler with an empty dictionary to store user messages
+        self.user_messages = {}
+
+    def handle_message(self, user, message):
+        """
+        Handles a new message from a user.
+
+        Args:
+            user (str): The username of the sender.
+            message (str): The content of the message.
+
+        Returns:
+            str: A response to the message.
+        """
+
+        # Check if the user is already in the chat
+        if user not in self.user_messages:
+            # If not, add them with an empty list of messages
+            self.user_messages[user] = []
+
+        # Add the new message to the user's list of messages
+        self.user_messages[user].append(message)
+
+        # Generate a response based on the message content
+        if "hello" in message.lower():
+            return f"Hello {user}!"
+        elif "goodbye" in message.lower():
+            return f"Goodbye {user}, it was nice chatting with you!"
+        else:
+            return "What's up?"
+
+    def get_user_messages(self, user):
+        """
+        Gets the list of messages from a specific user.
+
+        Args:
+            user (str): The username of the sender.
+
+        Returns:
+            list: A list of messages sent by the user.
+        """
+
+        # Check if the user is in the chat
+        if user not in self.user_messages:
+            return []
+
+        # Return the list of messages for the user
+        return self.user_messages[user]

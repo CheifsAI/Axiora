@@ -1066,11 +1066,13 @@ class Ui_MainWindow(object):
         self.groupBox_8.setSizePolicy(sizePolicy5)
         self.horizontalLayout_11 = QHBoxLayout(self.groupBox_8)
         self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
-        self.label_3 = QLabel(self.groupBox_8)
-        self.label_3.setObjectName(u"label_3")
-        self.label_3.setPixmap(QPixmap(u":/icons/images/icons/cil-link.png"))
+        self.pushButton_2 = QPushButton(self.groupBox_8)
+        self.pushButton_2.setObjectName(u"pushButton_2")
+        icon5 = QIcon()
+        icon5.addFile(u":/icons/images/icons/cil-link.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.pushButton_2.setIcon(icon5)
 
-        self.horizontalLayout_11.addWidget(self.label_3)
+        self.horizontalLayout_11.addWidget(self.pushButton_2)
 
         self.lineEdit_3 = QLineEdit(self.groupBox_8)
         self.lineEdit_3.setObjectName(u"lineEdit_3")
@@ -1082,9 +1084,9 @@ class Ui_MainWindow(object):
         self.pushButton_3.setObjectName(u"pushButton_3")
         self.pushButton_3.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
         self.pushButton_3.setStyleSheet(u"background-color: rgb(64, 39, 255);")
-        icon5 = QIcon()
-        icon5.addFile(u"images/icons/arrow-34-24.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.pushButton_3.setIcon(icon5)
+        icon6 = QIcon()
+        icon6.addFile(u"images/icons/arrow-34-24.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.pushButton_3.setIcon(icon6)
 
         self.horizontalLayout_11.addWidget(self.pushButton_3)
 
@@ -1168,9 +1170,9 @@ class Ui_MainWindow(object):
         self.openfile_btn.setFont(font)
         self.openfile_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.openfile_btn.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        icon6 = QIcon()
-        icon6.addFile(u":/icons/images/icons/cil-folder-open.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.openfile_btn.setIcon(icon6)
+        icon7 = QIcon()
+        icon7.addFile(u":/icons/images/icons/cil-folder-open.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.openfile_btn.setIcon(icon7)
 
         self.gridLayout.addWidget(self.openfile_btn, 0, 1, 1, 1)
 
@@ -1356,9 +1358,7 @@ class Ui_MainWindow(object):
 
         self.pushButton = QPushButton(self.qu_widget)
         self.pushButton.setObjectName(u"pushButton")
-        icon7 = QIcon()
-        icon7.addFile(u":/icons/images/icons/cil-link.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.pushButton.setIcon(icon7)
+        self.pushButton.setIcon(icon5)
 
         self.gridLayout_4.addWidget(self.pushButton, 1, 1, 1, 1)
 
@@ -1534,7 +1534,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget.setCurrentIndex(0)
         self.tabWidget.setCurrentIndex(0)
 
 
@@ -1596,7 +1596,7 @@ class Ui_MainWindow(object):
         self.groupBox_4.setTitle("")
         self.groupBox_7.setTitle("")
         self.groupBox_8.setTitle("")
-        self.label_3.setText("")
+        self.pushButton_2.setText("")
         self.lineEdit_3.setText("")
         self.lineEdit_3.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter your message here", None))
         self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"Send", None))

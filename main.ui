@@ -1826,7 +1826,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                       <string notr="true">background: transparent;</string>
                      </property>
                      <property name="currentIndex">
-                      <number>3</number>
+                      <number>0</number>
                      </property>
                      <widget class="QWidget" name="home">
                       <property name="styleSheet">
@@ -1876,12 +1876,13 @@ li.checked::marker { content: &quot;\2612&quot;; }
                               </property>
                               <layout class="QHBoxLayout" name="horizontalLayout_11">
                                <item>
-                                <widget class="QLabel" name="label_3">
+                                <widget class="QPushButton" name="pushButton_2">
                                  <property name="text">
                                   <string/>
                                  </property>
-                                 <property name="pixmap">
-                                  <pixmap resource="resources.qrc">:/icons/images/icons/cil-link.png</pixmap>
+                                 <property name="icon">
+                                  <iconset resource="resources.qrc">
+                                   <normaloff>:/icons/images/icons/cil-link.png</normaloff>:/icons/images/icons/cil-link.png</iconset>
                                  </property>
                                 </widget>
                                </item>
