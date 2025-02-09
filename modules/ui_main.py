@@ -1080,15 +1080,15 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_11.addWidget(self.lineEdit_3)
 
-        self.pushButton_3 = QPushButton(self.groupBox_8)
-        self.pushButton_3.setObjectName(u"pushButton_3")
-        self.pushButton_3.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
-        self.pushButton_3.setStyleSheet(u"background-color: rgb(64, 39, 255);")
+        self.send_btn = QPushButton(self.groupBox_8)
+        self.send_btn.setObjectName(u"send_btn")
+        self.send_btn.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
+        self.send_btn.setStyleSheet(u"background-color: rgb(64, 39, 255);")
         icon6 = QIcon()
         icon6.addFile(u"images/icons/arrow-34-24.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.pushButton_3.setIcon(icon6)
+        self.send_btn.setIcon(icon6)
 
-        self.horizontalLayout_11.addWidget(self.pushButton_3)
+        self.horizontalLayout_11.addWidget(self.send_btn)
 
 
         self.horizontalLayout_13.addWidget(self.groupBox_8)
@@ -1539,7 +1539,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget.setCurrentIndex(0)
         self.tabWidget.setCurrentIndex(0)
 
 
@@ -1604,7 +1604,7 @@ class Ui_MainWindow(object):
         self.chat_data_btn.setText("")
         self.lineEdit_3.setText("")
         self.lineEdit_3.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter your message here", None))
-        self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"Send", None))
+        self.send_btn.setText(QCoreApplication.translate("MainWindow", u"Send", None))
         self.labelBoxBlenderInstalation.setText(QCoreApplication.translate("MainWindow", u"Import Data", None))
         self.path_location.setText(QCoreApplication.translate("MainWindow", u"File Path", None))
         self.path_location.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type here", None))
@@ -1626,7 +1626,7 @@ class Ui_MainWindow(object):
         self.qu_num_list.setItemText(8, QCoreApplication.translate("MainWindow", u"9", None))
         self.qu_num_list.setItemText(9, QCoreApplication.translate("MainWindow", u"10", None))
 
-        self.qu_num_list.setCurrentText(QCoreApplication.translate("MainWindow", u"choose number of quetions", None))
+        self.qu_num_list.setCurrentText(QCoreApplication.translate("MainWindow", u"1", None))
         self.qu_btn.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
         self.pushButton.setText("")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Questions_tap), QCoreApplication.translate("MainWindow", u"Questions", None))

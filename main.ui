@@ -1826,7 +1826,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                       <string notr="true">background: transparent;</string>
                      </property>
                      <property name="currentIndex">
-                      <number>3</number>
+                      <number>0</number>
                      </property>
                      <widget class="QWidget" name="home">
                       <property name="styleSheet">
@@ -1903,7 +1903,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                 </widget>
                                </item>
                                <item>
-                                <widget class="QPushButton" name="pushButton_3">
+                                <widget class="QPushButton" name="send_btn">
                                  <property name="layoutDirection">
                                   <enum>Qt::LayoutDirection::RightToLeft</enum>
                                  </property>
@@ -2536,7 +2536,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                  <bool>true</bool>
                                 </property>
                                 <property name="currentText">
-                                 <string>choose number of quetions</string>
+                                 <string>1</string>
                                 </property>
                                 <property name="duplicatesEnabled">
                                  <bool>true</bool>
