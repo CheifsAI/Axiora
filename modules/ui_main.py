@@ -1309,6 +1309,28 @@ class Ui_MainWindow(object):
         self.qu_widget.setObjectName(u"qu_widget")
         self.gridLayout_4 = QGridLayout(self.qu_widget)
         self.gridLayout_4.setObjectName(u"gridLayout_4")
+        self.done_btn = QPushButton(self.qu_widget)
+        self.done_btn.setObjectName(u"done_btn")
+
+        self.gridLayout_4.addWidget(self.done_btn, 4, 0, 1, 3)
+
+        self.scrollArea = QScrollArea(self.qu_widget)
+        self.scrollArea.setObjectName(u"scrollArea")
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollAreaWidgetContents = QWidget()
+        self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 770, 458))
+        self.gridLayout_9 = QGridLayout(self.scrollAreaWidgetContents)
+        self.gridLayout_9.setObjectName(u"gridLayout_9")
+        self.qu_layout = QVBoxLayout()
+        self.qu_layout.setObjectName(u"qu_layout")
+
+        self.gridLayout_9.addLayout(self.qu_layout, 0, 0, 1, 1)
+
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+
+        self.gridLayout_4.addWidget(self.scrollArea, 3, 0, 1, 3)
+
         self.qu_num_list = QComboBox(self.qu_widget)
         self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
@@ -1330,29 +1352,15 @@ class Ui_MainWindow(object):
         self.qu_btn = QPushButton(self.qu_widget)
         self.qu_btn.setObjectName(u"qu_btn")
 
-        self.gridLayout_4.addWidget(self.qu_btn, 1, 1, 1, 1)
+        self.gridLayout_4.addWidget(self.qu_btn, 1, 2, 1, 1)
 
-        self.done_btn = QPushButton(self.qu_widget)
-        self.done_btn.setObjectName(u"done_btn")
+        self.pushButton = QPushButton(self.qu_widget)
+        self.pushButton.setObjectName(u"pushButton")
+        icon7 = QIcon()
+        icon7.addFile(u":/icons/images/icons/cil-link.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.pushButton.setIcon(icon7)
 
-        self.gridLayout_4.addWidget(self.done_btn, 4, 0, 1, 2)
-
-        self.scrollArea = QScrollArea(self.qu_widget)
-        self.scrollArea.setObjectName(u"scrollArea")
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollAreaWidgetContents = QWidget()
-        self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 770, 458))
-        self.gridLayout_9 = QGridLayout(self.scrollAreaWidgetContents)
-        self.gridLayout_9.setObjectName(u"gridLayout_9")
-        self.qu_layout = QVBoxLayout()
-        self.qu_layout.setObjectName(u"qu_layout")
-
-        self.gridLayout_9.addLayout(self.qu_layout, 0, 0, 1, 1)
-
-        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
-
-        self.gridLayout_4.addWidget(self.scrollArea, 3, 0, 1, 2)
+        self.gridLayout_4.addWidget(self.pushButton, 1, 1, 1, 1)
 
 
         self.gridLayout_3.addWidget(self.qu_widget, 2, 0, 1, 1)
@@ -1601,6 +1609,7 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(accessibility)
         self.tabWidget.setAccessibleDescription("")
 #endif // QT_CONFIG(accessibility)
+        self.done_btn.setText(QCoreApplication.translate("MainWindow", u"Done", None))
         self.qu_num_list.setItemText(0, QCoreApplication.translate("MainWindow", u"1", u"1"))
         self.qu_num_list.setItemText(1, QCoreApplication.translate("MainWindow", u"2", None))
         self.qu_num_list.setItemText(2, QCoreApplication.translate("MainWindow", u"3", None))
@@ -1612,9 +1621,9 @@ class Ui_MainWindow(object):
         self.qu_num_list.setItemText(8, QCoreApplication.translate("MainWindow", u"9", None))
         self.qu_num_list.setItemText(9, QCoreApplication.translate("MainWindow", u"10", None))
 
-        self.qu_num_list.setCurrentText(QCoreApplication.translate("MainWindow", u"Number of questionsla", None))
+        self.qu_num_list.setCurrentText(QCoreApplication.translate("MainWindow", u"choose number of quetions", None))
         self.qu_btn.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
-        self.done_btn.setText(QCoreApplication.translate("MainWindow", u"Done", None))
+        self.pushButton.setText("")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Questions_tap), QCoreApplication.translate("MainWindow", u"Questions", None))
         self.sum_btn.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Summerize_tab), QCoreApplication.translate("MainWindow", u"Summerize", None))
