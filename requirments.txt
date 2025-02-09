@@ -4,3 +4,4 @@ WikipediaQueryRun
 FAISS
 chromadb
 langchain_core
+arxiv
