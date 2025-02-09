@@ -6,7 +6,7 @@ from PySide6.QtGui import QColor, QFont, QFontDatabase
 from PySide6.QtWidgets import QGraphicsDropShadowEffect, QApplication, QMainWindow, QFileDialog, QPushButton, QLabel, QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton
 import sys
 #from PyQt5 import uic
-from OprFuncs import read_file
+from OprFuncs import read_file, data_infer
 from DataAnalyzer import DataAnalyzer
 #from PyQt5.QtWidgets import QMenu, QAction
 from Models import *
@@ -26,7 +26,7 @@ class GuiFunctions():
          self.main_window.ui.clean_data_btn.clicked.connect(self.handle_clean_data_btn)
          self.main_window.ui.qu_num_list.currentIndexChanged.connect(self.handle_qu_num)
          self.main_window.ui.qu_btn.clicked.connect(self.handle_qu_btn)
-
+         self.main_window.ui.chat_data_btn.clicked.connect(self.handle_chat_data_btn)
     def handle_data_button(self):
         fpath, _ = QFileDialog.getOpenFileName(
             self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)"
@@ -110,7 +110,16 @@ class GuiFunctions():
             # Set the layout for the scroll area widget contents
             scrollAreaWidgetContents.setLayout(qu_layout)
             self.scrollArea.setWidget(scrollAreaWidgetContents)
-            
+    def handle_chat_data_btn(self):
+        cfpath, _ = QFileDialog.getOpenFileName(
+            self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)"
+        )
+        if cfpath:
+            chat_df = read_file()
+            chat_analyzer = DataAnalyzer(dataframe=chat_df,llm=self.llm)
+            chat_df_anlysis = chat_analyzer.analysis_data()
+            return chat_df_anlysis
+
             
 # Functions.py
 
