@@ -1,3 +1,6 @@
 langchain_core
 arxiv
 WikipediaQueryRun
+FAISS
+chromadb
+langchain_core
