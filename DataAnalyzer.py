@@ -180,7 +180,7 @@ class DataAnalyzer:
         chain = prompt_template | self.llm
 
         while True:
-            question = input("You: ")
+            question = input()
             if question == "done":
                 return
             # response = llm.invoke(question)

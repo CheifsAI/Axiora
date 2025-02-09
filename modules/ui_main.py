@@ -1074,11 +1074,11 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_11.addWidget(self.chat_data_btn)
 
-        self.lineEdit_3 = QLineEdit(self.groupBox_8)
-        self.lineEdit_3.setObjectName(u"lineEdit_3")
-        self.lineEdit_3.setMinimumSize(QSize(0, 30))
+        self.lineEdit_message = QLineEdit(self.groupBox_8)
+        self.lineEdit_message.setObjectName(u"lineEdit_message")
+        self.lineEdit_message.setMinimumSize(QSize(0, 30))
 
-        self.horizontalLayout_11.addWidget(self.lineEdit_3)
+        self.horizontalLayout_11.addWidget(self.lineEdit_message)
 
         self.send_btn = QPushButton(self.groupBox_8)
         self.send_btn.setObjectName(u"send_btn")
@@ -1321,7 +1321,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 770, 458))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 46, 24))
         self.gridLayout_9 = QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_9.setObjectName(u"gridLayout_9")
         self.qu_layout = QVBoxLayout()
@@ -1602,8 +1602,8 @@ class Ui_MainWindow(object):
         self.groupBox_7.setTitle("")
         self.groupBox_8.setTitle("")
         self.chat_data_btn.setText("")
-        self.lineEdit_3.setText("")
-        self.lineEdit_3.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter your message here", None))
+        self.lineEdit_message.setText("")
+        self.lineEdit_message.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter your message here", None))
         self.send_btn.setText(QCoreApplication.translate("MainWindow", u"Send", None))
         self.labelBoxBlenderInstalation.setText(QCoreApplication.translate("MainWindow", u"Import Data", None))
         self.path_location.setText(QCoreApplication.translate("MainWindow", u"File Path", None))

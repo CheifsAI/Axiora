@@ -11,12 +11,16 @@ from DataAnalyzer import DataAnalyzer
 #from PyQt5.QtWidgets import QMenu, QAction
 from Models import *
 from markdown import markdown
+from modules.Message.message import Message
+from modules.Message.ui_page_messages import Ui_chat_page
 
 class GuiFunctions():
     def __init__(self,MainWindow):
         self.main_window = MainWindow
         self.ui = MainWindow.ui
         self.llm = llama3b
+        #self.chat_page = Ui_chat_page()
+        #self.chat_page = setupUi
         self.setup_connections()
 
     def setup_connections(self):
@@ -27,6 +31,9 @@ class GuiFunctions():
          self.main_window.ui.qu_num_list.currentIndexChanged.connect(self.handle_qu_num)
          self.main_window.ui.qu_btn.clicked.connect(self.handle_qu_btn)
          self.main_window.ui.chat_data_btn.clicked.connect(self.handle_chat_data_btn)
+         self.main_window.ui.chat_send_btn.clicked(self.send_message)
+         self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
+
     def handle_data_button(self):
         fpath, _ = QFileDialog.getOpenFileName(
             self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)"
@@ -147,57 +154,22 @@ class GuiFunctions():
             chat_analyzer = DataAnalyzer(dataframe=chat_df,llm=self.llm)
             chat_df_anlysis = chat_analyzer.analysis_data()
             return chat_df_anlysis
+        
+    def enter_return_release(self, event):
+        if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
+            self.send_message()
+    def send_message(self):
+        lineEdit_chat = self.main_window.ui.lineEdit_message
+        if lineEdit_chat.text() != "":
+            message = lineEdit_chat.text(), True
+            self.main_window.ui.groupBox_7.addWidget(message, Qt.AlignCenter, Qt.AlignBottom)
+            lineEdit_chat.setText("")
 
-            
-# Functions.py
+           # QTimer.singleShot(10, lambda: self.main_window.ui.messages_frame.setFixedHeight(self.chat_page.chat_messages_layout.sizeHint().height()))
+            # QTimer.singleShot(15, lambda: self.scroll_to_end())
 
-class ChatHandler:
-    def __init__(self):
-        # Initialize the chat handler with an empty dictionary to store user messages
-        self.user_messages = {}
-
-    def handle_message(self, user, message):
-        """
-        Handles a new message from a user.
-
-        Args:
-            user (str): The username of the sender.
-            message (str): The content of the message.
-
-        Returns:
-            str: A response to the message.
-        """
-
-        # Check if the user is already in the chat
-        if user not in self.user_messages:
-            # If not, add them with an empty list of messages
-            self.user_messages[user] = []
-
-        # Add the new message to the user's list of messages
-        self.user_messages[user].append(message)
-
-        # Generate a response based on the message content
-        if "hello" in message.lower():
-            return f"Hello {user}!"
-        elif "goodbye" in message.lower():
-            return f"Goodbye {user}, it was nice chatting with you!"
-        else:
-            return "What's up?"
-
-    def get_user_messages(self, user):
-        """
-        Gets the list of messages from a specific user.
-
-        Args:
-            user (str): The username of the sender.
-
-        Returns:
-            list: A list of messages sent by the user.
-        """
-
-        # Check if the user is in the chat
-        if user not in self.user_messages:
-            return []
-
-        # Return the list of messages for the user
-        return self.user_messages[user]
+            # SEND USER MESSAGE
+    def scroll_to_end(self):
+        # SCROLL TO END
+        self.scroll_bar = self.chat_page.chat_messages.verticalScrollBar()
+        self.scroll_bar.setValue(self.scroll_bar.maximum())
