@@ -3,6 +3,7 @@ from langchain.chains import LLMChain
 from OprFuncs import data_infer, extract_code, extract_questions
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+import re
 
 class DataAnalyzer:
     def __init__(self,dataframe,llm):
@@ -78,13 +79,16 @@ class DataAnalyzer:
 
 
     # Question Generator
-    def quetions_gen (self, num):
+    def questions_gen(self, num):
         data_info = self.data_info
-        
-        # Prompt and Chain for Question Generation
+
+        # Prompt Template for Question Generation
         question_prompt = '''
-        create {num} anlysis questions about the following data {data_info}
+        Create {num} analysis questions about the following data: 
+        {data_info}
+        Please format each question on a new line without numbering.
         '''
+        
         # Define the prompt template
         question_template = PromptTemplate(
             input_variables=["num", "data_info"],
@@ -92,20 +96,41 @@ class DataAnalyzer:
         )
         
         # Create a chain for question generation
-        question_chain = LLMChain(
-            llm=self.llm,
-            prompt=question_template
-        )
-        
-        # Generate the questions
-        questions = question_chain.run(num=num, data_info=data_info)
-        
-        questions_list = extract_questions(questions)
+        # Create a chain for question generation
+        from langchain.schema.runnable import RunnableLambda
 
-        self.memory.append(HumanMessage(content=question_prompt))
-        self.memory.append(AIMessage(content="\n".join(questions_list)))      
-        # Print the generated questions
+        # Create a RunnableSequence instead of LLMChain
+        question_chain = question_template | self.llm
+
+        # Use .invoke() instead of .run()
+        generated_questions = question_chain.invoke({"num": num, "data_info": data_info})
+
+
+        
+        # Parse the generated text into a list of questions
+        print("Generated Questions:", generated_questions)  # Debugging Output
+
+        questions_list = self._extract_questions(generated_questions)
+        
+        # Update conversation memory with actual inputs/outputs
+        formatted_prompt = question_template.format(num=num, data_info=data_info)
+        self.memory.append(HumanMessage(content=formatted_prompt))
+        self.memory.append(AIMessage(content="\n".join(questions_list)))
+        
         return questions_list
+
+    def _extract_questions(self, generated_questions):
+        # Extract text from the dictionary
+        if isinstance(generated_questions, dict):
+            text = generated_questions.get("text", "")  # Adjust key based on actual output
+        else:
+            text = str(generated_questions)  # Convert to string if unexpected type
+
+        if not text:
+            return []
+
+        return [line.strip() for line in text.split('\n') if line.strip()]
+
 
 
     def visual(self, questions):
@@ -133,7 +158,8 @@ class DataAnalyzer:
         # Print the generated visualization code
         print("Generated Visualization Code:\n", viscode)
 
-        self.memory.append(HumanMessage(content=visual_prompt))
+        self.memory.append(HumanMessage(content="Generated visualization"))
+
         self.memory.append(AIMessage(content=viscode))
 
         # Execute the visualization code

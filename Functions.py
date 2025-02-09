@@ -83,33 +83,61 @@ class GuiFunctions():
 # result = quetions_gen(llm=llm,dataframe=df1,num=2)
 # for i, question in enumerate(result, 1):
 #    print(markdown(question))
-    def handle_qu_num(self,index):
+    def handle_qu_num(self, index):
         self.ques_num_list = self.main_window.ui.qu_num_list
         self.num_qu = self.ques_num_list.itemText(index)
-        return self.num_qu
+        if self.num_qu.isdigit():  # Ensure it's a valid number
+            self.num_qu = int(self.num_qu)
+        else:
+            self.num_qu = 1  # Default to 1 if invalid
+
     def handle_qu_btn(self):
-        # Generate questions
-        self.g_questions = self.analyzer.quetions_gen(self.num_qu)
-        
+        if not isinstance(self.num_qu, int) or self.num_qu <= 0:
+            print("Invalid number of questions selected.")
+            return
+
+        self.g_questions = self.analyzer.questions_gen(self.num_qu)
+
         if self.g_questions:
             scrollAreaWidgetContents = self.main_window.ui.scrollAreaWidgetContents
-            qu_layout = self.main_window.ui.qu_layout
+            qu_layout = self.main_window.ui.qu_layout  # Existing layout
+
+            # Debugging
+            print("scrollAreaWidgetContents:", scrollAreaWidgetContents)
+            print("Type:", type(scrollAreaWidgetContents))
+
+            if scrollAreaWidgetContents is None:
+                print("Error: scrollAreaWidgetContents is None! Check UI setup.")
+                return
+
+            # Remove this incorrect check, since the debug output proves it's a QWidget
+            # if not isinstance(scrollAreaWidgetContents, QWidget):
+            #     print("Error: scrollAreaWidgetContents is not a QWidget!")
+            #     return
+
+            # Clear previous widgets
             while qu_layout.count():
                 item = qu_layout.takeAt(0)
                 widget = item.widget()
                 if widget:
                     widget.deleteLater()
-            
-            # Add a checkbox for each question in g_questions
-            for i, question in enumerate(self.g_questions):
-                checkBox = QCheckBox(parent = scrollAreaWidgetContents)  # Create a new QCheckBox
-                checkBox.setObjectName(f"checkBox_{i}")  # Set a unique object name
-                checkBox.setText(question)  # Set the checkbox text to the question
-                qu_layout.addWidget(checkBox)  # Add the checkbox to the layout
-            
-            # Set the layout for the scroll area widget contents
+
+            # Add checkboxes for the generated questions
+            for question in self.g_questions:
+                checkBox = QCheckBox(question, scrollAreaWidgetContents)
+                qu_layout.addWidget(checkBox)
+
+            # Ensure UI updates
             scrollAreaWidgetContents.setLayout(qu_layout)
-            self.scrollArea.setWidget(scrollAreaWidgetContents)
+            self.main_window.ui.scrollArea.setWidget(scrollAreaWidgetContents)
+            scrollAreaWidgetContents.adjustSize()  # Ensure proper resizing
+
+        else:
+            print("No questions generated.")
+
+
+
+
     def handle_chat_data_btn(self):
         cfpath, _ = QFileDialog.getOpenFileName(
             self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)"

@@ -1066,13 +1066,13 @@ class Ui_MainWindow(object):
         self.groupBox_8.setSizePolicy(sizePolicy5)
         self.horizontalLayout_11 = QHBoxLayout(self.groupBox_8)
         self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
-        self.pushButton_2 = QPushButton(self.groupBox_8)
-        self.pushButton_2.setObjectName(u"pushButton_2")
+        self.chat_data_btn = QPushButton(self.groupBox_8)
+        self.chat_data_btn.setObjectName(u"chat_data_btn")
         icon5 = QIcon()
         icon5.addFile(u":/icons/images/icons/cil-link.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.pushButton_2.setIcon(icon5)
+        self.chat_data_btn.setIcon(icon5)
 
-        self.horizontalLayout_11.addWidget(self.pushButton_2)
+        self.horizontalLayout_11.addWidget(self.chat_data_btn)
 
         self.lineEdit_3 = QLineEdit(self.groupBox_8)
         self.lineEdit_3.setObjectName(u"lineEdit_3")
@@ -1326,6 +1326,11 @@ class Ui_MainWindow(object):
         self.gridLayout_9.setObjectName(u"gridLayout_9")
         self.qu_layout = QVBoxLayout()
         self.qu_layout.setObjectName(u"qu_layout")
+        self.widget = QWidget(self.scrollAreaWidgetContents)
+        self.widget.setObjectName(u"widget")
+
+        self.qu_layout.addWidget(self.widget)
+
 
         self.gridLayout_9.addLayout(self.qu_layout, 0, 0, 1, 1)
 
@@ -1534,7 +1539,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(3)
         self.tabWidget.setCurrentIndex(0)
 
 
@@ -1596,7 +1601,7 @@ class Ui_MainWindow(object):
         self.groupBox_4.setTitle("")
         self.groupBox_7.setTitle("")
         self.groupBox_8.setTitle("")
-        self.pushButton_2.setText("")
+        self.chat_data_btn.setText("")
         self.lineEdit_3.setText("")
         self.lineEdit_3.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter your message here", None))
         self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"Send", None))
