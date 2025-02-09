@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QGraphicsDropShadowEffect, QApplication, QMainWind
 import sys
 #from PyQt5 import uic
 from OprFuncs import read_file
-from Main import DataAnalyzer
+from DataAnalyzer import DataAnalyzer
 #from PyQt5.QtWidgets import QMenu, QAction
 from Models import *
 from markdown import markdown

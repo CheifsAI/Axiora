@@ -1,4 +1,4 @@
-from Main import *
+from DataAnalyzer import *
 from Models import llama3b
 from OprFuncs import read_file
 df = read_file("Test_Datasets\supply_chain_data.csv")
