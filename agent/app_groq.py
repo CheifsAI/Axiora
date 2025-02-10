@@ -56,7 +56,7 @@ Questions:{input}
 document_chain = create_stuff_documents_chain(llm, prompt)
 
 # Create retriever
-retriever = st.session_state.vector.as_retriever()
+retriever = st.session_state.vector_db.as_retriever()
 
 # Create retrieval chain
 retrieval_chain = create_retrieval_chain(retriever, document_chain)
