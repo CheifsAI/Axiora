@@ -29,7 +29,7 @@ if "vector" not in st.session_state:
     
     # Split documents
     st.session_state.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    st.session_state.final_documents = st.session_state.text_splitter.split_documents(st.session_state.docs)
+    st.session_state.final_documents = st.session_state.text_splitter.split_documents(st.session_state.docs[:50])
     
     # Initialize vector database
     st.session_state.vector_db = FAISS.from_documents(st.session_state.final_documents, st.session_state.embedding)
