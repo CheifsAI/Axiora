@@ -21,7 +21,7 @@ groq_api_key = os.environ['GROQ_API_KEY']
 if "vector" not in st.session_state:
     
     # Initialize embeddings
-    st.session_state.embedding = OllamaEmbeddings(model="llama2")
+    st.session_state.embedding = OllamaEmbeddings(model="llama3.2:3b")
 
     # Load documents
     st.session_state.loader = WebBaseLoader("https://docs.smith.langchain.com/")
