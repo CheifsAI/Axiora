@@ -37,9 +37,10 @@ if "vector" not in st.session_state:
 # Initialize Groq Chat
 st.title("ChatAbdul_Jawad Demo")
 
+# Initialize Groq LLM
 llm = ChatGroq(groq_api_key=groq_api_key, model_name="mixtral-8x7b-32768")
 
-
+# Define the prompt template
 prompt = ChatPromptTemplate.from_template(
 """
 Answer the questions based on the provided context only.
@@ -51,10 +52,16 @@ Questions:{input}
 """
 )
 
+# Create document chain
 document_chain = create_stuff_documents_chain(llm, prompt)
+
+# Create retriever
 retriever = st.session_state.vector.as_retriever()
+
+# Create retrieval chain
 retrieval_chain = create_retrieval_chain(retriever, document_chain)
 
+# User input
 prompt = st.text_input("input your prompt here")
 
 if prompt:
@@ -62,3 +69,10 @@ if prompt:
     response = retrieval_chain.run({"input": prompt})
     print("Response time:", time.process_time() - start)  
     st.write(response['answer'])
+    
+    # With a streamlit expander
+    with st.expander("Document Similarity Search"):
+        # Find the relevant chunks
+        for i, doc in enumerate(response["context"]):
+            st.write(doc.page_content)
+            st.write("--------------------------------")
