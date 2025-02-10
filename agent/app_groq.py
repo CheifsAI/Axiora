@@ -1,2 +1,4 @@
 import streamlit as st
 from langchain_groq import ChatGroq
+from langchain_community.document_loaders import WebBaseLoader
+from langchain.embeddings import OllamaEmbeddings
