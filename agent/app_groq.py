@@ -14,3 +14,7 @@ load_dotenv()
 
 ## load the Groq API key
 groq_api_key=os.environ['GROQ_API_KEY']
+
+if "vector" not in st.session_state:
+    st.session_state.embedding = OllamaEmbeddings()
+    st.session_state.Loader = WebBaseLoader("https://docs.smith.langchain.com/")
