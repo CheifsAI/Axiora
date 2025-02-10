@@ -5,3 +5,6 @@ FAISS
 chromadb
 langchain_core
 arxiv
+grop
+langchain_grop
+beautifulsoup4
