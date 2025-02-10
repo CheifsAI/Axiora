@@ -66,7 +66,7 @@ prompt = st.text_input("input your prompt here")
 
 if prompt:
     start = time.process_time()
-    response = retrieval_chain.run({"input": prompt})
+    response = retrieval_chain.invoke({"input": prompt})
     print("Response time:", time.process_time() - start)  
     st.write(response['answer'])
     
