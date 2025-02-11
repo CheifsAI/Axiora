@@ -165,7 +165,7 @@ class GuiFunctions():
         print(f"User input: {user_input}")  # Debugging statement
         if user_input:
             print("Creating user message")  # Debugging statement
-            user_msg = self.create_chat_bubble(f"{user_input}", True, "You")
+            user_msg = ChatBubble(f"{user_input}", True, "You",self.main_window)
             print("Adding user message to layout")  # Debugging statement
             self.main_window.ui.chat_layout.addWidget(user_msg)
             print("Clearing input field")  # Debugging statement

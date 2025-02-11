@@ -5,7 +5,9 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QLineEdit,
                              QScrollArea, QSizePolicy, QHBoxLayout)
 
 class ChatBubble(QWidget):
-    def __init__(self, text, is_user, title):
+    def __init__(self, text, is_user, title,MainWindow):
+        self.main_window = MainWindow
+        self.ui = MainWindow.ui
         super().__init__()
         self.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
 
