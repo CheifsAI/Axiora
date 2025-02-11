@@ -3,17 +3,17 @@ from Custom_Widgets.QAppSettings import QAppSettings
 from Custom_Widgets.QCustomTipOverlay import QCustomTipOverlay
 from PySide6.QtCore import QSettings, QTimer
 from PySide6.QtGui import QColor, QFont, QFontDatabase
-from PySide6.QtWidgets import QGraphicsDropShadowEffect, QApplication, QMainWindow, QFileDialog, QPushButton, QLabel, QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton
+from PySide6.QtWidgets import QGraphicsDropShadowEffect, QApplication, QMainWindow, QFileDialog, QPushButton, QLabel, QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton, QSizePolicy
 import sys
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout
+from PyQt5.QtCore import Qt
 #from PyQt5 import uic
 from OprFuncs import read_file, data_infer
 from DataAnalyzer import DataAnalyzer
-#from PyQt5.QtWidgets import QMenu, QAction
+from PyQt5.QtWidgets import QWidget
 from Models import *
 from markdown import markdown
-from modules.Message.message import Message
-from modules.Message.ui_page_messages import Ui_chat_page
-
+from uiEXT.ChatBubble import ChatBubble
 class GuiFunctions():
     def __init__(self,MainWindow):
         self.main_window = MainWindow
@@ -31,7 +31,7 @@ class GuiFunctions():
          self.main_window.ui.qu_num_list.currentIndexChanged.connect(self.handle_qu_num)
          self.main_window.ui.qu_btn.clicked.connect(self.handle_qu_btn)
          self.main_window.ui.chat_data_btn.clicked.connect(self.handle_chat_data_btn)
-         self.main_window.ui.chat_send_btn.clicked(self.send_message)
+         self.main_window.ui.send_btn.clicked.connect(self.send_message)
          self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
 
     def handle_data_button(self):
@@ -159,17 +159,82 @@ class GuiFunctions():
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
             self.send_message()
     def send_message(self):
+        print("send_message called")  # Debugging statement
         lineEdit_chat = self.main_window.ui.lineEdit_message
-        if lineEdit_chat.text() != "":
-            message = lineEdit_chat.text(), True
-            self.main_window.ui.groupBox_7.addWidget(message, Qt.AlignCenter, Qt.AlignBottom)
-            lineEdit_chat.setText("")
+        user_input = lineEdit_chat.text()
+        print(f"User input: {user_input}")  # Debugging statement
+        if user_input:
+            print("Creating user message")  # Debugging statement
+            user_msg = self.create_chat_bubble(f"{user_input}", True, "You")
+            print("Adding user message to layout")  # Debugging statement
+            self.main_window.ui.chat_layout.addWidget(user_msg)
+            print("Clearing input field")  # Debugging statement
+            lineEdit_chat.clear()
+            #ai_msg = ChatBubble("I'm stupid rn", False, "AI")
+            #self.main_window.ui.chat_layout.addWidget(ai_msg)
+            #v_scroll = self.scroll_area.verticalScrollBar()
+      #QtCore.QTimer.singleShot(100, lambda: v_scroll.setValue(v_scroll.maximum()))
+    def create_chat_bubble(self,text, is_user, title):
 
-           # QTimer.singleShot(10, lambda: self.main_window.ui.messages_frame.setFixedHeight(self.chat_page.chat_messages_layout.sizeHint().height()))
-            # QTimer.singleShot(15, lambda: self.scroll_to_end())
+        # Create the outer widget
+        bubble_widget = QWidget()
+        bubble_widget.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Maximum)
 
-            # SEND USER MESSAGE
-    def scroll_to_end(self):
-        # SCROLL TO END
-        self.scroll_bar = self.chat_page.chat_messages.verticalScrollBar()
-        self.scroll_bar.setValue(self.scroll_bar.maximum())
+        # Create the title label
+        title_label = QLabel(title)
+        title_label.setObjectName("title")
+
+        # Create the message label
+        message_label = QLabel()
+        message_label.setText(text)
+        message_label.setWordWrap(True)
+        message_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        message_label.setTextFormat(Qt.RichText)  # Enable HTML formatting
+
+        # Apply styles based on user/bot
+        if is_user:
+            message_label.setObjectName("user-bubble")
+            message_label.setStyleSheet("""
+                QLabel#user-bubble {
+                    background-color: white;
+                    color: #333333;
+                    border: 1px solid #FFFFFF;
+                    border-radius: 15px;
+                    padding: 10px;
+                }
+            """)
+            title_label.setAlignment(Qt.AlignRight)
+        else:
+            message_label.setObjectName("bot-bubble")
+            message_label.setStyleSheet("""
+                QLabel#bot-bubble {
+                    background-color: #E8D8FF;
+                    color: #5E2D91;
+                    border: 1px solid #E8D8FF;
+                    border-radius: 15px;
+                    padding: 10px;
+                }
+            """)
+            title_label.setAlignment(Qt.AlignLeft)
+
+        # Create the layout for the chat bubble
+        bubble_layout = QHBoxLayout()
+        bubble_layout.setContentsMargins(0, 0, 0, 0)
+
+        if is_user:
+            bubble_layout.addStretch()
+            bubble_layout.addWidget(message_label)
+        else:
+            bubble_layout.addWidget(message_label)
+            bubble_layout.addStretch()
+
+        # Create the outer layout and add the title and bubble
+        outer_layout = QVBoxLayout()
+        outer_layout.setContentsMargins(0, 0, 0, 0)
+        outer_layout.addWidget(title_label)
+        outer_layout.addLayout(bubble_layout)
+
+        # Set the layout for the bubble widget
+        bubble_widget.setLayout(outer_layout)
+
+        return bubble_widget

@@ -1840,9 +1840,27 @@ li.checked::marker { content: &quot;\2612&quot;; }
                          </property>
                          <layout class="QVBoxLayout" name="verticalLayout_23">
                           <item>
-                           <widget class="QGroupBox" name="groupBox_7">
+                           <widget class="QScrollArea" name="chat_scrollArea">
+                            <property name="widgetResizable">
+                             <bool>true</bool>
+                            </property>
+                            <widget class="QWidget" name="scrollAreaWidgetContents_2">
+                             <property name="geometry">
+                              <rect>
+                               <x>0</x>
+                               <y>0</y>
+                               <width>786</width>
+                               <height>518</height>
+                              </rect>
+                             </property>
+                             <layout class="QGridLayout" name="gridLayout_10"/>
+                            </widget>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QGroupBox" name="groupBox_8">
                             <property name="sizePolicy">
-                             <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+                             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                               <horstretch>0</horstretch>
                               <verstretch>0</verstretch>
                              </sizepolicy>
@@ -1850,79 +1868,53 @@ li.checked::marker { content: &quot;\2612&quot;; }
                             <property name="title">
                              <string/>
                             </property>
+                            <layout class="QHBoxLayout" name="horizontalLayout_11">
+                             <item>
+                              <widget class="QPushButton" name="chat_data_btn">
+                               <property name="text">
+                                <string/>
+                               </property>
+                               <property name="icon">
+                                <iconset resource="resources.qrc">
+                                 <normaloff>:/icons/images/icons/cil-link.png</normaloff>:/icons/images/icons/cil-link.png</iconset>
+                               </property>
+                              </widget>
+                             </item>
+                             <item>
+                              <widget class="QLineEdit" name="lineEdit_message">
+                               <property name="minimumSize">
+                                <size>
+                                 <width>0</width>
+                                 <height>30</height>
+                                </size>
+                               </property>
+                               <property name="text">
+                                <string/>
+                               </property>
+                               <property name="placeholderText">
+                                <string>Enter your message here</string>
+                               </property>
+                              </widget>
+                             </item>
+                             <item>
+                              <widget class="QPushButton" name="send_btn">
+                               <property name="layoutDirection">
+                                <enum>Qt::LayoutDirection::RightToLeft</enum>
+                               </property>
+                               <property name="styleSheet">
+                                <string notr="true">background-color: rgb(64, 39, 255);</string>
+                               </property>
+                               <property name="text">
+                                <string>Send</string>
+                               </property>
+                               <property name="icon">
+                                <iconset>
+                                 <normaloff>images/icons/arrow-34-24.ico</normaloff>images/icons/arrow-34-24.ico</iconset>
+                               </property>
+                              </widget>
+                             </item>
+                            </layout>
                            </widget>
-                          </item>
-                          <item>
-                           <layout class="QHBoxLayout" name="horizontalLayout_13">
-                            <property name="spacing">
-                             <number>6</number>
-                            </property>
-                            <property name="leftMargin">
-                             <number>9</number>
-                            </property>
-                            <property name="rightMargin">
-                             <number>9</number>
-                            </property>
-                            <item>
-                             <widget class="QGroupBox" name="groupBox_8">
-                              <property name="sizePolicy">
-                               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                               </sizepolicy>
-                              </property>
-                              <property name="title">
-                               <string/>
-                              </property>
-                              <layout class="QHBoxLayout" name="horizontalLayout_11">
-                               <item>
-                                <widget class="QPushButton" name="chat_data_btn">
-                                 <property name="text">
-                                  <string/>
-                                 </property>
-                                 <property name="icon">
-                                  <iconset resource="resources.qrc">
-                                   <normaloff>:/icons/images/icons/cil-link.png</normaloff>:/icons/images/icons/cil-link.png</iconset>
-                                 </property>
-                                </widget>
-                               </item>
-                               <item>
-                                <widget class="QLineEdit" name="lineEdit_message">
-                                 <property name="minimumSize">
-                                  <size>
-                                   <width>0</width>
-                                   <height>30</height>
-                                  </size>
-                                 </property>
-                                 <property name="text">
-                                  <string/>
-                                 </property>
-                                 <property name="placeholderText">
-                                  <string>Enter your message here</string>
-                                 </property>
-                                </widget>
-                               </item>
-                               <item>
-                                <widget class="QPushButton" name="send_btn">
-                                 <property name="layoutDirection">
-                                  <enum>Qt::LayoutDirection::RightToLeft</enum>
-                                 </property>
-                                 <property name="styleSheet">
-                                  <string notr="true">background-color: rgb(64, 39, 255);</string>
-                                 </property>
-                                 <property name="text">
-                                  <string>Send</string>
-                                 </property>
-                                 <property name="icon">
-                                  <iconset>
-                                   <normaloff>images/icons/arrow-34-24.ico</normaloff>images/icons/arrow-34-24.ico</iconset>
-                                 </property>
-                                </widget>
-                               </item>
-                              </layout>
-                             </widget>
-                            </item>
-                           </layout>
                           </item>
                          </layout>
                         </widget>
@@ -2511,8 +2503,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>46</width>
-                                   <height>24</height>
+                                   <width>770</width>
+                                   <height>458</height>
                                   </rect>
                                  </property>
                                  <layout class="QGridLayout" name="gridLayout_9">
