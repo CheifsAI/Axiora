@@ -70,9 +70,12 @@ if prompt:
     print("Response time:", time.process_time() - start)  
     st.write(response['answer'])
     
-    # With a streamlit expander
-    with st.expander("Document Similarity Search"):
-        # Find the relevant chunks
-        for i, doc in enumerate(response["context"]):
-            st.write(doc.page_content)
-            st.write("--------------------------------")
+    # Display relevant documents in an expander
+    with st.expander("📄 Document Similarity Search"):
+        if "context" in response:  # Check if context is available
+            for i, doc in enumerate(response["context"]):
+                st.write(f"Document {i + 1}:")
+                st.write(doc.page_content)
+                st.write("--------------------------------")
+        else:
+            st.write("⚠️ No relevant documents found.")
