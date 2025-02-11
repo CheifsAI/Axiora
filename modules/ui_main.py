@@ -1051,6 +1051,11 @@ class Ui_MainWindow(object):
         self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 786, 518))
         self.gridLayout_10 = QGridLayout(self.scrollAreaWidgetContents_2)
         self.gridLayout_10.setObjectName(u"gridLayout_10")
+        self.chat_layout = QVBoxLayout()
+        self.chat_layout.setObjectName(u"chat_layout")
+
+        self.gridLayout_10.addLayout(self.chat_layout, 0, 0, 1, 1)
+
         self.chat_scrollArea.setWidget(self.scrollAreaWidgetContents_2)
 
         self.verticalLayout_23.addWidget(self.chat_scrollArea)
@@ -1316,7 +1321,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 770, 458))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 46, 24))
         self.gridLayout_9 = QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_9.setObjectName(u"gridLayout_9")
         self.qu_layout = QVBoxLayout()

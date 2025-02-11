@@ -1853,7 +1853,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                <height>518</height>
                               </rect>
                              </property>
-                             <layout class="QGridLayout" name="gridLayout_10"/>
+                             <layout class="QGridLayout" name="gridLayout_10">
+                              <item row="0" column="0">
+                               <layout class="QVBoxLayout" name="chat_layout"/>
+                              </item>
+                             </layout>
                             </widget>
                            </widget>
                           </item>
@@ -2503,8 +2507,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>770</width>
-                                   <height>458</height>
+                                   <width>46</width>
+                                   <height>24</height>
                                   </rect>
                                  </property>
                                  <layout class="QGridLayout" name="gridLayout_9">
