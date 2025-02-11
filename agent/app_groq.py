@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Load the Groq API key
-groq_api_key = os.environ['GROQ_API_KEY']
+groq_api_key = os.getenv('GROQ_API_KEY')
 
 # Initialize session state
 if "vector" not in st.session_state:
@@ -65,17 +65,21 @@ retrieval_chain = create_retrieval_chain(retriever, document_chain)
 prompt = st.text_input("input your prompt here")
 
 if prompt:
-    start = time.process_time()
-    response = retrieval_chain.invoke({"input": prompt})
-    print("Response time:", time.process_time() - start)  
-    st.write(response['answer'])
-    
-    # Display relevant documents in an expander
-    with st.expander("📄 Document Similarity Search"):
-        if "context" in response:  # Check if context is available
-            for i, doc in enumerate(response["context"]):
-                st.write(f"Document {i + 1}:")
-                st.write(doc.page_content)
-                st.write("--------------------------------")
-        else:
-            st.write("⚠️ No relevant documents found.")
+    with st.spinner('Processing your request...'):
+        start = time.process_time()
+        try:
+            response = retrieval_chain.invoke({"input": prompt})
+            st.write(response['answer'])
+            
+            with st.expander("📄 Document Similarity Search"):
+                if "context" in response:
+                    for i, doc in enumerate(response["context"]):
+                        st.write(f"Document {i + 1}:")
+                        st.write(doc.page_content)
+                        st.write("--------------------------------")
+                else:
+                    st.write("⚠️ No relevant documents found.")
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
+        finally:
+            st.info(f"Response time: {time.process_time() - start} seconds")
