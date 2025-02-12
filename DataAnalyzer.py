@@ -119,19 +119,6 @@ class DataAnalyzer:
         
         return questions_list
 
-    def _extract_questions(self, generated_questions):
-        # Extract text from the dictionary
-        if isinstance(generated_questions, dict):
-            text = generated_questions.get("text", "")  # Adjust key based on actual output
-        else:
-            text = str(generated_questions)  # Convert to string if unexpected type
-
-        if not text:
-            return []
-
-        return [line.strip() for line in text.split('\n') if line.strip()]
-
-
 
     def visual(self, questions):
         data_info = self.data_info
@@ -166,7 +153,7 @@ class DataAnalyzer:
         exec_env = {"df": self.dataframe}
         exec(viscode, exec_env)
 
-    def chat(self):
+    def chat(self,question):
         prompt_template = ChatPromptTemplate.from_messages(
             [
                 (
@@ -179,12 +166,9 @@ class DataAnalyzer:
                     )
         chain = prompt_template | self.llm
 
-        while True:
-            question = input()
-            if question == "done":
-                return
-            # response = llm.invoke(question)
-            response = chain.invoke({"input": question, "memory":self.memory})
-            self.memory.append(HumanMessage(content=question))
-            self.memory.append(AIMessage(content=response))
-            return response
+
+        # response = llm.invoke(question)
+        response = chain.invoke({"input": question, "memory":self.memory})
+        self.memory.append(HumanMessage(content=question))
+        self.memory.append(AIMessage(content=response))
+        return response

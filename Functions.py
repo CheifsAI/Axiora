@@ -72,7 +72,6 @@ class GuiFunctions():
         self.summary = markdown(self.analyzer.analysis_data())
         self.summary_text = self.main_window.ui.summary_text
         self.summary_text.setMarkdown(self.summary)
-        print(self.summary)
 
     def handle_btn_LLMs(self):
         #menu = QMenu()
@@ -166,15 +165,17 @@ class GuiFunctions():
         print("send_message called")  # Debugging statement
         lineEdit_chat = self.main_window.ui.lineEdit_message
         user_input = lineEdit_chat.text()
-        print(f"User input: {user_input}")  # Debugging statement
         if user_input:
-            print("Creating user message")  # Debugging statement
             user_msg = ChatBubble(user_input, True, "You")
-            print("Adding user message to layout")  # Debugging statement
             self.main_window.ui.chat_layout.addWidget(user_msg)
-            print("Clearing input field")  # Debugging statement
             lineEdit_chat.clear()
-            # Simulate a bot response
-            ai_msg = ChatBubble("I'm stupid rn", False, "AI")
-            self.main_window.ui.chat_layout.addWidget(ai_msg)
+            if not hasattr(self, 'analyzer') or not self.analyzer:
+                print("Analyzer not initialized!")
+                ai_response = "Upload a dataset first."
+                ai_msg = ChatBubble(ai_response, False, "AI")
+                self.main_window.ui.chat_layout.addWidget(ai_msg)
+            else:
+                ai_response = self.analyzer.chat(user_input)
+                ai_msg = ChatBubble(ai_response, False, "AI")
+                self.main_window.ui.chat_layout.addWidget(ai_msg)
   
