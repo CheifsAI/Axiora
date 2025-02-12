@@ -8,3 +8,4 @@ arxiv
 groq
 langchain_groq
 beautifulsoup4
+sentence_transformers
