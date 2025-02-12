@@ -3,6 +3,7 @@ from langchain.chains import LLMChain
 from OprFuncs import data_infer, extract_code, extract_questions
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+import re
 
 class DataAnalyzer:
     def __init__(self,dataframe,llm):
@@ -11,32 +12,6 @@ class DataAnalyzer:
         self.data_info = data_infer(dataframe)
         self.memory = []
 
-# Analysis Data
-    def analysis_data(self):
-        data_info = self.data_info
-
-        # Prompt and Chain for Analysis Data
-        analysis_prompt = '''
-        You are a data analyst. You are provided with a dataset about {data_info}
-        Here is the dataset structure:
-        {data_info}
-
-        Please analyze the data and provide insights about:
-        1. Key trends and patterns in the {data_info}.
-        2. Any anomalies or outliers in the data.
-        3. Recommendations or actionable insights based on the analyzed data.
-        '''
-        # Define the prompt template
-        analysis_template = PromptTemplate(
-            input_variables=["data_info","topic"],     
-            template=analysis_prompt
-        )
-        # Create a chain for analysis data
-        analysis_chain = LLMChain(llm=self.llm, prompt=analysis_template)
-        
-
-        # Run the analysis chain on the provided data
-        analysis = analysis_chain.run(data_info=data_info)
     def analysis_data(self):
         data_info = self.data_info
 
@@ -104,13 +79,16 @@ class DataAnalyzer:
 
 
     # Question Generator
-    def quetions_gen (self, num):
+    def questions_gen(self, num):
         data_info = self.data_info
-        
-        # Prompt and Chain for Question Generation
+
+        # Prompt Template for Question Generation
         question_prompt = '''
-        create {num} anlysis questions about the following data {data_info}
+        Create {num} analysis questions about the following data: 
+        {data_info}
+        Please format each question on a new line without numbering.
         '''
+        
         # Define the prompt template
         question_template = PromptTemplate(
             input_variables=["num", "data_info"],
@@ -118,19 +96,27 @@ class DataAnalyzer:
         )
         
         # Create a chain for question generation
-        question_chain = LLMChain(
-            llm=self.llm,
-            prompt=question_template
-        )
-        
-        # Generate the questions
-        questions = question_chain.run(num=num, data_info=data_info)
-        
-        questions_list = extract_questions(questions)
+        # Create a chain for question generation
+        from langchain.schema.runnable import RunnableLambda
 
-        self.memory.append(HumanMessage(content=question_prompt))
-        self.memory.append(AIMessage(content="\n".join(questions_list)))      
-        # Print the generated questions
+        # Create a RunnableSequence instead of LLMChain
+        question_chain = question_template | self.llm
+
+        # Use .invoke() instead of .run()
+        generated_questions = question_chain.invoke({"num": num, "data_info": data_info})
+
+
+        
+        # Parse the generated text into a list of questions
+        print("Generated Questions:", generated_questions)  # Debugging Output
+
+        questions_list = self._extract_questions(generated_questions)
+        
+        # Update conversation memory with actual inputs/outputs
+        formatted_prompt = question_template.format(num=num, data_info=data_info)
+        self.memory.append(HumanMessage(content=formatted_prompt))
+        self.memory.append(AIMessage(content="\n".join(questions_list)))
+        
         return questions_list
 
 
@@ -159,14 +145,15 @@ class DataAnalyzer:
         # Print the generated visualization code
         print("Generated Visualization Code:\n", viscode)
 
-        self.memory.append(HumanMessage(content=visual_prompt))
+        self.memory.append(HumanMessage(content="Generated visualization"))
+
         self.memory.append(AIMessage(content=viscode))
 
         # Execute the visualization code
         exec_env = {"df": self.dataframe}
         exec(viscode, exec_env)
 
-    def chat(self):
+    def chat(self,question):
         prompt_template = ChatPromptTemplate.from_messages(
             [
                 (
@@ -179,12 +166,9 @@ class DataAnalyzer:
                     )
         chain = prompt_template | self.llm
 
-        while True:
-            question = input("You: ")
-            if question == "done":
-                return
-            # response = llm.invoke(question)
-            response = chain.invoke({"input": question, "memory":self.memory})
-            self.memory.append(HumanMessage(content=question))
-            self.memory.append(AIMessage(content=response))
-            print("AI:" + response)
+
+        # response = llm.invoke(question)
+        response = chain.invoke({"input": question, "memory":self.memory})
+        self.memory.append(HumanMessage(content=question))
+        self.memory.append(AIMessage(content=response))
+        return response
