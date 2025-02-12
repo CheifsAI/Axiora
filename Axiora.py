@@ -19,7 +19,7 @@ import os
 import platform
 from Functions import GuiFunctions
 def resizeEvent(self, event):
-    new_size = max(10, self.width() // 100)  # حساب حجم الخط بناءً على حجم النافذة
+    new_size = max(10, self.width() // 100)  
     self.adjust_font_size(new_size)
     event.accept()
 

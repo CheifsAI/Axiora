@@ -1,18 +1,23 @@
 from Custom_Widgets import *
-from Custom_Widgets.QAppSettings import QAppSettings
-from Custom_Widgets.QCustomTipOverlay import QCustomTipOverlay
+#from Custom_Widgets.QAppSettings import QAppSettings
+#from Custom_Widgets.QCustomTipOverlay import QCustomTipOverlay
 #from PySide6.QtCore import QSettings, QTimer
 #from PySide6.QtGui import QColor, QFont, QFontDatabase
 #from PySide6.QtWidgets import QGraphicsDropShadowEffect, QApplication, QMainWindow, QFileDialog, QPushButton, QLabel, QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton, QSizePolicy
-import sys
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QFileDialog, QTableWidgetItem
-from PyQt5.QtCore import Qt
-#from PyQt5 import uic
+from PySide6 import QtCore
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (QApplication, QMainWindow, QLineEdit,
+                               QPushButton, QVBoxLayout, QWidget, QLabel,
+                               QScrollArea, QSizePolicy, QHBoxLayout,
+                               QFileDialog, QTableWidgetItem)
+
+#from PySide6 import uic
 from OprFuncs import read_file, data_infer
 from DataAnalyzer import DataAnalyzer
-from PyQt5.QtWidgets import QWidget
 from Models import *
 from markdown import markdown
+from uiEXT.ChatBubble import ChatBubble
+
 class GuiFunctions():
     def __init__(self,MainWindow):
         self.main_window = MainWindow
@@ -158,7 +163,6 @@ class GuiFunctions():
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
             self.send_message()
     def send_message(self):
-        from uiEXT.ChatBubble import ChatBubble
         print("send_message called")  # Debugging statement
         lineEdit_chat = self.main_window.ui.lineEdit_message
         user_input = lineEdit_chat.text()

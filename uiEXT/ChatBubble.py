@@ -1,9 +1,9 @@
-from PyQt5 import QtCore
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QLineEdit,
-                             QPushButton,QVBoxLayout, QWidget, QLabel,
-                             QScrollArea, QSizePolicy, QHBoxLayout)
-app = QApplication([])
+from PySide6 import QtCore
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (QApplication, QMainWindow, QLineEdit,
+                               QPushButton, QVBoxLayout, QWidget, QLabel,
+                               QScrollArea, QSizePolicy, QHBoxLayout)
+
 class ChatBubble(QWidget):
     def __init__(self, text, is_user, title, parent=None):
         super().__init__(parent)
