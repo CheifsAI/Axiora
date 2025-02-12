@@ -37,8 +37,8 @@ class DataAnalyzer:
         # Run the analysis chain on the provided data
         analysis = analysis_chain.run(data_info=data_info)
 
-        # Log the interaction in memory
-        self.memory.append(HumanMessage(content=analysis_prompt))
+        formatted_analysis_prompt = analysis_prompt.format(data_info=data_info)
+        self.memory.append(HumanMessage(content=formatted_analysis_prompt))
         self.memory.append(AIMessage(content=analysis))
 
         # Return the analysis
@@ -95,26 +95,18 @@ class DataAnalyzer:
             template=question_prompt
         )
         
-        # Create a chain for question generation
-        # Create a chain for question generation
-        from langchain.schema.runnable import RunnableLambda
-
-        # Create a RunnableSequence instead of LLMChain
-        question_chain = question_template | self.llm
-
+        question_chain = LLMChain(
+            llm=self.llm,
+            prompt=question_template
+        )
         # Use .invoke() instead of .run()
-        generated_questions = question_chain.invoke({"num": num, "data_info": data_info})
+        generated_questions = question_chain.run({"num": num, "data_info": data_info})
 
-
+        questions_list = extract_questions(generated_questions)
         
-        # Parse the generated text into a list of questions
-        print("Generated Questions:", generated_questions)  # Debugging Output
+        formatted_question_prompt = question_template.format(num=num, data_info=data_info)
 
-        questions_list = self._extract_questions(generated_questions)
-        
-        # Update conversation memory with actual inputs/outputs
-        formatted_prompt = question_template.format(num=num, data_info=data_info)
-        self.memory.append(HumanMessage(content=formatted_prompt))
+        self.memory.append(HumanMessage(content=formatted_question_prompt))
         self.memory.append(AIMessage(content="\n".join(questions_list)))
         
         return questions_list
@@ -145,7 +137,9 @@ class DataAnalyzer:
         # Print the generated visualization code
         print("Generated Visualization Code:\n", viscode)
 
-        self.memory.append(HumanMessage(content="Generated visualization"))
+        formatted_visual_prompt = visual_prompt.format(questions=questions, data_info=data_info)
+
+        self.memory.append(HumanMessage(content=formatted_visual_prompt))
 
         self.memory.append(AIMessage(content=viscode))
 
