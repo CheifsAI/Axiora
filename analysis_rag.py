@@ -1,17 +1,18 @@
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings import OllamaEmbeddings  # استخدام OllamaEmbeddings
+from langchain_community.embeddings import OllamaEmbeddings
 from langchain.chains import RetrievalQA
-from langchain_community.llms import Ollama  # استخدام Ollama بدلاً من HuggingFaceHub
+from langchain_community.llms import Ollama
 from langchain.prompts import PromptTemplate
 import pandas as pd
 import fitz  # PyMuPDF لقراءة ملفات PDF
+import io  # لقراءة الملف من الذاكرة
 
-# 1. تحميل ملف القواعد (PDF)
-def load_analysis_rules(file_path):
-    # فتح ملف PDF
-    doc = fitz.open(file_path)
+# 1. تحميل ملف القواعد (PDF) من الذاكرة
+def load_analysis_rules_from_memory(pdf_content):
+    # فتح ملف PDF من الذاكرة
+    doc = fitz.open(stream=pdf_content, filetype="pdf")
     rules = ""
     
     # استخراج النصوص من كل صفحة
@@ -95,8 +96,12 @@ def analyze_csv_with_rules(retrievalQA, df):
 
 # الخطوات الرئيسية
 if __name__ == "__main__":
-    # تحميل ملف القواعد (PDF)
-    rules = load_analysis_rules("storing.pdf")  # استبدل بمسار ملف PDF
+    # قراءة ملف PDF كبايتس
+    with open("storying.pdf", "rb") as file:
+        pdf_content = file.read()
+    
+    # تحميل ملف القواعد (PDF) من الذاكرة
+    rules = load_analysis_rules_from_memory(pdf_content)
     
     # إنشاء وثائق من القواعد
     documents = create_documents_from_rules(rules)
@@ -105,7 +110,8 @@ if __name__ == "__main__":
     retrievalQA = train_rag_system(documents)
     
     # تحميل ملف CSV جديد
-    df = load_csv("Regions.csv")  # استبدل بمسار ملف CSV
+    csv_path = r"D:\My-Githup\Axiora\ agent\Regions.csv"  # استخدام raw string
+    df = load_csv(csv_path)
     
     # تحليل ملف CSV بناءً على القواعد
     analysis_results = analyze_csv_with_rules(retrievalQA, df)
