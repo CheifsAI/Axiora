@@ -9,17 +9,25 @@ from langchain.schema import Document
 from langchain_community.llms import Ollama
 import numpy as np
 import pandas as pd
-from DataAnalyzer import DataAnalyzer
+from langchain_community.document_loaders import WikipediaLoader
+import os
+
+# Load reference book or Wikipedia as knowledge base
+loader = WikipediaLoader(query="Data Analysis", lang="en", load_max_docs=5)
+wikipedia_docs = loader.load()
 
 # Load the dataset
 file_path = "Regions.csv"
 df = pd.read_csv(file_path)
 
-# Create LangChain Document objects
+# Create LangChain Document objects from dataset
 documents = [
     Document(page_content=" | ".join([f"{col}: {str(row[col])}" for col in df.columns]))
     for _, row in df.iterrows()
 ]
+
+# Combine dataset documents with Wikipedia knowledge base
+documents.extend(wikipedia_docs)
 
 # Initialize the text splitter
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
@@ -64,11 +72,8 @@ retrievalQA = RetrievalQA.from_chain_type(
     chain_type_kwargs={"prompt": prompt}
 )
 
-# Initialize the DataAnalyzer
-analyzer = DataAnalyzer(df, llm=ollama_model)  # Use Ollama instead of HuggingFace
-
 # Define the query
-query = analyzer.analysis_data()
+query = "Analyze the given dataset with additional insights from the knowledge base."
 
 # Call the QA chain with our query
 result = retrievalQA.invoke({"query": query})
