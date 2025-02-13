@@ -115,6 +115,15 @@ class DataAnalyzer:
         self.memory.append(AIMessage(content="\n".join(questions_list)))
         
         return questions_list
+    def _extract_questions(self, generated_questions):
+        # Extract text from the dictionary
+        if isinstance(generated_questions, dict):
+            text = generated_questions.get("text", "")  # Adjust key based on actual output
+        else:
+            text = str(generated_questions)  # Convert to string if unexpected type
+        if not text:
+            return []
+        return [line.strip() for line in text.split('\n') if line.strip()]
 
 
     def visual(self, questions):
