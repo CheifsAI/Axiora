@@ -86,7 +86,9 @@ class DataAnalyzer:
         question_prompt = '''
         Create {num} analysis questions about the following data: 
         {data_info}
-        Please format each question on a new line without numbering.
+        Please format each question on a new line start with question number as the following example 
+        1. question1
+        2. question2
         '''
         
         # Define the prompt template
