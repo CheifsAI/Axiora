@@ -18,6 +18,10 @@ import sys
 import os
 import platform
 from Functions import GuiFunctions
+def resizeEvent(self, event):
+    new_size = max(10, self.width() // 100)  
+    self.adjust_font_size(new_size)
+    event.accept()
 
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
@@ -151,7 +155,7 @@ class MainWindow(QMainWindow):
     # ///////////////////////////////////////////////////////////////
     def mousePressEvent(self, event):
         # SET DRAG POS WINDOW
-        self.dragPos = event.globalPos()
+        self.dragPos = event.scenePosition().toPoint()
 
         # PRINT MOUSE EVENTS
         if event.buttons() == Qt.LeftButton:
