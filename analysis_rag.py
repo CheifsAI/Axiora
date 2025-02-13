@@ -1,80 +1,115 @@
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_community.document_loaders import PyPDFDirectoryLoader
-from langchain_community.embeddings import OllamaEmbeddings
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.chains import RetrievalQA
-from langchain_community.vectorstores import FAISS
-from langchain.prompts import PromptTemplate
 from langchain.schema import Document
-from langchain_community.llms import Ollama
-import numpy as np
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import OllamaEmbeddings  # استخدام OllamaEmbeddings
+from langchain.chains import RetrievalQA
+from langchain_community.llms import Ollama  # استخدام Ollama بدلاً من HuggingFaceHub
+from langchain.prompts import PromptTemplate
 import pandas as pd
-from langchain_community.document_loaders import WikipediaLoader
-import os
+import fitz  # PyMuPDF لقراءة ملفات PDF
 
-# Load reference book or Wikipedia as knowledge base
-loader = WikipediaLoader(query="Data Analysis", lang="en", load_max_docs=5)
-wikipedia_docs = loader.load()
+# 1. تحميل ملف القواعد (PDF)
+def load_analysis_rules(file_path):
+    # فتح ملف PDF
+    doc = fitz.open(file_path)
+    rules = ""
+    
+    # استخراج النصوص من كل صفحة
+    for page_num in range(len(doc)):
+        page = doc.load_page(page_num)
+        rules += page.get_text()
+    
+    return rules
 
-# Load the dataset
-file_path = "Regions.csv"
-df = pd.read_csv(file_path)
+# 2. إنشاء وثائق (Documents) من القواعد
+def create_documents_from_rules(rules):
+    documents = []
+    # إضافة القواعد كوثيقة
+    documents.append(Document(page_content=rules))
+    return documents
 
-# Create LangChain Document objects from dataset
-documents = [
-    Document(page_content=" | ".join([f"{col}: {str(row[col])}" for col in df.columns]))
-    for _, row in df.iterrows()
-]
+# 3. تدريب نظام RAG على القواعد
+def train_rag_system(documents):
+    # تقسيم النصوص إلى أجزاء أصغر
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    texts = text_splitter.split_documents(documents)
+    
+    # تهيئة نموذج التضمين (Embedding) باستخدام Ollama
+    embedding_model = OllamaEmbeddings(model="llama2")  # استخدام OllamaEmbeddings
+    
+    # إنشاء متجر المتجهات (Vector Store)
+    vector_db = FAISS.from_documents(texts, embedding_model)
+    
+    # تهيئة Retriever
+    retriever = vector_db.as_retriever(search_type="similarity", search_kwargs={"k": 3})
+    
+    # تهيئة نموذج اللغة (LLM) باستخدام Ollama
+    llm = Ollama(model="llama2")  # استخدام Ollama بدلاً من HuggingFaceHub
+    
+    # إنشاء سلسلة RetrievalQA
+    prompt_template = """
+    Use the following piece of context to answer the question asked.
+    Please try to provide the answer only based on the context.
 
-# Combine dataset documents with Wikipedia knowledge base
-documents.extend(wikipedia_docs)
+    {context}
+    Question: {question}
 
-# Initialize the text splitter
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    Helpful Answers:
+    """
+    prompt = PromptTemplate(
+        template=prompt_template,
+        input_variables=["context", "question"]
+    )
+    
+    retrievalQA = RetrievalQA.from_chain_type(
+        llm=llm,
+        chain_type="stuff",
+        retriever=retriever,
+        return_source_documents=True,
+        chain_type_kwargs={"prompt": prompt}
+    )
+    
+    return retrievalQA
 
-# Split the documents into chunks
-text_split = text_splitter.split_documents(documents)
+# 4. تحميل ملف CSV جديد
+def load_csv(file_path):
+    df = pd.read_csv(file_path)
+    return df
 
-# Initialize the embedding model
-embedding_model = OllamaEmbeddings(model="llama3.2:3b")
+# 5. تحليل ملف CSV بناءً على القواعد
+def analyze_csv_with_rules(retrievalQA, df):
+    # تحويل البيانات إلى وثائق
+    documents = []
+    for _, row in df.iterrows():
+        page_content = " | ".join([f"{col}: {str(row[col])}" for col in df.columns])
+        documents.append(Document(page_content=page_content))
+    
+    # تحليل البيانات باستخدام RAG
+    results = []
+    for doc in documents:
+        query = f"Analyze this data based on the rules: {doc.page_content}"
+        result = retrievalQA.invoke({"query": query})
+        results.append(result['result'])
+    
+    return results
 
-# Initialize the vector database
-vector_db = FAISS.from_documents(text_split, embedding_model)
-
-# Initialize the retriever
-retriever = vector_db.as_retriever(search_type="similarity", search_kwargs={"k": 3})
-
-# Initialize the Ollama LLM
-ollama_model = Ollama(model="mistral")
-
-# Define the prompt template
-prompt_template = """
-Use the following piece of context to answer the question asked.
-Please try to provide the answer only based on the context
-
-{context}
-Question: {question}
-
-Helpful Answers:
-"""
-
-prompt = PromptTemplate(
-    template=prompt_template,
-    input_variables=["context", "question"]
-)
-
-# Create the RetrievalQA chain
-retrievalQA = RetrievalQA.from_chain_type(
-    llm=ollama_model,
-    chain_type="stuff",
-    retriever=retriever,
-    return_source_documents=True,
-    chain_type_kwargs={"prompt": prompt}
-)
-
-# Define the query
-query = "Analyze the given dataset with additional insights from the knowledge base."
-
-# Call the QA chain with our query
-result = retrievalQA.invoke({"query": query})
-print(result['result'])
+# الخطوات الرئيسية
+if __name__ == "__main__":
+    # تحميل ملف القواعد (PDF)
+    rules = load_analysis_rules("storing.pdf")  # استبدل بمسار ملف PDF
+    
+    # إنشاء وثائق من القواعد
+    documents = create_documents_from_rules(rules)
+    
+    # تدريب نظام RAG على القواعد
+    retrievalQA = train_rag_system(documents)
+    
+    # تحميل ملف CSV جديد
+    df = load_csv("Regions.csv")  # استبدل بمسار ملف CSV
+    
+    # تحليل ملف CSV بناءً على القواعد
+    analysis_results = analyze_csv_with_rules(retrievalQA, df)
+    
+    # عرض النتائج
+    for i, result in enumerate(analysis_results):
+        print(f"Analysis for row {i+1}: {result}")
