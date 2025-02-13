@@ -1,70 +1,75 @@
-from langchain_community.document_loaders import WebBaseLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain_community.embeddings import OllamaEmbeddings
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.chains import RetrievalQA
 from langchain_community.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
-from langchain.chains import RetrievalQA
+from langchain.schema import Document
 from langchain_community.llms import Ollama
+import numpy as np
 import pandas as pd
+from DataAnalyzer import DataAnalyzer
 
-# ✅ **1️⃣ Load Wikipedia content and convert it into a knowledge base**
-url = "https://en.wikipedia.org/wiki/Data_analysis"  # Replace with your desired article URL
-loader = WebBaseLoader(url)
-wiki_documents = loader.load()
+# Load the dataset
+file_path = "Regions.csv"
+df = pd.read_csv(file_path)
 
-# ✅ **2️⃣ Split the content into smaller chunks**
+# Create LangChain Document objects
+documents = [
+    Document(page_content=" | ".join([f"{col}: {str(row[col])}" for col in df.columns]))
+    for _, row in df.iterrows()
+]
+
+# Initialize the text splitter
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-split_wiki_docs = text_splitter.split_documents(wiki_documents)
 
-# ✅ **3️⃣ Convert the chunks into embeddings using Ollama**
-embedding_model = OllamaEmbeddings(model="ollama-embedding")  # Use the appropriate Ollama model
+# Split the documents into chunks
+text_split = text_splitter.split_documents(documents)
 
-# ✅ **4️⃣ Create a FAISS vector database**
-vector_db = FAISS.from_documents(split_wiki_docs, embedding_model)
+# Initialize the embedding model
+embedding_model = OllamaEmbeddings(model="llama3.2:3b")
 
-# ✅ **5️⃣ Create a retriever**
+# Initialize the vector database
+vector_db = FAISS.from_documents(text_split, embedding_model)
+
+# Initialize the retriever
 retriever = vector_db.as_retriever(search_type="similarity", search_kwargs={"k": 3})
 
-# ✅ **6️⃣ Set up the LLM using Ollama**
-ollama_model = Ollama(model="mistral")  # Use the available Ollama model
+# Initialize the Ollama LLM
+ollama_model = Ollama(model="mistral")
 
-# ✅ **7️⃣ Define the prompt template**
-analysis_prompt_template = """
-Use the following information from the article to analyze the provided data:
+# Define the prompt template
+prompt_template = """
+Use the following piece of context to answer the question asked.
+Please try to provide the answer only based on the context
+
 {context}
+Question: {question}
 
-### Data:
-{data_sample}
-
-📊 **Analysis:**
+Helpful Answers:
 """
 
-analysis_prompt = PromptTemplate(
-    template=analysis_prompt_template,
-    input_variables=["context", "data_sample"]
+prompt = PromptTemplate(
+    template=prompt_template,
+    input_variables=["context", "question"]
 )
 
-# ✅ **8️⃣ Create the RAG-based analysis chain**
-analysis_chain = RetrievalQA.from_chain_type(
+# Create the RetrievalQA chain
+retrievalQA = RetrievalQA.from_chain_type(
     llm=ollama_model,
     chain_type="stuff",
     retriever=retriever,
     return_source_documents=True,
-    chain_type_kwargs={"prompt": analysis_prompt}
+    chain_type_kwargs={"prompt": prompt}
 )
 
-# ✅ **9️⃣ Function to analyze new data using RAG and Wikipedia content**
-def analyze_data_with_rag(df):
-    # Convert DataFrame into text format
-    data_sample = "\n".join([f"{col}: {df[col].astype(str).tolist()[:5]}" for col in df.columns])
+# Initialize the DataAnalyzer
+analyzer = DataAnalyzer(df, llm=ollama_model)  # Use Ollama instead of HuggingFace
 
-    # Run the analysis chain
-    result = analysis_chain.invoke({"query": data_sample})
+# Define the query
+query = analyzer.analysis_data()
 
-    return result['result']
-
-# ✅ **🔟 Test the analysis on a CSV file**
-df = pd.read_csv("Regions.csv")  # Replace with your file
-analysis_result = analyze_data_with_rag(df)
-
-print(analysis_result)
+# Call the QA chain with our query
+result = retrievalQA.invoke({"query": query})
+print(result['result'])
