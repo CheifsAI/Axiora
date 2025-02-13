@@ -9,7 +9,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QApplication, QMainWindow, QLineEdit,
                                QPushButton, QVBoxLayout, QWidget, QLabel,
                                QScrollArea, QSizePolicy, QHBoxLayout,
-                               QFileDialog, QTableWidgetItem)
+                               QFileDialog, QTableWidgetItem, QFrame)
 
 #from PySide6 import uic
 from OprFuncs import read_file, data_infer
@@ -94,57 +94,70 @@ class GuiFunctions():
 # for i, question in enumerate(result, 1):
 #    print(markdown(question))
     def handle_qu_num(self, index):
+        # More robust index handling
         self.ques_num_list = self.main_window.ui.qu_num_list
-        self.num_qu = self.ques_num_list.itemText(index)
-        if self.num_qu.isdigit():  # Ensure it's a valid number
-            self.num_qu = int(self.num_qu)
-        else:
-            self.num_qu = 1  # Default to 1 if invalid
+        self.num_qu = self.ques_num_list.itemData(index)  # Use itemData for numerical values
+        if not isinstance(self.num_qu, int) or self.num_qu <= 0:
+            print(f"Invalid question number: {self.num_qu}. Defaulting to 1")
+            self.num_qu = 1
 
     def handle_qu_btn(self):
-        if not isinstance(self.num_qu, int) or self.num_qu <= 0:
-            print("Invalid number of questions selected.")
+        # Validate analyzer state
+        if not hasattr(self, 'analyzer') or self.analyzer is None:
+            print("Analyzer not initialized. Load data first.")
             return
 
-        self.g_questions = self.analyzer.questions_gen(self.num_qu)
+        # Generate questions with error handling
+        try:
+            self.g_questions = self.analyzer.questions_gen(self.num_qu)
+        except Exception as e:
+            print(f"Question generation failed: {str(e)}")
+            self.g_questions = []
 
+        # Get references to UI components
+        scroll_area = self.main_window.ui.scrollArea
+        scroll_contents = self.main_window.ui.scrollAreaWidgetContents
+        
+        # Ensure proper widget hierarchy
+        if not scroll_contents.layout():
+            scroll_contents.setLayout(QVBoxLayout())
+        
+        qu_layout = scroll_contents.layout()
+        qu_layout.setAlignment(Qt.AlignTop)
+
+        # Clear previous questions
+        while qu_layout.count():
+            item = qu_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        # Add new questions with proper parenting
         if self.g_questions:
-            scrollAreaWidgetContents = self.main_window.ui.scrollAreaWidgetContents
-            qu_layout = self.main_window.ui.qu_layout  # Existing layout
+            for i, question in enumerate(self.g_questions, 1):
+                question_frame = QFrame(scroll_contents)
+                question_frame.setFrameShape(QFrame.StyledPanel)
+                
+                hbox = QHBoxLayout(question_frame)
+                hbox.addWidget(QLabel(f"{i}.", question_frame))
+                
+                check_box = QCheckBox(question, question_frame)
+                check_box.setWordWrap(True)
+                hbox.addWidget(check_box)
+                
+                qu_layout.addWidget(question_frame)
 
-            # Debugging
-            print("scrollAreaWidgetContents:", scrollAreaWidgetContents)
-            print("Type:", type(scrollAreaWidgetContents))
-
-            if scrollAreaWidgetContents is None:
-                print("Error: scrollAreaWidgetContents is None! Check UI setup.")
-                return
-
-            # Remove this incorrect check, since the debug output proves it's a QWidget
-            # if not isinstance(scrollAreaWidgetContents, QWidget):
-            #     print("Error: scrollAreaWidgetContents is not a QWidget!")
-            #     return
-
-            # Clear previous widgets
-            while qu_layout.count():
-                item = qu_layout.takeAt(0)
-                widget = item.widget()
-                if widget:
-                    widget.deleteLater()
-
-            # Add checkboxes for the generated questions
-            for question in self.g_questions:
-                checkBox = QCheckBox(question, scrollAreaWidgetContents)
-                qu_layout.addWidget(checkBox)
-
-            # Ensure UI updates
-            scrollAreaWidgetContents.setLayout(qu_layout)
-            self.main_window.ui.scrollArea.setWidget(scrollAreaWidgetContents)
-            scrollAreaWidgetContents.adjustSize()  # Ensure proper resizing
-
+            # Ensure proper layout update
+            scroll_contents.adjustSize()
+            scroll_area.updateGeometry()
+            QApplication.processEvents()  # Force UI refresh
         else:
-            print("No questions generated.")
+            error_label = QLabel("No questions generated. Please check your data.", scroll_contents)
+            error_label.setAlignment(Qt.AlignCenter)
+            qu_layout.addWidget(error_label)
 
+        # Set widget if not already set (should be done once during initialization)
+        if scroll_area.widget() != scroll_contents:
+            scroll_area.setWidget(scroll_contents)
 
 
 

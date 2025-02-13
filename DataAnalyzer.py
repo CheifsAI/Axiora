@@ -110,7 +110,10 @@ class DataAnalyzer:
         self.memory.append(AIMessage(content="\n".join(questions_list)))
         
         return questions_list
-
+    def extract_questions(text):
+        # Split by lines and remove numbering, bullets, or markdown
+        lines = re.split(r'\n+|\d+\.\s+|\* |- |• ', text.strip())
+        return [line.strip() for line in lines if line.strip() if line.strip()]
 
     def visual(self, questions):
         data_info = self.data_info
