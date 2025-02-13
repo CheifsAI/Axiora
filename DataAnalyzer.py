@@ -3,7 +3,6 @@ from langchain.chains import LLMChain
 from OprFuncs import data_infer, extract_code, extract_questions
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.schema.runnable import RunnableLambda
 import re
 
 class DataAnalyzer:
@@ -96,34 +95,21 @@ class DataAnalyzer:
             template=question_prompt
         )
         
-
-        question_chain = question_template | self.llm
-
+        question_chain = LLMChain(
+            llm=self.llm,
+            prompt=question_template
+        )
         # Use .invoke() instead of .run()
-        generated_questions = question_chain.invoke({"num": num, "data_info": data_info})
+        generated_questions = question_chain.run({"num": num, "data_info": data_info})
 
-
+        questions_list = extract_questions(generated_questions)
         
-        # Parse the generated text into a list of questions
-        print("Generated Questions:", generated_questions)  # Debugging Output
+        formatted_question_prompt = question_template.format(num=num, data_info=data_info)
 
-        questions_list = self._extract_questions(generated_questions)
-        
-        # Update conversation memory with actual inputs/outputs
-        formatted_prompt = question_template.format(num=num, data_info=data_info)
-        self.memory.append(HumanMessage(content=formatted_prompt))
+        self.memory.append(HumanMessage(content=formatted_question_prompt))
         self.memory.append(AIMessage(content="\n".join(questions_list)))
         
         return questions_list
-    def _extract_questions(self, generated_questions):
-        # Extract text from the dictionary
-        if isinstance(generated_questions, dict):
-            text = generated_questions.get("text", "")  # Adjust key based on actual output
-        else:
-            text = str(generated_questions)  # Convert to string if unexpected type
-        if not text:
-            return []
-        return [line.strip() for line in text.split('\n') if line.strip()]
 
 
     def visual(self, questions):
