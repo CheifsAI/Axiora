@@ -3,6 +3,7 @@ from langchain.chains import LLMChain
 from OprFuncs import data_infer, extract_code, extract_questions
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain.schema.runnable import RunnableLambda
 import re
 
 class DataAnalyzer:
@@ -95,25 +96,26 @@ class DataAnalyzer:
             template=question_prompt
         )
         
-        question_chain = LLMChain(
-            llm=self.llm,
-            prompt=question_template
-        )
+
+        question_chain = question_template | self.llm
+
         # Use .invoke() instead of .run()
-        generated_questions = question_chain.run({"num": num, "data_info": data_info})
+        generated_questions = question_chain.invoke({"num": num, "data_info": data_info})
 
-        questions_list = extract_questions(generated_questions)
+
         
-        formatted_question_prompt = question_template.format(num=num, data_info=data_info)
+        # Parse the generated text into a list of questions
+        print("Generated Questions:", generated_questions)  # Debugging Output
 
-        self.memory.append(HumanMessage(content=formatted_question_prompt))
+        questions_list = self._extract_questions(generated_questions)
+        
+        # Update conversation memory with actual inputs/outputs
+        formatted_prompt = question_template.format(num=num, data_info=data_info)
+        self.memory.append(HumanMessage(content=formatted_prompt))
         self.memory.append(AIMessage(content="\n".join(questions_list)))
         
         return questions_list
-    def extract_questions(text):
-        # Split by lines and remove numbering, bullets, or markdown
-        lines = re.split(r'\n+|\d+\.\s+|\* |- |• ', text.strip())
-        return [line.strip() for line in lines if line.strip() if line.strip()]
+
 
     def visual(self, questions):
         data_info = self.data_info
