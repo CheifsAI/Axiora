@@ -7,47 +7,39 @@ from langchain_community.llms import Ollama
 from langchain.prompts import PromptTemplate
 import pandas as pd
 import fitz  # PyMuPDF لقراءة ملفات PDF
-import io  # لقراءة الملف من الذاكرة
+import os  # للتحقق من وجود الملف
+from DataAnalyzer import DataAnalyzer  # Importing the class from another file
+
+FAISS_DB_PATH = "faiss_index"
 
 # 1. تحميل ملف القواعد (PDF) من الذاكرة
 def load_analysis_rules_from_memory(pdf_content):
-    # فتح ملف PDF من الذاكرة
     doc = fitz.open(stream=pdf_content, filetype="pdf")
     rules = ""
-    
-    # استخراج النصوص من كل صفحة
     for page_num in range(len(doc)):
         page = doc.load_page(page_num)
         rules += page.get_text()
-    
     return rules
 
 # 2. إنشاء وثائق (Documents) من القواعد
 def create_documents_from_rules(rules):
-    documents = []
-    # إضافة القواعد كوثيقة
-    documents.append(Document(page_content=rules))
-    return documents
+    return [Document(page_content=rules)]
 
 # 3. تدريب نظام RAG على القواعد
 def train_rag_system(documents):
-    # تقسيم النصوص إلى أجزاء أصغر
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    texts = text_splitter.split_documents(documents)
+    if os.path.exists(FAISS_DB_PATH):
+        print("\n🔄 Loading existing FAISS index...")
+        vector_db = FAISS.load_local(FAISS_DB_PATH, OllamaEmbeddings(model="llama2"))
+    else:
+        print("\n🛠️ Generating new embeddings and saving FAISS index...")
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        texts = text_splitter.split_documents(documents)
+        embedding_model = OllamaEmbeddings(model="llama2")
+        vector_db = FAISS.from_documents(texts, embedding_model)
+        vector_db.save_local(FAISS_DB_PATH)
     
-    # تهيئة نموذج التضمين (Embedding) باستخدام Ollama
-    embedding_model = OllamaEmbeddings(model="llama2")  # استخدام OllamaEmbeddings
-    
-    # إنشاء متجر المتجهات (Vector Store)
-    vector_db = FAISS.from_documents(texts, embedding_model)
-    
-    # تهيئة Retriever
     retriever = vector_db.as_retriever(search_type="similarity", search_kwargs={"k": 3})
-    
-    # تهيئة نموذج اللغة (LLM) باستخدام Ollama
-    llm = Ollama(model="llama2")  # استخدام Ollama بدلاً من HuggingFaceHub
-    
-    # إنشاء سلسلة RetrievalQA
+    llm = Ollama(model="llama2")
     prompt_template = """
     Use the following piece of context to answer the question asked.
     Please try to provide the answer only based on the context.
@@ -57,11 +49,7 @@ def train_rag_system(documents):
 
     Helpful Answers:
     """
-    prompt = PromptTemplate(
-        template=prompt_template,
-        input_variables=["context", "question"]
-    )
-    
+    prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
     retrievalQA = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
@@ -69,53 +57,35 @@ def train_rag_system(documents):
         return_source_documents=True,
         chain_type_kwargs={"prompt": prompt}
     )
-    
-    return retrievalQA
+    return retrievalQA, llm
 
 # 4. تحميل ملف CSV جديد
 def load_csv(file_path):
-    df = pd.read_csv(file_path)
-    return df
-
-# 5. تحليل ملف CSV بناءً على القواعد
-def analyze_csv_with_rules(retrievalQA, df):
-    # تحويل البيانات إلى وثائق
-    documents = []
-    for _, row in df.iterrows():
-        page_content = " | ".join([f"{col}: {str(row[col])}" for col in df.columns])
-        documents.append(Document(page_content=page_content))
-    
-    # تحليل البيانات باستخدام RAG
-    results = []
-    for doc in documents:
-        query = f"Analyze this data based on the rules: {doc.page_content}"
-        result = retrievalQA.invoke({"query": query})
-        results.append(result['result'])
-    
-    return results
+    return pd.read_csv(file_path)
 
 # الخطوات الرئيسية
 if __name__ == "__main__":
-    # قراءة ملف PDF كبايتس
+    # Load rules from PDF file
     with open("storying.pdf", "rb") as file:
         pdf_content = file.read()
     
-    # تحميل ملف القواعد (PDF) من الذاكرة
-    rules = load_analysis_rules_from_memory(pdf_content)
+    documents = load_analysis_rules_from_memory(pdf_content)
     
-    # إنشاء وثائق من القواعد
-    documents = create_documents_from_rules(rules)
+    # Train RAG model
+    retrievalQA, llm = train_rag_system(documents)
     
-    # تدريب نظام RAG على القواعد
-    retrievalQA = train_rag_system(documents)
+    # Load CSV data
+    df = load_csv("Regions.csv")  
     
-    # تحميل ملف CSV جديد
-    csv_path = r"D:\My-Githup\Axiora\ agent\Regions.csv"  # استخدام raw string
-    df = load_csv(csv_path)
+    # Create DataAnalyzer instance
+    analyzer = DataAnalyzer(df, llm=llm)
     
-    # تحليل ملف CSV بناءً على القواعد
-    analysis_results = analyze_csv_with_rules(retrievalQA, df)
+    # Perform data analysis
+    query = analyzer.analysis_data()
     
-    # عرض النتائج
-    for i, result in enumerate(analysis_results):
-        print(f"Analysis for row {i+1}: {result}")
+    # Use RetrievalQA to answer the query
+    result = retrievalQA.run(query)
+    
+    # Display the final result
+    print("Final Analysis Result:")
+    print(result)
