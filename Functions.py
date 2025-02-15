@@ -141,10 +141,16 @@ class GuiFunctions():
                 question_frame.setFrameShape(QFrame.StyledPanel)
                 
                 hbox = QHBoxLayout(question_frame)
-                hbox.addWidget(QLabel(f"{i}.", question_frame))
+                hbox.setContentsMargins(0, 0, 0, 0)  # Reduce margins
+                hbox.setSpacing(2)  # Reduce spacing between widgets
+                
+                number_label = QLabel(f"{i}.", question_frame)
+                number_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                hbox.addWidget(number_label)
                 
                 question_label = QLabel(str(question), question_frame)
                 question_label.setWordWrap(True)
+                question_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 hbox.addWidget(question_label)
                 
                 qu_layout.addWidget(question_frame)
