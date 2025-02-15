@@ -6,26 +6,20 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 import re
 import pandas as pd
 from langchain_community.chat_message_histories import ChatMessageHistory
-'''
+
+
 class DataAnalyzer:
     def __init__(self,dataframe,llm):
         self.dataframe = dataframe
         self.llm = llm
         self.data_info = data_infer(dataframe)
         self.memory = []
-'''
-
-class DataAnalyzer:
-    def __init__(self, dataframe, llm):  # Fixed constructor method
-        self.dataframe = pd.DataFrame(dataframe)
-        self.llm = llm
-        self.data_info = data_infer(self.dataframe)
-        self.memory = ChatMessageHistory()
 
     def analysis_data(self):
         data_info = self.data_info
 
-        analysis_prompt = '''
+        # Prompt and Chain for Analysis Data
+        analysis_prompt = ''' 
         You are a data analyst. You are provided with a dataset about {data_info}.
         Here is the dataset structure:
         {data_info}
@@ -38,34 +32,26 @@ class DataAnalyzer:
         2. *Anomalies or Outliers*:
         - [Identify any anomalies or outliers in the data].
 
-        3. *Recommendations*:
-        - [Provide actionable recommendations based on the analyzed data].
-
         Ensure your analysis is specific, data-driven, and actionable.
+
         '''
-        
         # Define the prompt template
         analysis_template = PromptTemplate(
             input_variables=["data_info"],
             template=analysis_prompt
         )
-
         # Create a chain for analysis data
-        analysis_chain = LLMChain(
-            llm=self.llm,
-            prompt=analysis_template,
-            llm_kwargs={"temperature": 0.3, "max_tokens": 500}  # Fixed parameter
-        )
+        analysis_chain = LLMChain(llm=self.llm, prompt=analysis_template)
 
         # Run the analysis chain on the provided data
-        analysis_result = analysis_chain.run(data_info=data_info)
+        analysis = analysis_chain.run(data_info=data_info)
 
+        formatted_analysis_prompt = analysis_prompt.format(data_info=data_info)
+        self.memory.append(HumanMessage(content=formatted_analysis_prompt))
+        self.memory.append(AIMessage(content=analysis))
 
-        # Save interaction in memory
-        self.memory.add_user_message(analysis_prompt.format(data_info=data_info))
-        self.memory.add_ai_message(analysis_result)
-
-        return analysis_result
+        # Return the analysis
+        return analysis
 
 
     # Question Generator
