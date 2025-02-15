@@ -100,6 +100,7 @@ class GuiFunctions():
         if not isinstance(self.num_qu, int) or self.num_qu <= 0:
             print(f"Invalid question number: {self.num_qu}. Defaulting to 1")
             self.num_qu = 1
+        print(f"Number of questions to generate: {self.num_qu}")
 
     def handle_qu_btn(self):
         # Validate analyzer state
@@ -110,6 +111,8 @@ class GuiFunctions():
         # Generate questions with error handling
         try:
             self.g_questions = self.analyzer.questions_gen(self.num_qu)
+            if not isinstance(self.g_questions, list):
+                self.g_questions = []  # Ensure it's a list
         except Exception as e:
             print(f"Question generation failed: {str(e)}")
             self.g_questions = []
@@ -140,11 +143,14 @@ class GuiFunctions():
                 hbox = QHBoxLayout(question_frame)
                 hbox.addWidget(QLabel(f"{i}.", question_frame))
                 
-                check_box = QCheckBox(question, question_frame)
-                check_box.setWordWrap(True)
-                hbox.addWidget(check_box)
+                question_label = QLabel(str(question), question_frame)
+                question_label.setWordWrap(True)
+                hbox.addWidget(question_label)
                 
                 qu_layout.addWidget(question_frame)
+
+                # Automatically send the question to the model
+                self.send_question_to_model(question, Qt.Checked)
 
             # Ensure proper layout update
             scroll_contents.adjustSize()
@@ -159,7 +165,13 @@ class GuiFunctions():
         if scroll_area.widget() != scroll_contents:
             scroll_area.setWidget(scroll_contents)
 
-
+    def send_question_to_model(self, question, state):
+        if state == Qt.Checked:
+            response = self.analyzer.chat(question)
+            ai_msg = ChatBubble(str(response), False, "AI")
+            self.main_window.ui.chat_layout.addWidget(ai_msg)
+        else:
+            print(f"Question unchecked: {question}")
 
     def handle_chat_data_btn(self):
         cfpath, _ = QFileDialog.getOpenFileName(
@@ -191,4 +203,3 @@ class GuiFunctions():
                 ai_response = self.analyzer.chat(user_input)
                 ai_msg = ChatBubble(ai_response, False, "AI")
                 self.main_window.ui.chat_layout.addWidget(ai_msg)
-  
