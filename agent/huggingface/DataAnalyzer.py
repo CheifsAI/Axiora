@@ -9,22 +9,24 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 
 
 class DataAnalyzer:
-    def __init__(self,dataframe,llm):
+    def __init__(self, dataframe, llm, retriever):
         self.dataframe = dataframe
         self.llm = llm
+        self.retriever = retriever  # ✅ Correctly storing retriever
         self.data_info = data_infer(dataframe)
         self.memory = []
 
     def analysis_data(self):
         data_info = self.data_info
 
-        # Prompt and Chain for Analysis Data
-        analysis_prompt = ''' 
-        You are a data analyst. You are provided with a dataset about {data_info}.
+        analysis_prompt = '''
+        You are a data analyst. You have been provided with a dataset about {data_info}.
         Here is the dataset structure:
         {data_info}
 
-        Please analyze the data and provide insights in the following format:
+        To enhance your analysis, you have access to a knowledge base containing relevant domain knowledge.
+
+        Please analyze the data by retrieving relevant insights and provide a structured analysis:
 
         1. *Key Trends and Patterns*:
         - [Describe the key trends and patterns in the data].
@@ -32,25 +34,32 @@ class DataAnalyzer:
         2. *Anomalies or Outliers*:
         - [Identify any anomalies or outliers in the data].
 
-        Ensure your analysis is specific, data-driven, and actionable.
-
+        Ensure your analysis is specific, data-driven, and incorporates retrieved domain knowledge.
         '''
-        # Define the prompt template
+
+        # ✅ Correctly use `self.retriever`
+        retrieved_docs = self.retriever.get_relevant_documents(query=data_info)
+        retrieved_knowledge = "\n".join([doc.page_content for doc in retrieved_docs]) if retrieved_docs else "No relevant knowledge found."
+
+        # Define prompt template
         analysis_template = PromptTemplate(
-            input_variables=["data_info"],
+            input_variables=["data_info", "retrieved_knowledge"],
             template=analysis_prompt
         )
-        # Create a chain for analysis data
+
+        # Create analysis chain
         analysis_chain = LLMChain(llm=self.llm, prompt=analysis_template)
 
-        # Run the analysis chain on the provided data
-        analysis = analysis_chain.invoke({"data_info": data_info})
+        # Run analysis with retrieved knowledge
+        analysis = analysis_chain.invoke({"data_info": data_info, "retrieved_knowledge": retrieved_knowledge})
 
-        formatted_analysis_prompt = analysis_prompt.format(data_info=data_info)
+        # Convert to string if needed
+        analysis = analysis["text"] if isinstance(analysis, dict) and "text" in analysis else str(analysis)
+
+        formatted_analysis_prompt = analysis_prompt.format(data_info=data_info, retrieved_knowledge=retrieved_knowledge)
         self.memory.append(HumanMessage(content=formatted_analysis_prompt))
         self.memory.append(AIMessage(content=analysis))
 
-        # Return the analysis
         return analysis
 
 
