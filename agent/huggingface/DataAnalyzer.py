@@ -59,14 +59,12 @@ class DataAnalyzer:
         # Run the analysis chain on the provided data
         analysis_result = analysis_chain.run(data_info=data_info)
 
-        # Extract questions from analysis (assuming extract_questions exists)
-        questions = extract_questions(analysis_result)
 
         # Save interaction in memory
         self.memory.add_user_message(analysis_prompt.format(data_info=data_info))
         self.memory.add_ai_message(analysis_result)
 
-        return analysis_result, questions
+        return analysis_result
 
 
     # Question Generator
