@@ -1053,6 +1053,11 @@ class Ui_MainWindow(object):
         self.gridLayout_10.setObjectName(u"gridLayout_10")
         self.chat_layout = QVBoxLayout()
         self.chat_layout.setObjectName(u"chat_layout")
+        self.pushButton_2 = QPushButton(self.scrollAreaWidgetContents_2)
+        self.pushButton_2.setObjectName(u"pushButton_2")
+
+        self.chat_layout.addWidget(self.pushButton_2)
+
 
         self.gridLayout_10.addLayout(self.chat_layout, 0, 0, 1, 1)
 
@@ -1599,6 +1604,7 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.closeAppBtn.setText("")
         self.groupBox_4.setTitle("")
+        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
         self.groupBox_8.setTitle("")
         self.chat_data_btn.setText("")
         self.lineEdit_message.setText("")

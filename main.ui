@@ -1855,7 +1855,15 @@ li.checked::marker { content: &quot;\2612&quot;; }
                              </property>
                              <layout class="QGridLayout" name="gridLayout_10">
                               <item row="0" column="0">
-                               <layout class="QVBoxLayout" name="chat_layout"/>
+                               <layout class="QVBoxLayout" name="chat_layout">
+                                <item>
+                                 <widget class="QPushButton" name="pushButton_2">
+                                  <property name="text">
+                                   <string>PushButton</string>
+                                  </property>
+                                 </widget>
+                                </item>
+                               </layout>
                               </item>
                              </layout>
                             </widget>
