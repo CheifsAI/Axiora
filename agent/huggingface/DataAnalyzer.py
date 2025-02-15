@@ -54,7 +54,7 @@ class DataAnalyzer:
         analysis_chain = LLMChain(
             llm=self.llm,
             prompt=analysis_template,
-            config={"temperature": 0.3, "max_tokens": 500}  # Fixed parameter
+            llm_kwargs={"temperature": 0.3, "max_tokens": 500}  # Fixed parameter
         )
 
         # Run the analysis chain on the provided data
