@@ -15,16 +15,15 @@ class DataAnalyzer:
 '''
 
 class DataAnalyzer:
-    def _init_(self, dataframe, llm):
+    def __init__(self, dataframe, llm):  # Fixed constructor method
         self.dataframe = dataframe
         self.llm = llm
         self.data_info = data_infer(dataframe)
-        self.memory = ChatMessageHistory()  # استخدام ChatMessageHistory
+        self.memory = ChatMessageHistory()
 
     def analysis_data(self):
         data_info = self.data_info
 
-        # Prompt and Chain for Analysis Data
         analysis_prompt = '''
         You are a data analyst. You are provided with a dataset about {data_info}.
         Here is the dataset structure:
@@ -43,60 +42,31 @@ class DataAnalyzer:
 
         Ensure your analysis is specific, data-driven, and actionable.
         '''
+        
         # Define the prompt template
         analysis_template = PromptTemplate(
             input_variables=["data_info"],
             template=analysis_prompt
         )
+
         # Create a chain for analysis data
         analysis_chain = LLMChain(
             llm=self.llm,
             prompt=analysis_template,
-            llm_kwargs={"temperature": 0.3, "max_tokens": 500}
+            config={"temperature": 0.3, "max_tokens": 500}  # Fixed parameter
         )
 
         # Run the analysis chain on the provided data
-        analysis = analysis_chain.run(data_info=data_info)
+        analysis_result = analysis_chain.run(data_info=data_info)
 
-        # Save the interaction to memory
+        # Extract questions from analysis (assuming extract_questions exists)
+        questions = extract_questions(analysis_result)
+
+        # Save interaction in memory
         self.memory.add_user_message(analysis_prompt.format(data_info=data_info))
-        self.memory.add_ai_message(analysis)
+        self.memory.add_ai_message(analysis_result)
 
-        # Return the analysis
-        return analysis        
-
-    # Drop Nulls
-    def drop_nulls(self):
-        data_info = self.data_info
-        
-        # Prompt and Chain for dropping nulls
-        drop_nulls_prompt = '''
-        create a code to drop the nulls from the DataFrame named 'df',
-        only include the dropping part and importing pandas,
-        insure that inplace = True, no extra context or reading the file.
-        '''
-        # Define the prompt template
-        drop_nulls_template = PromptTemplate(
-            input_variables=["data_info"],
-            template=drop_nulls_prompt
-        )
-        # Create a chain for dropping nulls
-        drop_nulls_chain = LLMChain(llm=self.llm, prompt=drop_nulls_template)
-        
-        # Extracting code for dropping nulls
-        drop_nulls_code = extract_code(drop_nulls_chain.run(data_info=data_info))
-        
-        # Print the code for dropping nulls
-        print("Code for dropping nulls:\n", drop_nulls_code)
-
-        self.memory.append(HumanMessage(content=drop_nulls_prompt))
-        self.memory.append(AIMessage(content=drop_nulls_code))
-        
-        # Drop null values from the data
-        exec_env = {"df": self.dataframe}
-        exec(drop_nulls_code, exec_env)
-        updated_df = exec_env["df"]
-        return updated_df
+        return analysis_result, questions
 
 
     # Question Generator
