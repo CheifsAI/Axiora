@@ -9,7 +9,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QApplication, QMainWindow, QLineEdit,
                                QPushButton, QVBoxLayout, QWidget, QLabel,
                                QScrollArea, QSizePolicy, QHBoxLayout,
-                               QFileDialog, QTableWidgetItem, QFrame)
+                               QFileDialog, QTableWidgetItem, QFrame, QCheckBox)
 
 #from PySide6 import uic
 from OprFuncs import read_file, data_infer
@@ -88,7 +88,7 @@ class GuiFunctions():
         # Populate the table with data
         for i in range(self.cleaned_df.shape[0]):
             for j in range(self.cleaned_df.shape[1]):
-                self.table.setItem(i, j, QTableWidgetItem(str(self.cleaned_df.iat[i, j])))
+                self.table.setItem(i, j, QTableWidgetItem(str(self.cleaned_df.iat(i, j))))
     
 # result = quetions_gen(llm=llm,dataframe=df1,num=2)
 # for i, question in enumerate(result, 1):
@@ -153,10 +153,11 @@ class GuiFunctions():
                 question_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 hbox.addWidget(question_label)
                 
+                check_box = QCheckBox(question_frame)
+                check_box.stateChanged.connect(lambda state, q=question: self.handle_question_selection(q, state))
+                hbox.addWidget(check_box)
+                
                 qu_layout.addWidget(question_frame)
-
-                # Automatically send the question to the model
-                self.send_question_to_model(question, Qt.Checked)
 
             # Ensure proper layout update
             scroll_contents.adjustSize()
@@ -170,6 +171,12 @@ class GuiFunctions():
         # Set widget if not already set (should be done once during initialization)
         if scroll_area.widget() != scroll_contents:
             scroll_area.setWidget(scroll_contents)
+
+    def handle_question_selection(self, question, state):
+        if state == Qt.Checked:
+            print(f"Question selected: {question}")
+        else:
+            print(f"Question deselected: {question}")
 
     def send_question_to_model(self, question, state):
         if state == Qt.Checked:
