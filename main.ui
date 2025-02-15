@@ -831,9 +831,11 @@ Button */
                   <property name="text">
                    <string>Data</string>
                   </property>
-                  <property name="icon">
-                   <iconset>
-                    <normaloff>data-collection.png</normaloff>data-collection.png</iconset>
+                  <property name="iconSize">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
                   </property>
                  </widget>
                 </item>
@@ -869,7 +871,7 @@ Button */
                    <string notr="true">background-image: url(:/icons/images/icons/cil-file.png);</string>
                   </property>
                   <property name="text">
-                   <string>New</string>
+                   <string>Questions</string>
                   </property>
                  </widget>
                 </item>
@@ -1855,15 +1857,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                              </property>
                              <layout class="QGridLayout" name="gridLayout_10">
                               <item row="0" column="0">
-                               <layout class="QVBoxLayout" name="chat_layout">
-                                <item>
-                                 <widget class="QPushButton" name="pushButton_2">
-                                  <property name="text">
-                                   <string>KKKKKKK</string>
-                                  </property>
-                                 </widget>
-                                </item>
-                               </layout>
+                               <layout class="QVBoxLayout" name="chat_layout"/>
                               </item>
                              </layout>
                             </widget>

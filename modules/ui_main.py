@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'main.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.1
+## Created by: Qt User Interface Compiler version 6.8.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -661,9 +661,7 @@ class Ui_MainWindow(object):
         self.btn_data.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.btn_data.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
         self.btn_data.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-gamepad.png);")
-        icon = QIcon()
-        icon.addFile(u"data-collection.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.btn_data.setIcon(icon)
+        self.btn_data.setIconSize(QSize(20, 20))
 
         self.verticalLayout_8.addWidget(self.btn_data)
 
@@ -792,9 +790,9 @@ class Ui_MainWindow(object):
         self.extraCloseColumnBtn.setMinimumSize(QSize(28, 28))
         self.extraCloseColumnBtn.setMaximumSize(QSize(28, 28))
         self.extraCloseColumnBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        icon1 = QIcon()
-        icon1.addFile(u":/icons/images/icons/icon_close.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.extraCloseColumnBtn.setIcon(icon1)
+        icon = QIcon()
+        icon.addFile(u":/icons/images/icons/icon_close.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.extraCloseColumnBtn.setIcon(icon)
         self.extraCloseColumnBtn.setIconSize(QSize(20, 20))
 
         self.extraTopLayout.addWidget(self.extraCloseColumnBtn, 0, 2, 1, 1)
@@ -952,9 +950,9 @@ class Ui_MainWindow(object):
         self.settingsTopBtn.setMinimumSize(QSize(28, 28))
         self.settingsTopBtn.setMaximumSize(QSize(28, 28))
         self.settingsTopBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        icon2 = QIcon()
-        icon2.addFile(u":/icons/images/icons/icon_settings.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.settingsTopBtn.setIcon(icon2)
+        icon1 = QIcon()
+        icon1.addFile(u":/icons/images/icons/icon_settings.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.settingsTopBtn.setIcon(icon1)
         self.settingsTopBtn.setIconSize(QSize(20, 20))
 
         self.horizontalLayout_2.addWidget(self.settingsTopBtn)
@@ -964,9 +962,9 @@ class Ui_MainWindow(object):
         self.minimizeAppBtn.setMinimumSize(QSize(28, 28))
         self.minimizeAppBtn.setMaximumSize(QSize(28, 28))
         self.minimizeAppBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        icon3 = QIcon()
-        icon3.addFile(u":/icons/images/icons/icon_minimize.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.minimizeAppBtn.setIcon(icon3)
+        icon2 = QIcon()
+        icon2.addFile(u":/icons/images/icons/icon_minimize.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.minimizeAppBtn.setIcon(icon2)
         self.minimizeAppBtn.setIconSize(QSize(20, 20))
 
         self.horizontalLayout_2.addWidget(self.minimizeAppBtn)
@@ -983,9 +981,9 @@ class Ui_MainWindow(object):
         font1.setStyleStrategy(QFont.PreferDefault)
         self.maximizeRestoreAppBtn.setFont(font1)
         self.maximizeRestoreAppBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        icon4 = QIcon()
-        icon4.addFile(u":/icons/images/icons/icon_maximize.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.maximizeRestoreAppBtn.setIcon(icon4)
+        icon3 = QIcon()
+        icon3.addFile(u":/icons/images/icons/icon_maximize.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.maximizeRestoreAppBtn.setIcon(icon3)
         self.maximizeRestoreAppBtn.setIconSize(QSize(20, 20))
 
         self.horizontalLayout_2.addWidget(self.maximizeRestoreAppBtn)
@@ -995,7 +993,7 @@ class Ui_MainWindow(object):
         self.closeAppBtn.setMinimumSize(QSize(28, 28))
         self.closeAppBtn.setMaximumSize(QSize(28, 28))
         self.closeAppBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.closeAppBtn.setIcon(icon1)
+        self.closeAppBtn.setIcon(icon)
         self.closeAppBtn.setIconSize(QSize(20, 20))
 
         self.horizontalLayout_2.addWidget(self.closeAppBtn)
@@ -1053,11 +1051,6 @@ class Ui_MainWindow(object):
         self.gridLayout_10.setObjectName(u"gridLayout_10")
         self.chat_layout = QVBoxLayout()
         self.chat_layout.setObjectName(u"chat_layout")
-        self.pushButton_2 = QPushButton(self.scrollAreaWidgetContents_2)
-        self.pushButton_2.setObjectName(u"pushButton_2")
-
-        self.chat_layout.addWidget(self.pushButton_2)
-
 
         self.gridLayout_10.addLayout(self.chat_layout, 0, 0, 1, 1)
 
@@ -1076,9 +1069,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
         self.chat_data_btn = QPushButton(self.groupBox_8)
         self.chat_data_btn.setObjectName(u"chat_data_btn")
-        icon5 = QIcon()
-        icon5.addFile(u":/icons/images/icons/cil-link.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.chat_data_btn.setIcon(icon5)
+        icon4 = QIcon()
+        icon4.addFile(u":/icons/images/icons/cil-link.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.chat_data_btn.setIcon(icon4)
 
         self.horizontalLayout_11.addWidget(self.chat_data_btn)
 
@@ -1092,9 +1085,9 @@ class Ui_MainWindow(object):
         self.send_btn.setObjectName(u"send_btn")
         self.send_btn.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
         self.send_btn.setStyleSheet(u"background-color: rgb(64, 39, 255);")
-        icon6 = QIcon()
-        icon6.addFile(u"images/icons/arrow-34-24.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.send_btn.setIcon(icon6)
+        icon5 = QIcon()
+        icon5.addFile(u"images/icons/arrow-34-24.ico", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.send_btn.setIcon(icon5)
 
         self.horizontalLayout_11.addWidget(self.send_btn)
 
@@ -1175,9 +1168,9 @@ class Ui_MainWindow(object):
         self.openfile_btn.setFont(font)
         self.openfile_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.openfile_btn.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        icon7 = QIcon()
-        icon7.addFile(u":/icons/images/icons/cil-folder-open.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.openfile_btn.setIcon(icon7)
+        icon6 = QIcon()
+        icon6.addFile(u":/icons/images/icons/cil-folder-open.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.openfile_btn.setIcon(icon6)
 
         self.gridLayout.addWidget(self.openfile_btn, 0, 1, 1, 1)
 
@@ -1368,7 +1361,7 @@ class Ui_MainWindow(object):
 
         self.pushButton = QPushButton(self.qu_widget)
         self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setIcon(icon5)
+        self.pushButton.setIcon(icon4)
 
         self.gridLayout_4.addWidget(self.pushButton, 1, 1, 1, 1)
 
@@ -1556,7 +1549,7 @@ class Ui_MainWindow(object):
         self.label_2.setText("")
         self.toggleButton.setText(QCoreApplication.translate("MainWindow", u"Hide", None))
         self.btn_data.setText(QCoreApplication.translate("MainWindow", u"Data", None))
-        self.btn_new.setText(QCoreApplication.translate("MainWindow", u"New", None))
+        self.btn_new.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
         self.btn_home.setText(QCoreApplication.translate("MainWindow", u"Home", None))
         self.btn_save.setText(QCoreApplication.translate("MainWindow", u"Save", None))
         self.btn_exit.setText(QCoreApplication.translate("MainWindow", u"Exit", None))
@@ -1604,7 +1597,6 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.closeAppBtn.setText("")
         self.groupBox_4.setTitle("")
-        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"KKKKKKK", None))
         self.groupBox_8.setTitle("")
         self.chat_data_btn.setText("")
         self.lineEdit_message.setText("")
