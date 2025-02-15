@@ -4,6 +4,7 @@ from OprFuncs import data_infer, extract_code, extract_questions
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 import re
+import pandas as pd
 from langchain_community.chat_message_histories import ChatMessageHistory
 '''
 class DataAnalyzer:
@@ -16,9 +17,9 @@ class DataAnalyzer:
 
 class DataAnalyzer:
     def __init__(self, dataframe, llm):  # Fixed constructor method
-        self.dataframe = dataframe
+        self.dataframe = pd.DataFrame(dataframe)
         self.llm = llm
-        self.data_info = data_infer(dataframe)
+        self.data_info = data_infer(self.dataframe)
         self.memory = ChatMessageHistory()
 
     def analysis_data(self):
