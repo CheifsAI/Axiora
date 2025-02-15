@@ -4,27 +4,44 @@ from OprFuncs import data_infer, extract_code, extract_questions
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 import re
-
+from langchain.memory import ChatMessageHistory
+'''
 class DataAnalyzer:
     def __init__(self,dataframe,llm):
         self.dataframe = dataframe
         self.llm = llm
         self.data_info = data_infer(dataframe)
         self.memory = []
+'''
+
+class DataAnalyzer:
+    def _init_(self, dataframe, llm):
+        self.dataframe = dataframe
+        self.llm = llm
+        self.data_info = data_infer(dataframe)
+        self.memory = ChatMessageHistory()  # استخدام ChatMessageHistory
 
     def analysis_data(self):
         data_info = self.data_info
 
         # Prompt and Chain for Analysis Data
         analysis_prompt = '''
-        You are a data analyst. You are provided with a dataset about {data_info}
+        You are a data analyst. You are provided with a dataset about {data_info}.
         Here is the dataset structure:
         {data_info}
 
-        Please analyze the data and provide insights about:
-        1. Key trends and patterns in the {data_info}.
-        2. Any anomalies or outliers in the data.
-        3. Recommendations or actionable insights based on the analyzed data.
+        Please analyze the data and provide insights in the following format:
+
+        1. *Key Trends and Patterns*:
+        - [Describe the key trends and patterns in the data].
+
+        2. *Anomalies or Outliers*:
+        - [Identify any anomalies or outliers in the data].
+
+        3. *Recommendations*:
+        - [Provide actionable recommendations based on the analyzed data].
+
+        Ensure your analysis is specific, data-driven, and actionable.
         '''
         # Define the prompt template
         analysis_template = PromptTemplate(
@@ -32,14 +49,18 @@ class DataAnalyzer:
             template=analysis_prompt
         )
         # Create a chain for analysis data
-        analysis_chain = LLMChain(llm=self.llm, prompt=analysis_template)
+        analysis_chain = LLMChain(
+            llm=self.llm,
+            prompt=analysis_template,
+            llm_kwargs={"temperature": 0.3, "max_tokens": 500}
+        )
 
         # Run the analysis chain on the provided data
         analysis = analysis_chain.run(data_info=data_info)
 
-        formatted_analysis_prompt = analysis_prompt.format(data_info=data_info)
-        self.memory.append(HumanMessage(content=formatted_analysis_prompt))
-        self.memory.append(AIMessage(content=analysis))
+        # Save the interaction to memory
+        self.memory.add_user_message(analysis_prompt.format(data_info=data_info))
+        self.memory.add_ai_message(analysis)
 
         # Return the analysis
         return analysis        
