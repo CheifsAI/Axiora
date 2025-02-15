@@ -44,7 +44,7 @@ class DataAnalyzer:
         analysis_chain = LLMChain(llm=self.llm, prompt=analysis_template)
 
         # Run the analysis chain on the provided data
-        analysis = analysis_chain.run(data_info=data_info)
+        analysis = analysis_chain.invoke({"data_info": data_info})
 
         formatted_analysis_prompt = analysis_prompt.format(data_info=data_info)
         self.memory.append(HumanMessage(content=formatted_analysis_prompt))
