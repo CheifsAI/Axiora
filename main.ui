@@ -979,7 +979,7 @@ Button */
                    <string notr="true">background-image: url(:/icons/images/icons/cil-x.png);</string>
                   </property>
                   <property name="text">
-                   <string>Exit</string>
+                   <string>Close</string>
                   </property>
                  </widget>
                 </item>
@@ -2509,7 +2509,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>46</width>
+                                   <width>54</width>
                                    <height>24</height>
                                   </rect>
                                  </property>
