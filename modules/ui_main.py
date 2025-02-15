@@ -1604,7 +1604,7 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.closeAppBtn.setText("")
         self.groupBox_4.setTitle("")
-        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"KKKKKKK", None))
         self.groupBox_8.setTitle("")
         self.chat_data_btn.setText("")
         self.lineEdit_message.setText("")
