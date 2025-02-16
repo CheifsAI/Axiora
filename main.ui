@@ -831,9 +831,11 @@ Button */
                   <property name="text">
                    <string>Data</string>
                   </property>
-                  <property name="icon">
-                   <iconset>
-                    <normaloff>data-collection.png</normaloff>data-collection.png</iconset>
+                  <property name="iconSize">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
                   </property>
                  </widget>
                 </item>
@@ -869,7 +871,7 @@ Button */
                    <string notr="true">background-image: url(:/icons/images/icons/cil-file.png);</string>
                   </property>
                   <property name="text">
-                   <string>New</string>
+                   <string>Questions</string>
                   </property>
                  </widget>
                 </item>
@@ -977,7 +979,7 @@ Button */
                    <string notr="true">background-image: url(:/icons/images/icons/cil-x.png);</string>
                   </property>
                   <property name="text">
-                   <string>Exit</string>
+                   <string>Close</string>
                   </property>
                  </widget>
                 </item>
@@ -2507,7 +2509,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>46</width>
+                                   <width>54</width>
                                    <height>24</height>
                                   </rect>
                                  </property>
