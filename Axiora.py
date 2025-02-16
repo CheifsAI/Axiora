@@ -17,7 +17,7 @@
 import sys
 import os
 import platform
-#from Functions import GuiFunctions
+from Functions import GuiFunctions
 def resizeEvent(self, event):
     new_size = max(10, self.width() // 100)  
     self.adjust_font_size(new_size)
@@ -43,7 +43,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         global widgets
         widgets = self.ui
-        #self.app_functions = GuiFunctions(self)
+        self.app_functions = GuiFunctions(self)
         
         # USE CUSTOM TITLE BAR | USE AS "False" FOR MAC OR LINUX
         # ///////////////////////////////////////////////////////////////
