@@ -9,7 +9,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QApplication, QMainWindow, QLineEdit,
                                QPushButton, QVBoxLayout, QWidget, QLabel,
                                QScrollArea, QSizePolicy, QHBoxLayout,
-                               QFileDialog, QTableWidgetItem, QFrame)
+                               QFileDialog, QTableWidgetItem, QFrame, QCheckBox)
 
 #from PySide6 import uic
 from OprFuncs import read_file, data_infer
@@ -19,24 +19,22 @@ from markdown import markdown
 from uiEXT.ChatBubble import ChatBubble
 
 class GuiFunctions():
-    def __init__(self,MainWindow):
+    def __init__(self, MainWindow):
         self.main_window = MainWindow
         self.ui = MainWindow.ui
         self.llm = llama3b
-        #self.chat_page = Ui_chat_page()
-        #self.chat_page = setupUi
         self.setup_connections()
 
     def setup_connections(self):
-         self.main_window.ui.openfile_btn.clicked.connect(self.handle_data_button)
-         self.main_window.ui.sum_btn.clicked.connect(self.handle_sum_btn)
-         self.main_window.ui.btn_LLMs.clicked.connect(self.handle_btn_LLMs)
-         self.main_window.ui.clean_data_btn.clicked.connect(self.handle_clean_data_btn)
-         self.main_window.ui.qu_num_list.currentIndexChanged.connect(self.handle_qu_num)
-         self.main_window.ui.qu_btn.clicked.connect(self.handle_qu_btn)
-         self.main_window.ui.chat_data_btn.clicked.connect(self.handle_chat_data_btn)
-         self.main_window.ui.send_btn.clicked.connect(self.send_message)
-         self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
+        self.main_window.ui.openfile_btn.clicked.connect(self.handle_data_button)
+        self.main_window.ui.sum_btn.clicked.connect(self.handle_sum_btn)
+        self.main_window.ui.btn_LLMs.clicked.connect(self.handle_btn_LLMs)
+        self.main_window.ui.clean_data_btn.clicked.connect(self.handle_clean_data_btn)
+        self.main_window.ui.qu_num_list.currentIndexChanged.connect(self.handle_qu_num)
+        self.main_window.ui.qu_btn.clicked.connect(self.handle_qu_btn)
+        self.main_window.ui.chat_data_btn.clicked.connect(self.handle_chat_data_btn)
+        self.main_window.ui.send_btn.clicked.connect(self.send_message)
+        self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
 
     def handle_data_button(self):
         fpath, _ = QFileDialog.getOpenFileName(
@@ -46,7 +44,7 @@ class GuiFunctions():
             self.location = self.main_window.ui.path_location
             self.location.setText(fpath)
             self.df = read_file(fpath)
-            self.analyzer = DataAnalyzer(dataframe=self.df,llm=self.llm)
+            self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
 
             # Convert index to a column
             self.df.insert(0, "Index", self.df.index)
@@ -67,11 +65,13 @@ class GuiFunctions():
                 for j in range(self.df.shape[1]):
                     self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))
 
-
     def handle_sum_btn(self):
         self.summary = markdown(self.analyzer.analysis_data())
         self.summary_text = self.main_window.ui.summary_text
         self.summary_text.setMarkdown(self.summary)
+
+    def handle_btn_LLMs(self):
+        print("Clicked LLM")
 
     def handle_btn_LLMs(self):
         #menu = QMenu()
@@ -88,7 +88,7 @@ class GuiFunctions():
         # Populate the table with data
         for i in range(self.cleaned_df.shape[0]):
             for j in range(self.cleaned_df.shape[1]):
-                self.table.setItem(i, j, QTableWidgetItem(str(self.cleaned_df.iat[i, j])))
+                self.table.setItem(i, j, QTableWidgetItem(str(self.cleaned_df.iat(i, j))))
     
 # result = quetions_gen(llm=llm,dataframe=df1,num=2)
 # for i, question in enumerate(result, 1):
@@ -100,6 +100,7 @@ class GuiFunctions():
         if not isinstance(self.num_qu, int) or self.num_qu <= 0:
             print(f"Invalid question number: {self.num_qu}. Defaulting to 1")
             self.num_qu = 1
+        print(f"Number of questions to generate: {self.num_qu}")
 
     def handle_qu_btn(self):
         # Validate analyzer state
@@ -110,6 +111,8 @@ class GuiFunctions():
         # Generate questions with error handling
         try:
             self.g_questions = self.analyzer.questions_gen(self.num_qu)
+            if not isinstance(self.g_questions, list):
+                self.g_questions = []  # Ensure it's a list
         except Exception as e:
             print(f"Question generation failed: {str(e)}")
             self.g_questions = []
@@ -138,10 +141,20 @@ class GuiFunctions():
                 question_frame.setFrameShape(QFrame.StyledPanel)
                 
                 hbox = QHBoxLayout(question_frame)
-                hbox.addWidget(QLabel(f"{i}.", question_frame))
+                hbox.setContentsMargins(0, 0, 0, 0)  # Reduce margins
+                hbox.setSpacing(2)  # Reduce spacing between widgets
                 
-                check_box = QCheckBox(question, question_frame)
-                check_box.setWordWrap(True)
+                number_label = QLabel(f"{i}.", question_frame)
+                number_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                hbox.addWidget(number_label)
+                
+                question_label = QLabel(str(question), question_frame)
+                question_label.setWordWrap(True)
+                question_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                hbox.addWidget(question_label)
+                
+                check_box = QCheckBox(question_frame)
+                check_box.stateChanged.connect(lambda state, q=question: self.handle_question_selection(q, state))
                 hbox.addWidget(check_box)
                 
                 qu_layout.addWidget(question_frame)
@@ -159,7 +172,19 @@ class GuiFunctions():
         if scroll_area.widget() != scroll_contents:
             scroll_area.setWidget(scroll_contents)
 
+    def handle_question_selection(self, question, state):
+        if state == Qt.Checked:
+            print(f"Question selected: {question}")
+        else:
+            print(f"Question deselected: {question}")
 
+    def send_question_to_model(self, question, state):
+        if state == Qt.Checked:
+            response = self.analyzer.chat(question)
+            ai_msg = ChatBubble(str(response), False, "AI")
+            self.main_window.ui.chat_layout.addWidget(ai_msg)
+        else:
+            print(f"Question unchecked: {question}")
 
     def handle_chat_data_btn(self):
         cfpath, _ = QFileDialog.getOpenFileName(
@@ -191,4 +216,3 @@ class GuiFunctions():
                 ai_response = self.analyzer.chat(user_input)
                 ai_msg = ChatBubble(ai_response, False, "AI")
                 self.main_window.ui.chat_layout.addWidget(ai_msg)
-  
