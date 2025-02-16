@@ -17,7 +17,7 @@
 import sys
 import os
 import platform
-from Functions import GuiFunctions
+#from Functions import GuiFunctions
 def resizeEvent(self, event):
     new_size = max(10, self.width() // 100)  
     self.adjust_font_size(new_size)
@@ -43,7 +43,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         global widgets
         widgets = self.ui
-        self.app_functions = GuiFunctions(self)
+        #self.app_functions = GuiFunctions(self)
         
         # USE CUSTOM TITLE BAR | USE AS "False" FOR MAC OR LINUX
         # ///////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ class MainWindow(QMainWindow):
         # SET CUSTOM THEME
         # ///////////////////////////////////////////////////////////////
         useCustomTheme = False
-        themeFile = "themes\py_dracula_light.qss"
+        themeFile = r"themes\py_dracula_light.qss"
 
         # SET THEME AND HACKS
         if useCustomTheme:
@@ -104,7 +104,7 @@ class MainWindow(QMainWindow):
             UIFunctions.theme(self, themeFile, True)
 
             # SET HACKS
-            AppFunctions.setThemeHack(self)
+            #AppFunctions.setThemeHack(self)
 
         # SET HOME PAGE AND SELECT MENU
         # ///////////////////////////////////////////////////////////////
