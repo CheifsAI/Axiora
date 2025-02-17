@@ -164,12 +164,19 @@ class MainWindow(QMainWindow):
         if event.buttons() == Qt.RightButton:
             print('Mouse click: RIGHT CLICK')
 
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon("icon.ico"))
 
-    #login_window = LoginWindow()
-    #login_window.show()
+    login_window = LoginWindow()
 
-    #window = MainWindow()
+    def open_main():
+        main_window = MainWindow()
+        main_window.show()
+        login_window.close()
+
+    login_window.login_accepted.connect(open_main)
+
+    login_window.show()
     sys.exit(app.exec())
