@@ -20,14 +20,14 @@ from uiEXT.ChatBubble import ChatBubble
 from sqlalchemy.orm import sessionmaker
 from Axioradb import *
 
-SessionLocal = sessionmaker(bind=engine)
+#SessionLocal = sessionmaker(bind=engine)
 
 class GuiFunctions():
     def __init__(self, MainWindow):
         self.main_window = MainWindow
         self.ui = MainWindow.ui
         self.llm = llama3b
-        self.db_session = SessionLocal()
+ #       self.db_session = SessionLocal()
         self.setup_connections()
 
     def setup_connections(self):
