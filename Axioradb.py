@@ -70,6 +70,27 @@ class Session(Base):
     def __repr__(self):
         return f"<Session(session_id={self.session_id}, user_id={self.user_id}, llm_id={self.llm_id}, creation_date={self.creation_date})>"
 
+class DataSet(Base):
+    __tablename__ = "data_set"  # Table name in SQLite
+
+    # Define columns
+    data_set_id = Column(Integer, primary_key=True, autoincrement=True)  # Auto-incrementing primary key
+    session_id = Column(Integer, ForeignKey('session.session_id', ondelete='CASCADE'), nullable=False)  # Foreign key
+    raw_data = Column(Text)  # Raw data stored as text
+    transformed_data_set = Column(Text)  # Transformed data stored as text
+    uploaded_at = Column(DateTime, default=datetime.utcnow)  # Timestamp with default value
+    # Define relationship to the Session table
+    session = relationship("Session", back_populates="data_sets")
+
+    def __init__(self, session_id, raw_data=None, transformed_data_set=None):
+        
+        self.session_id = session_id
+        self.raw_data = raw_data
+        self.transformed_data_set = transformed_data_set
+
+    def __repr__(self):
+        
+        return f"<DataSet(data_set_id={self.data_set_id}, session_id={self.session_id}, uploaded_at='{self.uploaded_at}')>"
 
 
 
