@@ -9,7 +9,7 @@ from sqlalchemy import(
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
-engine = create_engine("sqlite:///axiora.db")
+engine = create_engine("sqlite:///axioradb.db")
 Base = declarative_base()
 
 class users(Base):
