@@ -2,6 +2,7 @@ import sys
 import os
 import platform
 from Functions import GuiFunctions
+from uiEXT.login.LoginWindow import LoginWindow
 def resizeEvent(self, event):
     new_size = max(10, self.width() // 100)  
     self.adjust_font_size(new_size)
@@ -147,8 +148,19 @@ class MainWindow(QMainWindow):
         if event.buttons() == Qt.RightButton:
             print('Mouse click: RIGHT CLICK')
 
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon("icon.ico"))
-    window = MainWindow()
+
+    login_window = LoginWindow()
+
+    def open_main():
+        main_window = MainWindow()
+        main_window.show()
+        login_window.close()
+
+    login_window.login_accepted.connect(open_main)
+
+    login_window.show()
     sys.exit(app.exec())
