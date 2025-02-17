@@ -40,20 +40,22 @@ class LLM(Base):
     llm_id = Column(Integer, primary_key=True, autoincrement=True) 
     llm_name = Column(String(255), nullable=False)
     parameters = Column(SmallInteger)
+    install_llm_code = Column(String)
 
-    def __init__(self, llm_name, parameters=None):
+    def __init__(self, llm_name, install_llm_code, parameters=None):
         self.llm_name = llm_name
         self.parameters = parameters
+        self.install_llm_code = install_llm_code
 
     def __repr__(self):
-        return f"<LLM(llm_id={self.llm_id}, llm_name='{self.llm_name}', parameters={self.parameters})>"
+        return f"<LLM(llm_id={self.llm_id}, llm_name='{self.llm_name}', parameters={self.parameters},install_llm_code='{self.install_llm_code}')>"
     
 class Session(Base):
     __tablename__ = "Session"
 
     session_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
-    data_info = Column(Text)  # TEXT (can be NULL)
+    data_info = Column(Text) 
     llm_id = Column(Integer, ForeignKey("LLM.llm_id", ondelete="CASCADE"), nullable=False)
     creation_date = Column(DateTime, default=datetime.utcnow)
 
