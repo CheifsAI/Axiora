@@ -1,11 +1,11 @@
 from PySide6.QtWidgets import (QApplication, QMainWindow, QLineEdit, QPushButton, QVBoxLayout, QWidget, QLabel,
                                QScrollArea, QSizePolicy, QHBoxLayout, QFileDialog, QTableWidgetItem, QFrame)
 from PySide6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QRect
-from PySide6.QtGui import QColor, QGraphicsDropShadowEffect
-from ui_login import Ui_Login 
-from circular_progress import CircularProgress
-
-
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QGraphicsDropShadowEffect
+from uiEXT.login.ui_login import Ui_Login 
+from uiEXT.login.circular_progress import CircularProgress
+counter = 0
 
 class LoginWindow(QMainWindow):
 
@@ -68,9 +68,8 @@ class LoginWindow(QMainWindow):
             password = self.ui.password.text()
 
             def open_main():
-                # SHOW MAIN WINDOW
+                from Axiora import MainWindow
                 self.main = MainWindow()
-                self.main.top_user.label_user.setText(username.capitalize())
                 self.main.show()                
                 self.close()
 

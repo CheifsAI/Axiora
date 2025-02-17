@@ -18,6 +18,7 @@ import sys
 import os
 import platform
 from Functions import GuiFunctions
+from uiEXT.login.LoginWindow import LoginWindow
 def resizeEvent(self, event):
     new_size = max(10, self.width() // 100)  
     self.adjust_font_size(new_size)
@@ -166,5 +167,9 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon("icon.ico"))
-    window = MainWindow()
+
+    #login_window = LoginWindow()
+    #login_window.show()
+
+    #window = MainWindow()
     sys.exit(app.exec())
