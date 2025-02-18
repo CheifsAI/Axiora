@@ -4,8 +4,11 @@ from PySide6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QRect, 
 from PySide6.QtGui import QColor
 from uiEXT.login.ui_login import Ui_Login 
 from uiEXT.login.circular_progress import CircularProgress
+from sqlalchemy.orm import sessionmaker  
+from Axioradb import engine, users
 
 counter = 0
+SessionLocal = sessionmaker(bind=engine)
 
 class LoginWindow(QMainWindow):
     # Add a custom signal that will be emitted when login is accepted
@@ -59,18 +62,22 @@ class LoginWindow(QMainWindow):
             username = self.ui.username.text()
             password = self.ui.password.text()
 
-            if username and password == "123456":
-                self.ui.user_description.setText(f"Welcome {username}!")
-                self.ui.user_description.setStyleSheet("#user_description { color: #bdff00 }")
-                self.ui.username.setStyleSheet("#username:focus { border: 3px solid #bdff00; }")
-                self.ui.password.setStyleSheet("#password:focus { border: 3px solid #bdff00; }")
-                # Emit the login_accepted signal after a short delay (allowing the progress/animation)
-                QTimer.singleShot(1200, lambda: self.login_accepted.emit())
-            else:
-                self.ui.username.setStyleSheet("#username:focus { border: 3px solid rgb(255, 0, 127); }")
-                self.ui.password.setStyleSheet("#password:focus { border: 3px solid rgb(255, 0, 127); }")
-                self.shacke_window()  # (Consider renaming this method to shake_window)
-
+            db = SessionLocal()
+            try:
+                user = db.query(users).filter(users.username == username).first()
+                if user and user.check_password(password):
+                    self.ui.user_description.setText(f"Welcome {username}!")
+                    self.ui.user_description.setStyleSheet("#user_description { color: #bdff00 }")
+                    self.ui.username.setStyleSheet("#username:focus { border: 3px solid #bdff00; }")
+                    self.ui.password.setStyleSheet("#password:focus { border: 3px solid #bdff00; }")
+                    # Emit the login_accepted signal after a short delay (allowing the progress/animation)
+                    QTimer.singleShot(1200, lambda: self.login_accepted.emit())
+                else:
+                    self.ui.username.setStyleSheet("#username:focus { border: 3px solid rgb(255, 0, 127); }")
+                    self.ui.password.setStyleSheet("#password:focus { border: 3px solid rgb(255, 0, 127); }")
+                    self.shacke_window()  # (Consider renaming this method to shake_window)
+            finally:
+                db.close()
         # Call the base class event handler if needed
         return super().keyReleaseEvent(event)
 

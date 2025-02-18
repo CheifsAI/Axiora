@@ -127,7 +127,7 @@ class Ui_Login(object):
 
     def retranslateUi(self, Login):
         Login.setWindowTitle(QCoreApplication.translate("Login", u"Login. PyBlackBOX", None))
-        self.user_description.setText(QCoreApplication.translate("Login", u"Login (pass: 123456):", None))
+        self.user_description.setText(QCoreApplication.translate("Login", u"Login:", None))
         self.username.setPlaceholderText(QCoreApplication.translate("Login", u"Username", None))
         self.password.setPlaceholderText(QCoreApplication.translate("Login", u"Password", None))
     # retranslateUi
