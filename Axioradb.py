@@ -6,8 +6,7 @@ from sqlalchemy import (
     Column, String, Integer, CHAR, SmallInteger,
     Text, DateTime
 )
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, declarative_base
 
 engine = create_engine("sqlite:///axioradb.db")
 Base = declarative_base()
@@ -16,7 +15,7 @@ class users(Base):
     __tablename__ = "users"
     user_id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String, nullable=False, unique=True)
-    password_hash = Column(String, nullable=False)  # Corrected column name
+    password_hash = Column(String, nullable=False)
     email = Column(String)
     sessions = relationship("Session", back_populates="user")
 

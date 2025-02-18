@@ -3,6 +3,9 @@ import os
 import platform
 from Functions import GuiFunctions
 from uiEXT.login.LoginWindow import LoginWindow
+from PySide6.QtWidgets import QApplication, QMainWindow, QHeaderView
+from PySide6.QtGui import QIcon
+
 def resizeEvent(self, event):
     new_size = max(10, self.width() // 100)  
     self.adjust_font_size(new_size)
@@ -80,13 +83,13 @@ class MainWindow(QMainWindow):
 
         # SET CUSTOM THEME
         # ///////////////////////////////////////////////////////////////
-        useCustomTheme = False
+        useCustomTheme = True
         themeFile = r"themes\py_dracula_light.qss"
 
         # SET THEME AND HACKS
         if useCustomTheme:
             # LOAD AND APPLY STYLE
-            UIFunctions.theme(self, themeFile, True)
+            self.applyTheme(themeFile)
 
             # SET HACKS
             #AppFunctions.setThemeHack(self)
@@ -96,6 +99,9 @@ class MainWindow(QMainWindow):
         widgets.stackedWidget.setCurrentWidget(widgets.home)
         widgets.btn_home.setStyleSheet(UIFunctions.selectMenu(widgets.btn_home.styleSheet()))
 
+    def applyTheme(self, themeFile):
+        with open(themeFile, "r") as file:
+            self.setStyleSheet(file.read())
 
     # BUTTONS CLICK
     # Post here your functions for clicked buttons
@@ -128,7 +134,6 @@ class MainWindow(QMainWindow):
 
         # PRINT BTN NAME
         print(f'Button "{btnName}" pressed!')
-
 
     # RESIZE EVENTS
     # ///////////////////////////////////////////////////////////////
