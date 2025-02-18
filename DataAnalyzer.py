@@ -1,15 +1,15 @@
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
-from OprFuncs import data_infer, extract_code, extract_questions
+from OprFuncs import *
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-import re
 
 class DataAnalyzer:
     def __init__(self,dataframe,llm):
         self.dataframe = dataframe
         self.llm = llm
         self.data_info = data_infer(dataframe)
+        self.data_describtion = data_describer(dataframe)
         self.memory = []
 
     def analysis_data(self):

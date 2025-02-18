@@ -11,6 +11,22 @@ def data_infer(dataframe):
             encoding="utf-8") as f:  
         f.write(data_info)
     return data_info
+
+def data_describer(dataframe):
+    # Get the description of the dataframe
+    description = dataframe.describe()
+    
+    # Convert the description to a string with column names
+    description_str = "Data Description:\n"
+    for col in description.columns:
+        description_str += f"\nColumn: {col}\n"
+        description_str += description[col].to_string() + "\n"
+    
+    # Write the description to a file
+    with open("df_description.txt", "w", encoding="utf-8") as f:
+        f.write(description_str)
+    
+    return description_str
 def extract_code(input_text):
     result = re.search(r'```.*?\n(.*?)\n```', input_text, re.DOTALL)
     code = result.group(1) if result else input_text
