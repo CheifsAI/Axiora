@@ -67,7 +67,7 @@ class MainWindow(QMainWindow):
         widgets.btn_save.clicked.connect(self.buttonClick)
 
         # Set icons for buttons
-        widgets.btn_home.setIcon(QIcon("path/to/home_icon.png"))
+        widgets.btn_home.setIcon(QIcon(r"images\icons\chat.png"))
         widgets.btn_data.setIcon(QIcon("path/to/data_icon.png"))
         widgets.btn_new.setIcon(QIcon("path/to/new_icon.png"))
 
