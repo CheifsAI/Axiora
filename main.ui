@@ -690,11 +690,47 @@ Button */
                 <string/>
                </property>
                <property name="styleSheet">
-                <string notr="true">background-image: url(:/icons/images/images/logo axuira.png);</string>
+                <string notr="true"/>
                </property>
                <property name="locale">
                 <locale language="English" country="CookIslands"/>
                </property>
+               <layout class="QGridLayout" name="gridLayout_11" rowstretch="0" columnstretch="0" rowminimumheight="0">
+                <property name="leftMargin">
+                 <number>7</number>
+                </property>
+                <property name="topMargin">
+                 <number>7</number>
+                </property>
+                <property name="rightMargin">
+                 <number>7</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>7</number>
+                </property>
+                <property name="horizontalSpacing">
+                 <number>6</number>
+                </property>
+                <property name="verticalSpacing">
+                 <number>5</number>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label">
+                  <property name="minimumSize">
+                   <size>
+                    <width>10</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">border-image: url(:/icons/images/images/logo axuira.png);</string>
+                  </property>
+                  <property name="text">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/icons/images/images/logo axuira.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
             </layout>
@@ -1835,8 +1871,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
                               <rect>
                                <x>0</x>
                                <y>0</y>
-                               <width>786</width>
-                               <height>518</height>
+                               <width>40</width>
+                               <height>24</height>
                               </rect>
                              </property>
                              <layout class="QGridLayout" name="gridLayout_10">

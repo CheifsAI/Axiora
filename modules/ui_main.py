@@ -601,8 +601,20 @@ class Ui_MainWindow(object):
         self.widget = QWidget(self.topLogoInfo)
         self.widget.setObjectName(u"widget")
         self.widget.setFont(font)
-        self.widget.setStyleSheet(u"background-image: url(:/icons/images/images/logo axuira.png);")
+        self.widget.setStyleSheet(u"")
         self.widget.setLocale(QLocale(QLocale.English, QLocale.CookIslands))
+        self.gridLayout_11 = QGridLayout(self.widget)
+        self.gridLayout_11.setObjectName(u"gridLayout_11")
+        self.gridLayout_11.setHorizontalSpacing(6)
+        self.gridLayout_11.setVerticalSpacing(5)
+        self.gridLayout_11.setContentsMargins(7, 7, 7, 7)
+        self.label = QLabel(self.widget)
+        self.label.setObjectName(u"label")
+        self.label.setMinimumSize(QSize(10, 0))
+        self.label.setStyleSheet(u"border-image: url(:/icons/images/images/logo axuira.png);")
+
+        self.gridLayout_11.addWidget(self.label, 0, 0, 1, 1)
+
 
         self.gridLayout_8.addWidget(self.widget, 0, 0, 1, 1)
 
@@ -1034,7 +1046,7 @@ class Ui_MainWindow(object):
         self.chat_scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 786, 518))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 40, 24))
         self.gridLayout_10 = QGridLayout(self.scrollAreaWidgetContents_2)
         self.gridLayout_10.setObjectName(u"gridLayout_10")
         self.chat_layout = QVBoxLayout()
@@ -1540,6 +1552,7 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(accessibility)
         self.widget.setAccessibleName("")
 #endif // QT_CONFIG(accessibility)
+        self.label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><img src=\":/icons/images/images/logo axuira.png\"/></p></body></html>", None))
         self.toggleButton.setText(QCoreApplication.translate("MainWindow", u"Hide", None))
         self.btn_home.setText(QCoreApplication.translate("MainWindow", u"Home", None))
         self.btn_data.setText(QCoreApplication.translate("MainWindow", u"Data", None))
