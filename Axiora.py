@@ -15,7 +15,7 @@ def resizeEvent(self, event):
 # ///////////////////////////////////////////////////////////////
 from modules import *
 from widgets import *
-os.environ["QT_FONT_DPI"] = "115" # FIX Problem for High DPI and Scale above 100%
+os.environ["QT_FONT_DPI"] = "110" # FIX Problem for High DPI and Scale above 100%
 
 # SET AS GLOBAL WIDGETS
 # ///////////////////////////////////////////////////////////////
