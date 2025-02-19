@@ -582,31 +582,22 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.topLogoInfo = QFrame(self.leftMenuBg)
         self.topLogoInfo.setObjectName(u"topLogoInfo")
-        self.topLogoInfo.setMinimumSize(QSize(0, 50))
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy.setHorizontalStretch(10)
+        sizePolicy.setVerticalStretch(10)
+        sizePolicy.setHeightForWidth(self.topLogoInfo.sizePolicy().hasHeightForWidth())
+        self.topLogoInfo.setSizePolicy(sizePolicy)
+        self.topLogoInfo.setMinimumSize(QSize(10, 10))
         self.topLogoInfo.setMaximumSize(QSize(16777215, 50))
+        self.topLogoInfo.setSizeIncrement(QSize(50, 50))
+        self.topLogoInfo.setBaseSize(QSize(50, 0))
+        self.topLogoInfo.setStyleSheet(u"border-image: url(:/icons/images/images/logo axuira.png);")
         self.topLogoInfo.setFrameShape(QFrame.Shape.NoFrame)
         self.topLogoInfo.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout_8 = QGridLayout(self.topLogoInfo)
         self.gridLayout_8.setObjectName(u"gridLayout_8")
-        self.label_2 = QLabel(self.topLogoInfo)
-        self.label_2.setObjectName(u"label_2")
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        sizePolicy.setHorizontalStretch(100)
-        sizePolicy.setVerticalStretch(100)
-        sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
-        self.label_2.setSizePolicy(sizePolicy)
-        self.label_2.setMinimumSize(QSize(50, 40))
-        self.label_2.setStyleSheet(u"background-image: url(:/icons/images/images/logo axuira.png);")
-        self.label_2.setFrameShadow(QFrame.Shadow.Raised)
-        self.label_2.setLineWidth(0)
-        self.label_2.setPixmap(QPixmap(u":/icons/images/images/logo axuira.png"))
-        self.label_2.setScaledContents(True)
-        self.label_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.label_2.setWordWrap(False)
-        self.label_2.setMargin(3)
-
-        self.gridLayout_8.addWidget(self.label_2, 1, 0, 1, 1)
-
+        self.gridLayout_8.setHorizontalSpacing(0)
+        self.gridLayout_8.setContentsMargins(0, 0, 0, 0)
 
         self.verticalLayout_3.addWidget(self.topLogoInfo)
 
@@ -703,7 +694,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_8.addWidget(self.btn_save)
 
 
-        self.verticalMenuLayout.addWidget(self.topMenu, 0, Qt.AlignmentFlag.AlignTop)
+        self.verticalMenuLayout.addWidget(self.topMenu)
 
         self.bottomMenu = QFrame(self.leftMenuFrame)
         self.bottomMenu.setObjectName(u"bottomMenu")
@@ -726,7 +717,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_9.addWidget(self.toggleLeftBox)
 
 
-        self.verticalMenuLayout.addWidget(self.bottomMenu, 0, Qt.AlignmentFlag.AlignBottom)
+        self.verticalMenuLayout.addWidget(self.bottomMenu)
 
 
         self.verticalLayout_3.addWidget(self.leftMenuFrame)
@@ -1535,7 +1526,9 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.label_2.setText("")
+#if QT_CONFIG(whatsthis)
+        self.topLogoInfo.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><img src=\":/icons/images/images/logo axuira.png\"/></p></body></html>", None))
+#endif // QT_CONFIG(whatsthis)
         self.toggleButton.setText(QCoreApplication.translate("MainWindow", u"Hide", None))
         self.btn_home.setText(QCoreApplication.translate("MainWindow", u"Home", None))
         self.btn_data.setText(QCoreApplication.translate("MainWindow", u"Data", None))
