@@ -9,10 +9,10 @@ MODERN THEME - CUSTOM COLOR BASED
 
 ///////////////////////////////////////////////////////////////////////////////////////////////// */
 
-QWidget{
+QWidget {
     background-color: #030f0f;
     color: #00DF82;
-    font: 10pt "Segoe UI";
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 
 /* Tooltip */
@@ -21,6 +21,7 @@ QToolTip {
     background-color: #00DF82;
     border: 1px solid #03624c;
     padding: 5px;
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 
 /* Background App */
@@ -28,6 +29,7 @@ QToolTip {
     background-color: #030f0f;
     border: 1px solid #03624c;
     color: #00DF82;
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 
 /* Left Menu */
@@ -40,8 +42,8 @@ QToolTip {
     background-position: centered;
     background-repeat: no-repeat;
 }
-#titleLeftApp { font: 63 12pt "Segoe UI Semibold"; color: #00DF82; }
-#titleLeftDescription { font: 8pt "Segoe UI"; color: #00DF82; }
+#titleLeftApp { font: 63 14pt "Segoe UI Semibold"; color: #00DF82; } /* Increase font size here */
+#titleLeftDescription { font: 10pt "Segoe UI"; color: #00DF82; } /* Increase font size here */
 
 /* MENUS */
 #topMenu .QPushButton {    
@@ -53,6 +55,7 @@ QToolTip {
     text-align: left;
     padding-left: 44px;
     color: #00DF82;
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 #topMenu .QPushButton:hover {
     background-color: #00DF82;
@@ -71,6 +74,7 @@ QToolTip {
     text-align: left;
     padding-left: 44px;
     color: #00DF82;
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 #bottomMenu .QPushButton:hover {
     background-color: #00DF82;
@@ -94,6 +98,7 @@ QToolTip {
     text-align: left;
     padding-left: 44px;
     color: #00DF82;
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 #toggleButton:hover {
     background-color: #00DF82;
@@ -105,12 +110,13 @@ QToolTip {
 }
 
 /* Title Menu */
-#titleRightInfo { padding-left: 10px; color: #00DF82; }
+#titleRightInfo { padding-left: 10px; color: #00DF82; font: 12pt "Segoe UI"; } /* Increase font size here */
 
 /* Extra Tab */
 #extraLeftBox {    
     background-color: #03624c;
     color: #00DF82;
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 #extraTopBg{    
     background-color: #00DF82;
@@ -124,7 +130,7 @@ QToolTip {
 }
 
 /* Label */
-#extraLabel { color: #00DF82; }
+#extraLabel { color: #00DF82; font: 12pt "Segoe UI"; } /* Increase font size here */
 
 /* Btn Close */
 #extraCloseColumnBtn { background-color: rgba(0, 223, 130, 0.2); border: none;  border-radius: 5px; }
@@ -146,6 +152,7 @@ QToolTip {
     text-align: left;
     padding-left: 44px;
     color: #00DF82;
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 #extraTopMenu .QPushButton:hover {
     background-color: #00DF82;
@@ -165,10 +172,11 @@ QToolTip {
 }
 #titleRightInfo{
     color: #00DF82;
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 
 /* Top Buttons */
-#rightButtons .QPushButton { background-color: rgba(0, 223, 130, 0.2); border: none;  border-radius: 5px; }
+#rightButtons .QPushButton { background-color: rgba(0, 223, 130, 0.2); border: none;  border-radius: 5px; font: 12pt "Segoe UI"; } /* Increase font size here */
 #rightButtons .QPushButton:hover { background-color: #00DF82; border-style: solid; border-radius: 4px; }
 #rightButtons .QPushButton:pressed { background-color: #03624c; border-style: solid; border-radius: 4px; }
 
@@ -178,7 +186,7 @@ QToolTip {
 
 /* Bottom Bar */
 #bottomBar { background-color: #03624c }
-#bottomBar QLabel { font-size: 11px; color: #00DF82; padding-left: 10px; padding-right: 10px; padding-bottom: 2px; }
+#bottomBar QLabel { font-size: 13pt; color: #00DF82; padding-left: 10px; padding-right: 10px; padding-bottom: 2px; } /* Increase font size here */
 
 /* Content Settings */
 /* MENUS */
@@ -191,6 +199,7 @@ QToolTip {
     text-align: left;
     padding-left: 44px;
     color: #00DF82;
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 #contentSettings .QPushButton:hover {
     background-color: #00DF82;
@@ -207,12 +216,12 @@ QTableWidget {
     padding: 10px;
     border-radius: 5px;
     outline: none;
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 QTableWidget::item{
     border-color: #03624c;
     padding-left: 5px;
     padding-right: 5px;
-    gridline-color: #03624c;
 }
 QTableWidget::item:selected{
     background-color: #00DF82;
@@ -234,6 +243,7 @@ QHeaderView::section:horizontal {
     border-top-left-radius: 7px;
     border-top-right-radius: 7px;
     color: #00DF82;
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 QHeaderView::section:vertical {
     border: 1px solid #03624c;
@@ -248,6 +258,7 @@ QLineEdit {
     selection-color: #030f0f;
     selection-background-color: #00DF82;
     color: #00DF82;
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 QLineEdit:hover {
     border: 2px solid #00DF82;
@@ -264,6 +275,7 @@ QPlainTextEdit {
     selection-color: #030f0f;
     selection-background-color: #00DF82;
     color: #00DF82;
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 QPlainTextEdit QScrollBar:vertical {
     width: 8px;
@@ -392,6 +404,7 @@ QComboBox {
     padding: 5px;
     padding-left: 10px;
     color: #00DF82;
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 QComboBox:hover {
     border: 2px solid #00DF82;
@@ -472,6 +485,7 @@ QSlider::handle:vertical:pressed {
     border-radius: 5px;
     padding: 5px;
     border: 2px solid #03624c;
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 #pagesContainer QCommandLinkButton:hover {    
     color: #030f0f;
@@ -488,6 +502,7 @@ QSlider::handle:vertical:pressed {
     border-radius: 5px;    
     background-color: #03624c;
     color: #00DF82;
+    font: 12pt "Segoe UI"; /* Increase font size here */
 }
 #pagesContainer QPushButton:hover {
     background-color: #00DF82;

@@ -4,7 +4,7 @@ import platform
 from Functions import GuiFunctions
 from uiEXT.login.LoginWindow import LoginWindow
 from PySide6.QtWidgets import QApplication, QMainWindow, QHeaderView
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QFont
 
 def resizeEvent(self, event):
     new_size = max(10, self.width() // 100)  
@@ -15,7 +15,7 @@ def resizeEvent(self, event):
 # ///////////////////////////////////////////////////////////////
 from modules import *
 from widgets import *
-os.environ["QT_FONT_DPI"] = "96" # FIX Problem for High DPI and Scale above 100%
+os.environ["QT_FONT_DPI"] = "115" # FIX Problem for High DPI and Scale above 100%
 
 # SET AS GLOBAL WIDGETS
 # ///////////////////////////////////////////////////////////////
@@ -157,6 +157,10 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon("icon.ico"))
+
+    # Set the font size for the entire application
+    font = QFont("Segoe UI", 12)  # Change the font size here
+    app.setFont(font)
 
     login_window = LoginWindow()
 
