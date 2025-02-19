@@ -17,7 +17,7 @@ from langchain import hub
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain, SequentialChain
 from langchain_community.llms import Ollama
-#from OprFuncs import data_infer, extract_code, extract_questions
+from OprFuncs import data_infer, extract_code, extract_questions
 import pandas as pd
 
 # Initialize Ollama
