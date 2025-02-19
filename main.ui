@@ -652,7 +652,7 @@ Button */
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/icons/images/images/logo axuira.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="styleSheet">
-             <string notr="true">border-image: url(:/icons/images/images/logo axuira.png);</string>
+             <string notr="true"/>
             </property>
             <property name="frameShape">
              <enum>QFrame::Shape::NoFrame</enum>
@@ -676,6 +676,33 @@ Button */
              <property name="horizontalSpacing">
               <number>0</number>
              </property>
+             <item row="0" column="0">
+              <widget class="QFrame" name="frame">
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>10</pointsize>
+                 <italic>false</italic>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="accessibleName">
+                <string/>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="locale">
+                <locale language="English" country="CookIslands"/>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::Shape::StyledPanel</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Shadow::Raised</enum>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -949,7 +976,7 @@ Button */
                </layout>
               </widget>
              </item>
-             <item>
+             <item alignment="Qt::AlignmentFlag::AlignBottom">
               <widget class="QFrame" name="bottomMenu">
                <property name="frameShape">
                 <enum>QFrame::Shape::NoFrame</enum>
@@ -1002,7 +1029,7 @@ Button */
                    <enum>Qt::LayoutDirection::LeftToRight</enum>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">background-image: url(:/icons/images/icons/icon_settings.png);</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Left Box</string>
@@ -1791,7 +1818,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                       <string notr="true">background: transparent;</string>
                      </property>
                      <property name="currentIndex">
-                      <number>0</number>
+                      <number>3</number>
                      </property>
                      <widget class="QWidget" name="home">
                       <property name="styleSheet">
@@ -2472,8 +2499,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>46</width>
-                                   <height>24</height>
+                                   <width>770</width>
+                                   <height>458</height>
                                   </rect>
                                  </property>
                                  <layout class="QGridLayout" name="gridLayout_9">
@@ -2490,6 +2517,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
                               </item>
                               <item row="1" column="0">
                                <widget class="QComboBox" name="qu_num_list">
+                                <property name="accessibleName">
+                                 <string extracomment="enter number of questions"/>
+                                </property>
                                 <property name="autoFillBackground">
                                  <bool>false</bool>
                                 </property>
@@ -2497,7 +2527,10 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                  <bool>true</bool>
                                 </property>
                                 <property name="currentText">
-                                 <string>1</string>
+                                 <string comment="Enter number of questions" extracomment="Enter number of questions"/>
+                                </property>
+                                <property name="placeholderText">
+                                 <string comment="Enter number of questions" extracomment="Enter number of questions">Enter number of questions</string>
                                 </property>
                                 <property name="duplicatesEnabled">
                                  <bool>true</bool>

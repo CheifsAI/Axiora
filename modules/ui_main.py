@@ -591,13 +591,23 @@ class Ui_MainWindow(object):
         self.topLogoInfo.setMaximumSize(QSize(16777215, 50))
         self.topLogoInfo.setSizeIncrement(QSize(50, 50))
         self.topLogoInfo.setBaseSize(QSize(50, 0))
-        self.topLogoInfo.setStyleSheet(u"border-image: url(:/icons/images/images/logo axuira.png);")
+        self.topLogoInfo.setStyleSheet(u"")
         self.topLogoInfo.setFrameShape(QFrame.Shape.NoFrame)
         self.topLogoInfo.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout_8 = QGridLayout(self.topLogoInfo)
         self.gridLayout_8.setObjectName(u"gridLayout_8")
         self.gridLayout_8.setHorizontalSpacing(0)
         self.gridLayout_8.setContentsMargins(0, 0, 0, 0)
+        self.frame = QFrame(self.topLogoInfo)
+        self.frame.setObjectName(u"frame")
+        self.frame.setFont(font)
+        self.frame.setStyleSheet(u"")
+        self.frame.setLocale(QLocale(QLocale.English, QLocale.CookIslands))
+        self.frame.setFrameShape(QFrame.Shape.StyledPanel)
+        self.frame.setFrameShadow(QFrame.Shadow.Raised)
+
+        self.gridLayout_8.addWidget(self.frame, 0, 0, 1, 1)
+
 
         self.verticalLayout_3.addWidget(self.topLogoInfo)
 
@@ -712,12 +722,12 @@ class Ui_MainWindow(object):
         self.toggleLeftBox.setFont(font)
         self.toggleLeftBox.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.toggleLeftBox.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.toggleLeftBox.setStyleSheet(u"background-image: url(:/icons/images/icons/icon_settings.png);")
+        self.toggleLeftBox.setStyleSheet(u"")
 
         self.verticalLayout_9.addWidget(self.toggleLeftBox)
 
 
-        self.verticalMenuLayout.addWidget(self.bottomMenu)
+        self.verticalMenuLayout.addWidget(self.bottomMenu, 0, Qt.AlignmentFlag.AlignBottom)
 
 
         self.verticalLayout_3.addWidget(self.leftMenuFrame)
@@ -1299,7 +1309,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 46, 24))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 770, 458))
         self.gridLayout_9 = QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_9.setObjectName(u"gridLayout_9")
         self.qu_layout = QVBoxLayout()
@@ -1517,7 +1527,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(3)
         self.tabWidget.setCurrentIndex(0)
 
 
@@ -1529,6 +1539,9 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(whatsthis)
         self.topLogoInfo.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><img src=\":/icons/images/images/logo axuira.png\"/></p></body></html>", None))
 #endif // QT_CONFIG(whatsthis)
+#if QT_CONFIG(accessibility)
+        self.frame.setAccessibleName("")
+#endif // QT_CONFIG(accessibility)
         self.toggleButton.setText(QCoreApplication.translate("MainWindow", u"Hide", None))
         self.btn_home.setText(QCoreApplication.translate("MainWindow", u"Home", None))
         self.btn_data.setText(QCoreApplication.translate("MainWindow", u"Data", None))
@@ -1604,7 +1617,11 @@ class Ui_MainWindow(object):
         self.qu_num_list.setItemText(8, QCoreApplication.translate("MainWindow", u"9", None))
         self.qu_num_list.setItemText(9, QCoreApplication.translate("MainWindow", u"10", None))
 
-        self.qu_num_list.setCurrentText(QCoreApplication.translate("MainWindow", u"1", None))
+#if QT_CONFIG(accessibility)
+        self.qu_num_list.setAccessibleName("")
+#endif // QT_CONFIG(accessibility)
+        self.qu_num_list.setCurrentText("")
+        self.qu_num_list.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter number of questions", u"Enter number of questions"))
         self.qu_btn.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
         self.pushButton.setText("")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Questions_tap), QCoreApplication.translate("MainWindow", u"Questions", None))
