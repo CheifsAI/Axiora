@@ -677,7 +677,7 @@ Button */
               <number>0</number>
              </property>
              <item row="0" column="0">
-              <widget class="QFrame" name="frame">
+              <widget class="QWidget" name="widget" native="true">
                <property name="font">
                 <font>
                  <family>Segoe UI</family>
@@ -690,16 +690,10 @@ Button */
                 <string/>
                </property>
                <property name="styleSheet">
-                <string notr="true"/>
+                <string notr="true">background-image: url(:/icons/images/images/logo axuira.png);</string>
                </property>
                <property name="locale">
                 <locale language="English" country="CookIslands"/>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::Shape::StyledPanel</enum>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Shadow::Raised</enum>
                </property>
               </widget>
              </item>
@@ -888,7 +882,7 @@ Button */
                    <enum>Qt::LayoutDirection::LeftToRight</enum>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">background-image: url(:/icons/images/icons/cil-gamepad.png);</string>
+                   <string notr="true">background-image: url(:/icons/images/icons/cil-data-transfer-up.png);</string>
                   </property>
                   <property name="text">
                    <string>Data</string>
@@ -2902,7 +2896,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                 <property name="bottomMargin">
                  <number>0</number>
                 </property>
-                <item>
+                <item alignment="Qt::AlignmentFlag::AlignLeft">
                  <widget class="QLabel" name="creditsLabel">
                   <property name="maximumSize">
                    <size>

@@ -598,15 +598,13 @@ class Ui_MainWindow(object):
         self.gridLayout_8.setObjectName(u"gridLayout_8")
         self.gridLayout_8.setHorizontalSpacing(0)
         self.gridLayout_8.setContentsMargins(0, 0, 0, 0)
-        self.frame = QFrame(self.topLogoInfo)
-        self.frame.setObjectName(u"frame")
-        self.frame.setFont(font)
-        self.frame.setStyleSheet(u"")
-        self.frame.setLocale(QLocale(QLocale.English, QLocale.CookIslands))
-        self.frame.setFrameShape(QFrame.Shape.StyledPanel)
-        self.frame.setFrameShadow(QFrame.Shadow.Raised)
+        self.widget = QWidget(self.topLogoInfo)
+        self.widget.setObjectName(u"widget")
+        self.widget.setFont(font)
+        self.widget.setStyleSheet(u"background-image: url(:/icons/images/images/logo axuira.png);")
+        self.widget.setLocale(QLocale(QLocale.English, QLocale.CookIslands))
 
-        self.gridLayout_8.addWidget(self.frame, 0, 0, 1, 1)
+        self.gridLayout_8.addWidget(self.widget, 0, 0, 1, 1)
 
 
         self.verticalLayout_3.addWidget(self.topLogoInfo)
@@ -674,7 +672,7 @@ class Ui_MainWindow(object):
         self.btn_data.setFont(font)
         self.btn_data.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.btn_data.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.btn_data.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-gamepad.png);")
+        self.btn_data.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-data-transfer-up.png);")
         self.btn_data.setIconSize(QSize(20, 20))
 
         self.verticalLayout_8.addWidget(self.btn_data)
@@ -1314,10 +1312,10 @@ class Ui_MainWindow(object):
         self.gridLayout_9.setObjectName(u"gridLayout_9")
         self.qu_layout = QVBoxLayout()
         self.qu_layout.setObjectName(u"qu_layout")
-        self.widget = QWidget(self.scrollAreaWidgetContents)
-        self.widget.setObjectName(u"widget")
+        self.widget1 = QWidget(self.scrollAreaWidgetContents)
+        self.widget1.setObjectName(u"widget1")
 
-        self.qu_layout.addWidget(self.widget)
+        self.qu_layout.addWidget(self.widget1)
 
 
         self.gridLayout_9.addLayout(self.qu_layout, 0, 0, 1, 1)
@@ -1494,7 +1492,7 @@ class Ui_MainWindow(object):
         self.creditsLabel.setFont(font2)
         self.creditsLabel.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
-        self.horizontalLayout_5.addWidget(self.creditsLabel)
+        self.horizontalLayout_5.addWidget(self.creditsLabel, 0, Qt.AlignmentFlag.AlignLeft)
 
         self.version = QLabel(self.bottomBar)
         self.version.setObjectName(u"version")
@@ -1540,7 +1538,7 @@ class Ui_MainWindow(object):
         self.topLogoInfo.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><img src=\":/icons/images/images/logo axuira.png\"/></p></body></html>", None))
 #endif // QT_CONFIG(whatsthis)
 #if QT_CONFIG(accessibility)
-        self.frame.setAccessibleName("")
+        self.widget.setAccessibleName("")
 #endif // QT_CONFIG(accessibility)
         self.toggleButton.setText(QCoreApplication.translate("MainWindow", u"Hide", None))
         self.btn_home.setText(QCoreApplication.translate("MainWindow", u"Home", None))
