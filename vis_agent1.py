@@ -96,7 +96,7 @@ code_gen_prompt = PromptTemplate(
     chart.title = "Chart Title"
     chart.x_labels = data.index
     chart.add('Series', data.values)
-    chart.render_to_file('chart.svg')
+    chart.render_to_file('charts/chart.svg')
 
     Generate code for the current dataset:
     """
