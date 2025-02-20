@@ -65,7 +65,7 @@ def chart_selector(input_text):
         data_info=data_info,
         data_sample=data_head,
         data_summary=data_summary,
-        guidelines=guidelines  # Corrected parameter name
+        guidelines=guidelines  
     )
 
 code_gen_prompt = PromptTemplate(
