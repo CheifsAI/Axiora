@@ -69,15 +69,37 @@ def chart_selector(input_text):
     )
 
 code_gen_prompt = PromptTemplate(
-input_variables=["question", "chart_type", "data_info", "data_sample", "data_summary"],
+    input_variables=["question", "chart_type", "data_info", "data_sample", "data_summary"],
     template="""
     You are provided with:
         1. Dataset metadata: {data_info}
         2. Dataset sample: {data_sample}
         3. Dataset summary: {data_summary}
-    Generate matplotlib code for {chart_type} chart answering:
+
+    Generate Pygal code for {chart_type} chart answering:
     Question: {question}
-    Include sample data, labels, and plt.show()"""
+
+    Follow these requirements:
+    1. Use pandas to process the dataframe, don't read the dataframe, it's already read with the name df
+    2. Create Pygal chart object with appropriate config
+    3. Add data using dataframe columns
+    4. Include proper labels and styling
+    5. Save to SVG file
+
+    Example structure:
+    import pygal
+    from pygal.style import Style
+    # Data processing
+    data = dataframe['column'].value_counts()
+    # Chart configuration
+    chart = pygal.Bar(style=Style(...), x_label_rotation=45)
+    chart.title = "Chart Title"
+    chart.x_labels = data.index
+    chart.add('Series', data.values)
+    chart.render_to_file('chart.svg')
+
+    Generate code for the current dataset:
+    """
 )
 code_chain = LLMChain(llm=llm, prompt=code_gen_prompt)
 
@@ -101,7 +123,7 @@ tools = [
             "question": x.split("|")[0].strip('"').strip(),
             "chart_type": x.split("|")[1].strip().lower() if "|" in x else "bar"
         }),
-        description="Generate matplotlib code for specified chart type"
+        description="Generate Pygal visualization code for specified chart type"
     )
 ]
 agent_prompt = hub.pull("hwchase17/react").partial(
