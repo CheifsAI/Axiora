@@ -80,17 +80,10 @@ class Ui_Login(object):
 
         self.verticalLayout_2.addItem(self.verticalSpacer)
 
-        self.logo = QFrame(self.frame_widgets)
+        self.logo = QLabel(self.frame_widgets)
         self.logo.setObjectName(u"logo")
         self.logo.setMinimumSize(QSize(0, 260))
-        self.logo.setStyleSheet(u"#logo {\n"
-"	border-radius: 10px;\n"
-"	background-image: url(:/images_svg/images/images_svg/logo_home.svg);\n"
-"	background-position: center;\n"
-"	background-repeat: no-repeat;\n"
-"}")
-        self.logo.setFrameShape(QFrame.NoFrame)
-        self.logo.setFrameShadow(QFrame.Raised)
+        self.logo.setAlignment(Qt.AlignCenter)
 
         self.verticalLayout_2.addWidget(self.logo)
 

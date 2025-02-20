@@ -3,6 +3,9 @@ import os
 import platform
 from Functions import GuiFunctions
 from uiEXT.login.LoginWindow import LoginWindow
+from PySide6.QtWidgets import QApplication, QMainWindow, QHeaderView
+from PySide6.QtGui import QIcon, QFont
+
 def resizeEvent(self, event):
     new_size = max(10, self.width() // 100)  
     self.adjust_font_size(new_size)
@@ -12,7 +15,7 @@ def resizeEvent(self, event):
 # ///////////////////////////////////////////////////////////////
 from modules import *
 from widgets import *
-os.environ["QT_FONT_DPI"] = "96" # FIX Problem for High DPI and Scale above 100%
+os.environ["QT_FONT_DPI"] = "110" # FIX Problem for High DPI and Scale above 100%
 
 # SET AS GLOBAL WIDGETS
 # ///////////////////////////////////////////////////////////////
@@ -63,6 +66,11 @@ class MainWindow(QMainWindow):
         widgets.btn_new.clicked.connect(self.buttonClick)
         widgets.btn_save.clicked.connect(self.buttonClick)
 
+        # Set icons for buttons
+        widgets.btn_home.setIcon(QIcon(r"images\icons\chat.png"))
+        widgets.btn_data.setIcon(QIcon("path/to/data_icon.png"))
+        widgets.btn_new.setIcon(QIcon("path/to/new_icon.png"))
+
         # EXTRA LEFT BOX
         def openCloseLeftBox():
             UIFunctions.toggleLeftBox(self, True)
@@ -80,13 +88,13 @@ class MainWindow(QMainWindow):
 
         # SET CUSTOM THEME
         # ///////////////////////////////////////////////////////////////
-        useCustomTheme = False
+        useCustomTheme = True
         themeFile = r"themes\py_dracula_light.qss"
 
         # SET THEME AND HACKS
         if useCustomTheme:
             # LOAD AND APPLY STYLE
-            UIFunctions.theme(self, themeFile, True)
+            self.applyTheme(themeFile)
 
             # SET HACKS
             #AppFunctions.setThemeHack(self)
@@ -96,6 +104,9 @@ class MainWindow(QMainWindow):
         widgets.stackedWidget.setCurrentWidget(widgets.home)
         widgets.btn_home.setStyleSheet(UIFunctions.selectMenu(widgets.btn_home.styleSheet()))
 
+    def applyTheme(self, themeFile):
+        with open(themeFile, "r") as file:
+            self.setStyleSheet(file.read())
 
     # BUTTONS CLICK
     # Post here your functions for clicked buttons
@@ -129,7 +140,6 @@ class MainWindow(QMainWindow):
         # PRINT BTN NAME
         print(f'Button "{btnName}" pressed!')
 
-
     # RESIZE EVENTS
     # ///////////////////////////////////////////////////////////////
     def resizeEvent(self, event):
@@ -152,6 +162,10 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon("icon.ico"))
+
+    # Set the font size for the entire application
+    font = QFont("Segoe UI", 12)  # Change the font size here
+    app.setFont(font)
 
     login_window = LoginWindow()
 

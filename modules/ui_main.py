@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'main.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.2
+## Created by: Qt User Interface Compiler version 6.8.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -582,29 +582,41 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.topLogoInfo = QFrame(self.leftMenuBg)
         self.topLogoInfo.setObjectName(u"topLogoInfo")
-        self.topLogoInfo.setMinimumSize(QSize(0, 50))
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy.setHorizontalStretch(10)
+        sizePolicy.setVerticalStretch(10)
+        sizePolicy.setHeightForWidth(self.topLogoInfo.sizePolicy().hasHeightForWidth())
+        self.topLogoInfo.setSizePolicy(sizePolicy)
+        self.topLogoInfo.setMinimumSize(QSize(10, 10))
         self.topLogoInfo.setMaximumSize(QSize(16777215, 50))
+        self.topLogoInfo.setSizeIncrement(QSize(50, 50))
+        self.topLogoInfo.setBaseSize(QSize(50, 0))
+        self.topLogoInfo.setStyleSheet(u"")
         self.topLogoInfo.setFrameShape(QFrame.Shape.NoFrame)
         self.topLogoInfo.setFrameShadow(QFrame.Shadow.Raised)
         self.gridLayout_8 = QGridLayout(self.topLogoInfo)
         self.gridLayout_8.setObjectName(u"gridLayout_8")
-        self.label_2 = QLabel(self.topLogoInfo)
-        self.label_2.setObjectName(u"label_2")
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        sizePolicy.setHorizontalStretch(100)
-        sizePolicy.setVerticalStretch(100)
-        sizePolicy.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
-        self.label_2.setSizePolicy(sizePolicy)
-        self.label_2.setMinimumSize(QSize(50, 40))
-        self.label_2.setFrameShadow(QFrame.Shadow.Raised)
-        self.label_2.setLineWidth(0)
-        self.label_2.setPixmap(QPixmap(u":/icons/images/images/logo axuira.png"))
-        self.label_2.setScaledContents(True)
-        self.label_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.label_2.setWordWrap(False)
-        self.label_2.setMargin(3)
+        self.gridLayout_8.setHorizontalSpacing(0)
+        self.gridLayout_8.setContentsMargins(0, 0, 0, 0)
+        self.widget = QWidget(self.topLogoInfo)
+        self.widget.setObjectName(u"widget")
+        self.widget.setFont(font)
+        self.widget.setStyleSheet(u"")
+        self.widget.setLocale(QLocale(QLocale.English, QLocale.CookIslands))
+        self.gridLayout_11 = QGridLayout(self.widget)
+        self.gridLayout_11.setObjectName(u"gridLayout_11")
+        self.gridLayout_11.setHorizontalSpacing(6)
+        self.gridLayout_11.setVerticalSpacing(5)
+        self.gridLayout_11.setContentsMargins(7, 7, 7, 7)
+        self.label = QLabel(self.widget)
+        self.label.setObjectName(u"label")
+        self.label.setMinimumSize(QSize(10, 0))
+        self.label.setStyleSheet(u"border-image: url(:/icons/images/images/logo axuira.png);")
 
-        self.gridLayout_8.addWidget(self.label_2, 1, 0, 1, 1)
+        self.gridLayout_11.addWidget(self.label, 0, 0, 1, 1)
+
+
+        self.gridLayout_8.addWidget(self.widget, 0, 0, 1, 1)
 
 
         self.verticalLayout_3.addWidget(self.topLogoInfo)
@@ -652,6 +664,18 @@ class Ui_MainWindow(object):
         self.verticalLayout_8.setSpacing(0)
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
         self.verticalLayout_8.setContentsMargins(0, 0, 0, 0)
+        self.btn_home = QPushButton(self.topMenu)
+        self.btn_home.setObjectName(u"btn_home")
+        sizePolicy1.setHeightForWidth(self.btn_home.sizePolicy().hasHeightForWidth())
+        self.btn_home.setSizePolicy(sizePolicy1)
+        self.btn_home.setMinimumSize(QSize(0, 45))
+        self.btn_home.setFont(font)
+        self.btn_home.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.btn_home.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.btn_home.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-chat-bubble.png);")
+
+        self.verticalLayout_8.addWidget(self.btn_home)
+
         self.btn_data = QPushButton(self.topMenu)
         self.btn_data.setObjectName(u"btn_data")
         sizePolicy1.setHeightForWidth(self.btn_data.sizePolicy().hasHeightForWidth())
@@ -660,7 +684,7 @@ class Ui_MainWindow(object):
         self.btn_data.setFont(font)
         self.btn_data.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.btn_data.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.btn_data.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-gamepad.png);")
+        self.btn_data.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-data-transfer-up.png);")
         self.btn_data.setIconSize(QSize(20, 20))
 
         self.verticalLayout_8.addWidget(self.btn_data)
@@ -677,18 +701,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addWidget(self.btn_new)
 
-        self.btn_home = QPushButton(self.topMenu)
-        self.btn_home.setObjectName(u"btn_home")
-        sizePolicy1.setHeightForWidth(self.btn_home.sizePolicy().hasHeightForWidth())
-        self.btn_home.setSizePolicy(sizePolicy1)
-        self.btn_home.setMinimumSize(QSize(0, 45))
-        self.btn_home.setFont(font)
-        self.btn_home.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.btn_home.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.btn_home.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-home.png);")
-
-        self.verticalLayout_8.addWidget(self.btn_home)
-
         self.btn_save = QPushButton(self.topMenu)
         self.btn_save.setObjectName(u"btn_save")
         sizePolicy1.setHeightForWidth(self.btn_save.sizePolicy().hasHeightForWidth())
@@ -701,20 +713,8 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addWidget(self.btn_save)
 
-        self.btn_exit = QPushButton(self.topMenu)
-        self.btn_exit.setObjectName(u"btn_exit")
-        sizePolicy1.setHeightForWidth(self.btn_exit.sizePolicy().hasHeightForWidth())
-        self.btn_exit.setSizePolicy(sizePolicy1)
-        self.btn_exit.setMinimumSize(QSize(0, 45))
-        self.btn_exit.setFont(font)
-        self.btn_exit.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.btn_exit.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.btn_exit.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-x.png);")
 
-        self.verticalLayout_8.addWidget(self.btn_exit)
-
-
-        self.verticalMenuLayout.addWidget(self.topMenu, 0, Qt.AlignmentFlag.AlignTop)
+        self.verticalMenuLayout.addWidget(self.topMenu)
 
         self.bottomMenu = QFrame(self.leftMenuFrame)
         self.bottomMenu.setObjectName(u"bottomMenu")
@@ -732,7 +732,7 @@ class Ui_MainWindow(object):
         self.toggleLeftBox.setFont(font)
         self.toggleLeftBox.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.toggleLeftBox.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.toggleLeftBox.setStyleSheet(u"background-image: url(:/icons/images/icons/icon_settings.png);")
+        self.toggleLeftBox.setStyleSheet(u"")
 
         self.verticalLayout_9.addWidget(self.toggleLeftBox)
 
@@ -1046,7 +1046,7 @@ class Ui_MainWindow(object):
         self.chat_scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 786, 518))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 40, 24))
         self.gridLayout_10 = QGridLayout(self.scrollAreaWidgetContents_2)
         self.gridLayout_10.setObjectName(u"gridLayout_10")
         self.chat_layout = QVBoxLayout()
@@ -1319,15 +1319,15 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 54, 24))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 770, 458))
         self.gridLayout_9 = QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_9.setObjectName(u"gridLayout_9")
         self.qu_layout = QVBoxLayout()
         self.qu_layout.setObjectName(u"qu_layout")
-        self.widget = QWidget(self.scrollAreaWidgetContents)
-        self.widget.setObjectName(u"widget")
+        self.widget1 = QWidget(self.scrollAreaWidgetContents)
+        self.widget1.setObjectName(u"widget1")
 
-        self.qu_layout.addWidget(self.widget)
+        self.qu_layout.addWidget(self.widget1)
 
 
         self.gridLayout_9.addLayout(self.qu_layout, 0, 0, 1, 1)
@@ -1504,7 +1504,7 @@ class Ui_MainWindow(object):
         self.creditsLabel.setFont(font2)
         self.creditsLabel.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
-        self.horizontalLayout_5.addWidget(self.creditsLabel)
+        self.horizontalLayout_5.addWidget(self.creditsLabel, 0, Qt.AlignmentFlag.AlignLeft)
 
         self.version = QLabel(self.bottomBar)
         self.version.setObjectName(u"version")
@@ -1537,7 +1537,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(3)
         self.tabWidget.setCurrentIndex(0)
 
 
@@ -1546,13 +1546,18 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.label_2.setText("")
+#if QT_CONFIG(whatsthis)
+        self.topLogoInfo.setWhatsThis(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><img src=\":/icons/images/images/logo axuira.png\"/></p></body></html>", None))
+#endif // QT_CONFIG(whatsthis)
+#if QT_CONFIG(accessibility)
+        self.widget.setAccessibleName("")
+#endif // QT_CONFIG(accessibility)
+        self.label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><img src=\":/icons/images/images/logo axuira.png\"/></p></body></html>", None))
         self.toggleButton.setText(QCoreApplication.translate("MainWindow", u"Hide", None))
+        self.btn_home.setText(QCoreApplication.translate("MainWindow", u"Home", None))
         self.btn_data.setText(QCoreApplication.translate("MainWindow", u"Data", None))
         self.btn_new.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
-        self.btn_home.setText(QCoreApplication.translate("MainWindow", u"Home", None))
         self.btn_save.setText(QCoreApplication.translate("MainWindow", u"Save", None))
-        self.btn_exit.setText(QCoreApplication.translate("MainWindow", u"Close", None))
         self.toggleLeftBox.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
         self.extraLabel.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
 #if QT_CONFIG(tooltip)
@@ -1623,7 +1628,11 @@ class Ui_MainWindow(object):
         self.qu_num_list.setItemText(8, QCoreApplication.translate("MainWindow", u"9", None))
         self.qu_num_list.setItemText(9, QCoreApplication.translate("MainWindow", u"10", None))
 
-        self.qu_num_list.setCurrentText(QCoreApplication.translate("MainWindow", u"1", None))
+#if QT_CONFIG(accessibility)
+        self.qu_num_list.setAccessibleName("")
+#endif // QT_CONFIG(accessibility)
+        self.qu_num_list.setCurrentText("")
+        self.qu_num_list.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter number of questions", u"Enter number of questions"))
         self.qu_btn.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
         self.pushButton.setText("")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Questions_tap), QCoreApplication.translate("MainWindow", u"Questions", None))

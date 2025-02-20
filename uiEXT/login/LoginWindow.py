@@ -1,7 +1,7 @@
 # LoginWindow.py
-from PySide6.QtWidgets import QMainWindow, QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QMainWindow, QLabel, QVBoxLayout, QWidget, QGraphicsDropShadowEffect
 from PySide6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QRect, Signal
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QPixmap
 from uiEXT.login.ui_login import Ui_Login 
 from uiEXT.login.circular_progress import CircularProgress
 from sqlalchemy.orm import sessionmaker  
@@ -45,6 +45,14 @@ class LoginWindow(QMainWindow):
         self.shadow.setYOffset(0)
         self.shadow.setColor(QColor(0, 0, 0, 80))
         self.ui.bg.setGraphicsEffect(self.shadow)
+
+        # ADD LOGO IMAGE
+        logo_path = r"images\images\logo axuira.png"
+        pixmap = QPixmap(logo_path)
+        if not pixmap.isNull():
+            self.ui.logo.setPixmap(pixmap)
+        else:
+            print(f"Could not create pixmap from {logo_path}")
 
         # QTIMER TO UPDATE THE PROGRESS
         self.timer = QTimer()
