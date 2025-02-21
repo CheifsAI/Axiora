@@ -10,7 +10,6 @@ min      1930.000000
 75%      2002.000000
 max      2014.000000
 
-
 Column: Home Team Goals
 count    852.000000
 mean       1.811033

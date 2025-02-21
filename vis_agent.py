@@ -1,3 +1,17 @@
+def data_describer(dataframe):
+    # Get the description of the dataframe
+    description = dataframe.describe()
+    
+    # Convert the description to a string with column names
+    description_str = "Data Description:\n"
+    for col in description.columns:
+        description_str += f"\nColumn: {col}\n"
+        description_str += description[col].to_string() + "\n"
+    
+    # Write the description to a file
+    with open("df_description.txt", "w", encoding="utf-8") as f:
+        f.write(description_str)
+    return description_str
 from langchain.agents import AgentExecutor, Tool, create_react_agent
 from langchain import hub
 from langchain.prompts import PromptTemplate
@@ -5,11 +19,12 @@ from langchain.chains import LLMChain, SequentialChain
 from langchain_community.llms import Ollama
 from OprFuncs import data_infer, extract_code, extract_questions
 import pandas as pd
-from OprFuncs import data_infer,data_describer
+
 # Initialize Ollama
 llm = Ollama(model="llama3.2:3b")
 
 dataframe = pd.read_csv("Test_Datasets/WorldCupMatches.csv")
+from OprFuncs import data_infer
 dataframe = dataframe
 data_info = data_infer(dataframe)
 data_summary = data_describer(dataframe)
@@ -125,7 +140,7 @@ agent_executor = AgentExecutor(
     verbose=True,
     max_iterations=3,
     handle_parsing_errors=True,
-    stop=["\nFINAL ANSWER"]  # Move stop sequence here
+    stop=["\nFINAL ANSWER"] 
 )
 question = "Show the most teams played as home team off all time"
 
