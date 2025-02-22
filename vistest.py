@@ -215,7 +215,7 @@ execute_agent(question)
 
 
 #----------------------------------------------------
-
+#pygal library and create many of charts
 import pygal
 import pandas as pd
 from pygal.style import Style
@@ -310,7 +310,7 @@ execute_agent(question)
 
 
 #-------------------------------------------------------
-
+# دي مكتبه matplotlib
 
 import pandas as pd
 import matplotlib.pyplot as plt
