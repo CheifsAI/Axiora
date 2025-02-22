@@ -2535,11 +2535,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                  </property>
                                  <layout class="QGridLayout" name="gridLayout_9">
                                   <item row="0" column="0">
-                                   <layout class="QVBoxLayout" name="qu_layout">
-                                    <item>
-                                     <widget class="QWidget" name="widget" native="true"/>
-                                    </item>
-                                   </layout>
+                                   <layout class="QVBoxLayout" name="qu_layout"/>
                                   </item>
                                  </layout>
                                 </widget>
@@ -2557,7 +2553,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                  <bool>true</bool>
                                 </property>
                                 <property name="currentText">
-                                 <string comment="Enter number of questions" extracomment="Enter number of questions"/>
+                                 <string comment="Enter number of questions" extracomment="Enter number of questions">Select number of questions</string>
                                 </property>
                                 <property name="placeholderText">
                                  <string comment="Enter number of questions" extracomment="Enter number of questions">Enter number of questions</string>
@@ -2565,6 +2561,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                 <property name="duplicatesEnabled">
                                  <bool>true</bool>
                                 </property>
+                                <item>
+                                 <property name="text">
+                                  <string comment="select number of questions" extracomment="select number of questions">Select number of questions</string>
+                                 </property>
+                                </item>
                                 <item>
                                  <property name="text">
                                   <string comment="1">1</string>
