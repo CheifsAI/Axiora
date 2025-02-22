@@ -98,14 +98,36 @@ class GuiFunctions():
 # result = quetions_gen(llm=llm,dataframe=df1,num=2)
 # for i, question in enumerate(result, 1):
 #    print(markdown(question))
+
+
+    import re
+
+    def extract_questions(text):
+        """ Extracts and cleans numbered questions from LLM output """
+
+        # Find all lines that start with a number, followed by a period
+        raw_questions = re.findall(r"^\d+\.\s*(.+)", text, re.MULTILINE)
+
+        # Filter out irrelevant lines (e.g., "Here are two questions...")
+        filtered_questions = [q for q in raw_questions if not q.lower().startswith("here are")]
+
+        return filtered_questions
+
     def handle_qu_num(self, index):
-        # More robust index handling
-        self.ques_num_list = self.main_window.ui.qu_num_list
-        self.num_qu = self.ques_num_list.itemData(index)  # Use itemData for numerical values
-        if not isinstance(self.num_qu, int) or self.num_qu <= 0:
-            print(f"Invalid question number: {self.num_qu}. Defaulting to 1")
+        """Handles the selection of the number of questions."""
+        self.ques_num_list = self.main_window.ui.qu_num_list  # Get the dropdown list
+        self.num_qu = self.ques_num_list.currentText()  # Get text directly
+
+        try:
+            self.num_qu = int(self.num_qu)  # Convert to integer
+        except ValueError:
+            print(f"Invalid selection: {self.num_qu}. Defaulting to 1")
             self.num_qu = 1
+
         print(f"Number of questions to generate: {self.num_qu}")
+
+
+
 
     def handle_qu_btn(self):
         # Validate analyzer state
@@ -113,14 +135,24 @@ class GuiFunctions():
             print("Analyzer not initialized. Load data first.")
             return
 
-        # Generate questions with error handling
-        try:
-            self.g_questions = self.analyzer.questions_gen(self.num_qu)
-            if not isinstance(self.g_questions, list):
-                self.g_questions = []  # Ensure it's a list
-        except Exception as e:
-            print(f"Question generation failed: {str(e)}")
-            self.g_questions = []
+        # Generate questions with error handling and retry mechanism
+        max_retries = 3
+        retries = 0
+        while retries < max_retries:
+            try:
+                self.g_questions = self.analyzer.questions_gen(self.num_qu)
+                if not isinstance(self.g_questions, list):
+                    self.g_questions = []  # Ensure it's a list
+            except Exception as e:
+                print(f"Question generation failed: {str(e)}")
+                self.g_questions = []
+
+            # Validate the number of generated questions
+            if len(self.g_questions) == self.num_qu:
+                break
+            else:
+                print(f"Warning: Expected {self.num_qu} questions, but got {len(self.g_questions)}")
+                retries += 1
 
         # Get references to UI components
         scroll_area = self.main_window.ui.scrollArea

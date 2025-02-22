@@ -2,6 +2,7 @@ import pandas as pd
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from OprFuncs import *
+from langchain.schema.runnable import RunnableSequence
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
@@ -80,47 +81,85 @@ class DataAnalyzer:
         return updated_df
 
 
-    
+
+
+    import re
+    from langchain.schema.runnable import RunnableLambda
+
     def questions_gen(self, num):
         data_info = self.data_info
         data_sample = self.data_head
         data_summary = self.data_describtion
-        
-        question_prompt = '''
+
+        question_prompt = f"""
         You are a data analyst. You are provided with:
         1. Dataset metadata: {data_info}
         2. Dataset sample: {data_sample}
         3. Dataset summary: {data_summary} 
         Create {num} analysis questions about the dataset.
 
-        Please format each question on a new line start with question number as the following example 
-        1. question1
-        2. question2
-        '''
-        
-        
+        Please format each question on a new line, starting with a number, as in this example:
+        1. What is the average price?
+        2. How does revenue correlate with stock levels?
+        """
+
         question_template = PromptTemplate(
-            input_variables=["num", "data_info","data_sample","data_summary"],
+            input_variables=["num", "data_info", "data_sample", "data_summary"],
             template=question_prompt
         )
-        
-        question_chain = LLMChain(
-            llm=self.llm,
-            prompt=question_template
-        )
-        
-        generated_questions = question_chain.run({"num": num, "data_info": data_info,
-                                                  "data_sample":data_sample,"data_summary":data_summary})
 
-        questions_list = extract_questions(generated_questions)
-        
-        formatted_question_prompt = question_template.format(num=num, data_info=data_info,
-                                                             data_sample=data_sample, data_summary=data_summary)
+        # Corrected LLM Chain (RunnableLambda wraps a function to make it Runnable)
+        question_chain = question_template | self.llm
 
-        self.memory.append(HumanMessage(content=formatted_question_prompt))
-        self.memory.append(AIMessage(content="\n".join(questions_list)))
-        
-        return questions_list
+        try:
+            generated_questions = question_chain.invoke({
+                "num": num,
+                "data_info": data_info,
+                "data_sample": data_sample,
+                "data_summary": data_summary
+            })
+
+            # Print raw output to check if LLM is returning anything
+            print("Raw LLM Output:", repr(generated_questions))
+
+            if not generated_questions.strip():
+                print("⚠️ LLM did not generate any questions.")
+                return []
+
+            # Split and clean questions
+            questions_list = [q.strip() for q in generated_questions.strip().split("\n") if q.strip()]
+            
+            # Debug step: Print extracted list
+            print("Extracted Questions List:", questions_list)
+
+            # Loosen regex to check if it's filtering out too much
+            questions_list = [q for q in questions_list if re.match(r"^\d+\.", q)]  
+
+            # Trim extra questions if needed
+            if len(questions_list) > num:
+                questions_list = questions_list[:num]
+
+            # Handle missing questions
+            if len(questions_list) < num:
+                print(f"⚠️ Warning: Expected {num} questions, but got {len(questions_list)}")
+
+            # Store in memory
+            formatted_question_prompt = question_template.format(
+                num=num,
+                data_info=data_info,
+                data_sample=data_sample,
+                data_summary=data_summary
+            )
+            self.memory.append(HumanMessage(content=formatted_question_prompt))
+            self.memory.append(AIMessage(content="\n".join(questions_list)))
+
+            return questions_list
+
+        except Exception as e:
+            print(f"❌ Error generating questions: {e}")
+            return []
+
+
 
 
     def visual(self, questions):
