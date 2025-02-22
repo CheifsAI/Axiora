@@ -39,10 +39,16 @@ guidelines = """▼ Chart Selection Matrix
 | Correlation between 2 variables    | Scatter plot    |
 | Multivariate comparison            | Heatmap         |
 | Geographical data                  | Choropleth      |
+| showing both distribution and density| Violin Plot   |
+| Correlation between 3 variables    |   Bubble Chart  |
+| relative importance of regions     |   Cartogram     |
 
 ▲ Special Cases:
 - Use box plots for statistical distributions
-- Use stacked bars for cumulative totals
+- Use stacked bars for cumulative totals 
+- Use treemaps for visualizing hierarchical data
+- Use area charts to avoid misleading 
+- Avoid clutter and unnecessary visual elements
 - Avoid pie charts when >5 categories"""
 chart_selection_prompt = PromptTemplate(
     input_variables=["data_info", "data_sample", "data_summary", "guidelines", "question"],
