@@ -1355,11 +1355,11 @@ class Ui_MainWindow(object):
 
         self.gridLayout_4.addWidget(self.qu_btn, 1, 2, 1, 1)
 
-        self.pushButton = QPushButton(self.qu_widget)
-        self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setIcon(icon4)
+        self.qu_data_btn = QPushButton(self.qu_widget)
+        self.qu_data_btn.setObjectName(u"qu_data_btn")
+        self.qu_data_btn.setIcon(icon4)
 
-        self.gridLayout_4.addWidget(self.pushButton, 1, 1, 1, 1)
+        self.gridLayout_4.addWidget(self.qu_data_btn, 1, 1, 1, 1)
 
 
         self.gridLayout_3.addWidget(self.qu_widget, 2, 0, 1, 1)
@@ -1631,7 +1631,7 @@ class Ui_MainWindow(object):
         self.qu_num_list.setCurrentText(QCoreApplication.translate("MainWindow", u"Select number of questions", u"Enter number of questions"))
         self.qu_num_list.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter number of questions", u"Enter number of questions"))
         self.qu_btn.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
-        self.pushButton.setText("")
+        self.qu_data_btn.setText("")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Questions_tap), QCoreApplication.translate("MainWindow", u"Questions", None))
         self.sum_btn.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Summerize_tab), QCoreApplication.translate("MainWindow", u"Summerize", None))

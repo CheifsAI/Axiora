@@ -20,6 +20,7 @@ from functools import partial
 from uiEXT.ChatBubble import ChatBubble
 from sqlalchemy.orm import sessionmaker
 from Axioradb import *
+from docx import Document
 
 #SessionLocal = sessionmaker(bind=engine)
 
@@ -41,6 +42,20 @@ class GuiFunctions():
         self.main_window.ui.chat_data_btn.clicked.connect(self.handle_chat_data_btn)
         self.main_window.ui.send_btn.clicked.connect(self.send_message)
         self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
+        self.main_window.ui.qu_data_btn.clicked.connect(self.handle_word_btn)  # Connect the qu_data_btn
+
+    def handle_word_btn(self):
+        fpath, _ = QFileDialog.getOpenFileName(
+            self.main_window, "Open Word File", "", "Word Files (*.docx)"
+        )
+        if fpath:
+            document = Document(fpath)
+            full_text = []
+            for para in document.paragraphs:
+                full_text.append(para.text)
+            word_content = '\n'.join(full_text)
+            print(word_content)  # Print the content of the Word file to the console
+            # You can also display the content in a QTextEdit or any other widget
 
     def handle_data_button(self):
         fpath, _ = QFileDialog.getOpenFileName(
@@ -79,10 +94,6 @@ class GuiFunctions():
     def handle_btn_LLMs(self):
         print("Clicked LLM")
 
-    def handle_btn_LLMs(self):
-        #menu = QMenu()
-        print("Clicked LLM")
-
     def handle_clean_data_btn(self):
         self.cleaned_df = self.analyzer.drop_nulls()
         self.table = self.main_window.ui.tableData
@@ -100,7 +111,7 @@ class GuiFunctions():
 # for i, question in enumerate(result, 1):
 #    print(markdown(question))
 
-
+    import re
 
     def extract_questions(text):
         """Extracts and cleans numbered questions from LLM output"""
@@ -134,9 +145,6 @@ class GuiFunctions():
             self.num_qu = 1
 
         print(f"Number of questions to generate: {self.num_qu}")
-
-
-
 
     def handle_qu_btn(self):
         # Validate analyzer state
