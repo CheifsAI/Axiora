@@ -1309,27 +1309,27 @@ class Ui_MainWindow(object):
         self.qu_widget.setObjectName(u"qu_widget")
         self.gridLayout_4 = QGridLayout(self.qu_widget)
         self.gridLayout_4.setObjectName(u"gridLayout_4")
-        self.done_btn = QPushButton(self.qu_widget)
-        self.done_btn.setObjectName(u"done_btn")
-
-        self.gridLayout_4.addWidget(self.done_btn, 4, 0, 1, 3)
-
         self.scrollArea = QScrollArea(self.qu_widget)
         self.scrollArea.setObjectName(u"scrollArea")
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 770, 458))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 770, 491))
         self.gridLayout_9 = QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_9.setObjectName(u"gridLayout_9")
         self.qu_layout = QVBoxLayout()
         self.qu_layout.setObjectName(u"qu_layout")
+        self.done_btn = QPushButton(self.scrollAreaWidgetContents)
+        self.done_btn.setObjectName(u"done_btn")
+
+        self.qu_layout.addWidget(self.done_btn, 0, Qt.AlignmentFlag.AlignBottom)
+
 
         self.gridLayout_9.addLayout(self.qu_layout, 0, 0, 1, 1)
 
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
-        self.gridLayout_4.addWidget(self.scrollArea, 3, 0, 1, 3)
+        self.gridLayout_4.addWidget(self.scrollArea, 3, 0, 3, 5)
 
         self.qu_num_list = QComboBox(self.qu_widget)
         self.qu_num_list.addItem("")
@@ -1348,21 +1348,21 @@ class Ui_MainWindow(object):
         self.qu_num_list.setEditable(True)
         self.qu_num_list.setDuplicatesEnabled(True)
 
-        self.gridLayout_4.addWidget(self.qu_num_list, 1, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.qu_num_list, 1, 0, 1, 2)
 
         self.qu_btn = QPushButton(self.qu_widget)
         self.qu_btn.setObjectName(u"qu_btn")
 
-        self.gridLayout_4.addWidget(self.qu_btn, 1, 2, 1, 1)
+        self.gridLayout_4.addWidget(self.qu_btn, 1, 4, 1, 1)
 
         self.qu_data_btn = QPushButton(self.qu_widget)
         self.qu_data_btn.setObjectName(u"qu_data_btn")
         self.qu_data_btn.setIcon(icon4)
 
-        self.gridLayout_4.addWidget(self.qu_data_btn, 1, 1, 1, 1)
+        self.gridLayout_4.addWidget(self.qu_data_btn, 1, 3, 1, 1)
 
 
-        self.gridLayout_3.addWidget(self.qu_widget, 2, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.qu_widget, 1, 0, 1, 1)
 
         self.tabWidget.addTab(self.Questions_tap, "")
         self.Summerize_tab = QWidget()
