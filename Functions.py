@@ -29,7 +29,8 @@ class GuiFunctions():
         self.main_window = MainWindow
         self.ui = MainWindow.ui
         self.llm = llama3b
- #       self.db_session = SessionLocal()
+        # self.db_session = SessionLocal()
+        self.selected_qu_list = []  # Initialize the list to store selected questions
         self.setup_connections()
 
     def setup_connections(self):
@@ -101,21 +102,17 @@ class GuiFunctions():
         self.table.setColumnCount(self.cleaned_df.shape[1])  # Set number of columns
         self.table.setHorizontalHeaderLabels(self.cleaned_df.columns)  # Set column headers
         header = self.table.horizontalHeader()
-        #header.setStyleSheet("QHeaderView::section { background-color: lightgray; }")
+        # header.setStyleSheet("QHeaderView::section { background-color: lightgray; }")
         # Populate the table with data
         for i in range(self.cleaned_df.shape[0]):
             for j in range(self.cleaned_df.shape[1]):
                 self.table.setItem(i, j, QTableWidgetItem(str(self.cleaned_df.iat(i, j))))
-    
-# result = quetions_gen(llm=llm,dataframe=df1,num=2)
-# for i, question in enumerate(result, 1):
-#    print(markdown(question))
 
     import re
 
     def extract_questions(text):
         """Extracts and cleans numbered questions from LLM output"""
-        
+
         # Find all valid numbered questions
         extracted_questions = re.findall(r"^\d+\.\s+(.+)", text, re.MULTILINE)
 
@@ -174,11 +171,11 @@ class GuiFunctions():
         # Get references to UI components
         scroll_area = self.main_window.ui.scrollArea
         scroll_contents = self.main_window.ui.scrollAreaWidgetContents
-        
+
         # Ensure proper widget hierarchy
         if not scroll_contents.layout():
             scroll_contents.setLayout(QVBoxLayout())
-        
+
         qu_layout = scroll_contents.layout()
         qu_layout.setAlignment(Qt.AlignTop)
 
@@ -193,24 +190,24 @@ class GuiFunctions():
             for i, question in enumerate(self.g_questions, 1):
                 question_frame = QFrame(scroll_contents)
                 question_frame.setFrameShape(QFrame.StyledPanel)
-                
+
                 hbox = QHBoxLayout(question_frame)
                 hbox.setContentsMargins(0, 0, 0, 0)  # Reduce margins
                 hbox.setSpacing(2)  # Reduce spacing between widgets
-                
+
                 number_label = QLabel(f"{i}.", question_frame)
                 number_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 hbox.addWidget(number_label)
-                
+
                 question_label = QLabel(str(question), question_frame)
                 question_label.setWordWrap(True)
                 question_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 hbox.addWidget(question_label)
-                
+
                 check_box = QCheckBox(question_frame)
                 check_box.stateChanged.connect(partial(self.handle_question_selection, question))
                 hbox.addWidget(check_box)
-                
+
                 qu_layout.addWidget(question_frame)
 
             # Ensure proper layout update
@@ -228,8 +225,12 @@ class GuiFunctions():
 
     def handle_question_selection(self, question, state):
         if state == Qt.Checked:
+            if question not in self.selected_qu_list:
+                self.selected_qu_list.append(question)
             print(f"Question selected: {question}")
         else:
+            if question in self.selected_qu_list:
+                self.selected_qu_list.remove(question)
             print(f"Question deselected: {question}")
 
     def send_question_to_model(self, question, state):
