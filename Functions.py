@@ -16,6 +16,7 @@ from OprFuncs import read_file, data_infer
 from DataAnalyzer import DataAnalyzer
 from Models import *
 from markdown import markdown
+from functools import partial
 from uiEXT.ChatBubble import ChatBubble
 from sqlalchemy.orm import sessionmaker
 from Axioradb import *
@@ -100,18 +101,26 @@ class GuiFunctions():
 #    print(markdown(question))
 
 
-    import re
 
     def extract_questions(text):
-        """ Extracts and cleans numbered questions from LLM output """
+        """Extracts and cleans numbered questions from LLM output"""
+        
+        # Find all valid numbered questions
+        extracted_questions = re.findall(r"^\d+\.\s+(.+)", text, re.MULTILINE)
 
-        # Find all lines that start with a number, followed by a period
-        raw_questions = re.findall(r"^\d+\.\s*(.+)", text, re.MULTILINE)
+        # Remove introductory phrases like "Here are the questions:"
+        filtered_questions = [q.strip() for q in extracted_questions if not q.lower().startswith("here are")]
 
-        # Filter out irrelevant lines (e.g., "Here are two questions...")
-        filtered_questions = [q for q in raw_questions if not q.lower().startswith("here are")]
+        # Ensure each question starts with a number and a period
+        formatted_questions_list = []
+        for i, question in enumerate(filtered_questions, 1):
+            # Remove any existing numbering
+            question = re.sub(r"^\d+\.\s*", "", question)
+            # Add correct numbering
+            question = f"{i}. {question}"
+            formatted_questions_list.append(question)
 
-        return filtered_questions
+        return formatted_questions_list
 
     def handle_qu_num(self, index):
         """Handles the selection of the number of questions."""
@@ -119,9 +128,9 @@ class GuiFunctions():
         self.num_qu = self.ques_num_list.currentText()  # Get text directly
 
         try:
-            self.num_qu = int(self.num_qu)  # Convert to integer
+            self.num_qu = int(self.ques_num_list.currentText().strip())
         except ValueError:
-            print(f"Invalid selection: {self.num_qu}. Defaulting to 1")
+            print(f"⚠️ Invalid selection: {self.num_qu}. Defaulting to 1")
             self.num_qu = 1
 
         print(f"Number of questions to generate: {self.num_qu}")
@@ -191,7 +200,7 @@ class GuiFunctions():
                 hbox.addWidget(question_label)
                 
                 check_box = QCheckBox(question_frame)
-                check_box.stateChanged.connect(lambda state, q=question: self.handle_question_selection(q, state))
+                check_box.stateChanged.connect(partial(self.handle_question_selection, question))
                 hbox.addWidget(check_box)
                 
                 qu_layout.addWidget(question_frame)

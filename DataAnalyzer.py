@@ -83,8 +83,9 @@ class DataAnalyzer:
 
 
 
+
+
     import re
-    from langchain.schema.runnable import RunnableLambda
 
     def questions_gen(self, num):
         data_info = self.data_info
@@ -108,7 +109,6 @@ class DataAnalyzer:
             template=question_prompt
         )
 
-        # Corrected LLM Chain (RunnableLambda wraps a function to make it Runnable)
         question_chain = question_template | self.llm
 
         try:
@@ -119,28 +119,21 @@ class DataAnalyzer:
                 "data_summary": data_summary
             })
 
-            # Print raw output to check if LLM is returning anything
-            print("Raw LLM Output:", repr(generated_questions))
+            print("🔹 Raw LLM Output:", repr(generated_questions))
 
             if not generated_questions.strip():
                 print("⚠️ LLM did not generate any questions.")
                 return []
 
-            # Split and clean questions
-            questions_list = [q.strip() for q in generated_questions.strip().split("\n") if q.strip()]
-            
-            # Debug step: Print extracted list
-            print("Extracted Questions List:", questions_list)
+            # Use the improved extraction function
+            questions_list = extract_questions(generated_questions)
 
-            # Loosen regex to check if it's filtering out too much
-            questions_list = [q for q in questions_list if re.match(r"^\d+\.", q)]  
+            print("🟢 Extracted Questions List:", questions_list)
 
-            # Trim extra questions if needed
+            # Trim or handle missing questions
             if len(questions_list) > num:
                 questions_list = questions_list[:num]
-
-            # Handle missing questions
-            if len(questions_list) < num:
+            elif len(questions_list) < num:
                 print(f"⚠️ Warning: Expected {num} questions, but got {len(questions_list)}")
 
             # Store in memory
@@ -158,6 +151,7 @@ class DataAnalyzer:
         except Exception as e:
             print(f"❌ Error generating questions: {e}")
             return []
+
 
 
 
