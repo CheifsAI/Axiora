@@ -55,8 +55,72 @@ class GuiFunctions():
             for para in document.paragraphs:
                 full_text.append(para.text)
             word_content = '\n'.join(full_text)
-            print(word_content)  # Print the content of the Word file to the console
-            # You can also display the content in a QTextEdit or any other widget
+            
+            # Debug: Print the content of the Word file
+            print("Word file content:")
+            print(word_content)
+
+            # Extract questions from the Word content
+            questions = self.extract_questions(word_content)
+            
+            # Debug: Print the extracted questions
+            print("Extracted questions:")
+            print(questions)
+
+            # Get references to UI components
+            scroll_area = self.main_window.ui.scrollArea
+            scroll_contents = self.main_window.ui.scrollAreaWidgetContents
+
+            # Ensure proper widget hierarchy
+            if not scroll_contents.layout():
+                scroll_contents.setLayout(QVBoxLayout())
+
+            qu_layout = scroll_contents.layout()
+            qu_layout.setAlignment(Qt.AlignTop)
+
+            # Clear previous questions
+            while qu_layout.count():
+                item = qu_layout.takeAt(0)
+                if item.widget():
+                    item.widget().deleteLater()
+
+            # Add new questions with proper parenting
+            if questions:
+                for i, question in enumerate(questions, 1):
+                    question_frame = QFrame(scroll_contents)
+                    question_frame.setFrameShape(QFrame.StyledPanel)
+
+                    hbox = QHBoxLayout(question_frame)
+                    hbox.setContentsMargins(0, 0, 0, 0)  # Reduce margins
+                    hbox.setSpacing(2)  # Reduce spacing between widgets
+
+                    number_label = QLabel(f"{i}.", question_frame)
+                    number_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                    hbox.addWidget(number_label)
+
+                    question_label = QLabel(str(question), question_frame)
+                    question_label.setWordWrap(True)
+                    question_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    hbox.addWidget(question_label)
+
+                    check_box = QCheckBox(question_frame)
+                    check_box.stateChanged.connect(partial(self.handle_question_selection, question))
+                    hbox.addWidget(check_box)
+
+                    qu_layout.addWidget(question_frame)
+
+                # Ensure proper layout update
+                scroll_contents.adjustSize()
+                scroll_area.updateGeometry()
+                QApplication.processEvents()  # Force UI refresh
+            else:
+                error_label = QLabel("No questions extracted. Please check your Word file.", scroll_contents)
+                error_label.setAlignment(Qt.AlignCenter)
+                qu_layout.addWidget(error_label)
+
+            # Set widget if not already set (should be done once during initialization)
+            if scroll_area.widget() != scroll_contents:
+                scroll_area.setWidget(scroll_contents)
 
     def handle_data_button(self):
         fpath, _ = QFileDialog.getOpenFileName(
@@ -110,25 +174,10 @@ class GuiFunctions():
 
     import re
 
-    def extract_questions(text):
-        """Extracts and cleans numbered questions from LLM output"""
-
-        # Find all valid numbered questions
-        extracted_questions = re.findall(r"^\d+\.\s+(.+)", text, re.MULTILINE)
-
-        # Remove introductory phrases like "Here are the questions:"
-        filtered_questions = [q.strip() for q in extracted_questions if not q.lower().startswith("here are")]
-
-        # Ensure each question starts with a number and a period
-        formatted_questions_list = []
-        for i, question in enumerate(filtered_questions, 1):
-            # Remove any existing numbering
-            question = re.sub(r"^\d+\.\s*", "", question)
-            # Add correct numbering
-            question = f"{i}. {question}"
-            formatted_questions_list.append(question)
-
-        return formatted_questions_list
+    def extract_questions(self, text):
+        """Extracts questions from the text by splitting on newlines."""
+        questions = [line.strip() for line in text.split('\n') if line.strip()]
+        return questions
 
     def handle_qu_num(self, index):
         """Handles the selection of the number of questions."""
@@ -247,13 +296,14 @@ class GuiFunctions():
         )
         if cfpath:
             chat_df = read_file()
-            chat_analyzer = DataAnalyzer(dataframe=chat_df,llm=self.llm)
+            chat_analyzer = DataAnalyzer(dataframe=chat_df, llm=self.llm)
             chat_df_anlysis = chat_analyzer.analysis_data()
             return chat_df_anlysis
-        
+
     def enter_return_release(self, event):
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
             self.send_message()
+
     def send_message(self):
         print("send_message called")  # Debugging statement
         lineEdit_chat = self.main_window.ui.lineEdit_message
