@@ -664,6 +664,13 @@ class Ui_MainWindow(object):
         self.verticalLayout_8.setSpacing(0)
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
         self.verticalLayout_8.setContentsMargins(0, 0, 0, 0)
+        self.pushButton = QPushButton(self.topMenu)
+        self.pushButton.setObjectName(u"pushButton")
+        self.pushButton.setMinimumSize(QSize(0, 45))
+        self.pushButton.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-home.png);")
+
+        self.verticalLayout_8.addWidget(self.pushButton)
+
         self.btn_home = QPushButton(self.topMenu)
         self.btn_home.setObjectName(u"btn_home")
         sizePolicy1.setHeightForWidth(self.btn_home.sizePolicy().hasHeightForWidth())
@@ -700,6 +707,13 @@ class Ui_MainWindow(object):
         self.btn_new.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-file.png);")
 
         self.verticalLayout_8.addWidget(self.btn_new)
+
+        self.pushButton_2 = QPushButton(self.topMenu)
+        self.pushButton_2.setObjectName(u"pushButton_2")
+        self.pushButton_2.setMinimumSize(QSize(0, 45))
+        self.pushButton_2.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-chart.png);")
+
+        self.verticalLayout_8.addWidget(self.pushButton_2)
 
         self.btn_save = QPushButton(self.topMenu)
         self.btn_save.setObjectName(u"btn_save")
@@ -1046,7 +1060,7 @@ class Ui_MainWindow(object):
         self.chat_scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 40, 24))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 786, 518))
         self.gridLayout_10 = QGridLayout(self.scrollAreaWidgetContents_2)
         self.gridLayout_10.setObjectName(u"gridLayout_10")
         self.chat_layout = QVBoxLayout()
@@ -1102,7 +1116,22 @@ class Ui_MainWindow(object):
         self.home_2.setObjectName(u"home_2")
         self.gridLayout_2 = QGridLayout(self.home_2)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.widget_2 = QWidget(self.home_2)
+        self.widget_2.setObjectName(u"widget_2")
+
+        self.gridLayout_2.addWidget(self.widget_2, 0, 0, 1, 1)
+
         self.stackedWidget.addWidget(self.home_2)
+        self.page = QWidget()
+        self.page.setObjectName(u"page")
+        self.gridLayout_12 = QGridLayout(self.page)
+        self.gridLayout_12.setObjectName(u"gridLayout_12")
+        self.widget_3 = QWidget(self.page)
+        self.widget_3.setObjectName(u"widget_3")
+
+        self.gridLayout_12.addWidget(self.widget_3, 0, 0, 1, 1)
+
+        self.stackedWidget.addWidget(self.page)
         self.data_page = QWidget()
         self.data_page.setObjectName(u"data_page")
         self.data_page.setStyleSheet(u"b")
@@ -1309,34 +1338,30 @@ class Ui_MainWindow(object):
         self.qu_widget.setObjectName(u"qu_widget")
         self.gridLayout_4 = QGridLayout(self.qu_widget)
         self.gridLayout_4.setObjectName(u"gridLayout_4")
-        self.done_btn = QPushButton(self.qu_widget)
-        self.done_btn.setObjectName(u"done_btn")
-
-        self.gridLayout_4.addWidget(self.done_btn, 4, 0, 1, 3)
-
         self.scrollArea = QScrollArea(self.qu_widget)
         self.scrollArea.setObjectName(u"scrollArea")
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 770, 458))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 770, 491))
         self.gridLayout_9 = QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_9.setObjectName(u"gridLayout_9")
         self.qu_layout = QVBoxLayout()
         self.qu_layout.setObjectName(u"qu_layout")
-        self.widget1 = QWidget(self.scrollAreaWidgetContents)
-        self.widget1.setObjectName(u"widget1")
+        self.done_btn = QPushButton(self.scrollAreaWidgetContents)
+        self.done_btn.setObjectName(u"done_btn")
 
-        self.qu_layout.addWidget(self.widget1)
+        self.qu_layout.addWidget(self.done_btn, 0, Qt.AlignmentFlag.AlignBottom)
 
 
         self.gridLayout_9.addLayout(self.qu_layout, 0, 0, 1, 1)
 
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
-        self.gridLayout_4.addWidget(self.scrollArea, 3, 0, 1, 3)
+        self.gridLayout_4.addWidget(self.scrollArea, 3, 0, 3, 5)
 
         self.qu_num_list = QComboBox(self.qu_widget)
+        self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
@@ -1352,21 +1377,21 @@ class Ui_MainWindow(object):
         self.qu_num_list.setEditable(True)
         self.qu_num_list.setDuplicatesEnabled(True)
 
-        self.gridLayout_4.addWidget(self.qu_num_list, 1, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.qu_num_list, 1, 0, 1, 2)
 
         self.qu_btn = QPushButton(self.qu_widget)
         self.qu_btn.setObjectName(u"qu_btn")
 
-        self.gridLayout_4.addWidget(self.qu_btn, 1, 2, 1, 1)
+        self.gridLayout_4.addWidget(self.qu_btn, 1, 4, 1, 1)
 
-        self.pushButton = QPushButton(self.qu_widget)
-        self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setIcon(icon4)
+        self.qu_data_btn = QPushButton(self.qu_widget)
+        self.qu_data_btn.setObjectName(u"qu_data_btn")
+        self.qu_data_btn.setIcon(icon4)
 
-        self.gridLayout_4.addWidget(self.pushButton, 1, 1, 1, 1)
+        self.gridLayout_4.addWidget(self.qu_data_btn, 1, 3, 1, 1)
 
 
-        self.gridLayout_3.addWidget(self.qu_widget, 2, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.qu_widget, 1, 0, 1, 1)
 
         self.tabWidget.addTab(self.Questions_tap, "")
         self.Summerize_tab = QWidget()
@@ -1537,7 +1562,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget.setCurrentIndex(1)
         self.tabWidget.setCurrentIndex(0)
 
 
@@ -1554,9 +1579,11 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(accessibility)
         self.label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><img src=\":/icons/images/images/logo axuira.png\"/></p></body></html>", None))
         self.toggleButton.setText(QCoreApplication.translate("MainWindow", u"Hide", None))
+        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
         self.btn_home.setText(QCoreApplication.translate("MainWindow", u"Home", None))
         self.btn_data.setText(QCoreApplication.translate("MainWindow", u"Data", None))
         self.btn_new.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
+        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
         self.btn_save.setText(QCoreApplication.translate("MainWindow", u"Save", None))
         self.toggleLeftBox.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
         self.extraLabel.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
@@ -1617,24 +1644,25 @@ class Ui_MainWindow(object):
         self.tabWidget.setAccessibleDescription("")
 #endif // QT_CONFIG(accessibility)
         self.done_btn.setText(QCoreApplication.translate("MainWindow", u"Done", None))
-        self.qu_num_list.setItemText(0, QCoreApplication.translate("MainWindow", u"1", u"1"))
-        self.qu_num_list.setItemText(1, QCoreApplication.translate("MainWindow", u"2", None))
-        self.qu_num_list.setItemText(2, QCoreApplication.translate("MainWindow", u"3", None))
-        self.qu_num_list.setItemText(3, QCoreApplication.translate("MainWindow", u"4", None))
-        self.qu_num_list.setItemText(4, QCoreApplication.translate("MainWindow", u"5", None))
-        self.qu_num_list.setItemText(5, QCoreApplication.translate("MainWindow", u"6", None))
-        self.qu_num_list.setItemText(6, QCoreApplication.translate("MainWindow", u"7", None))
-        self.qu_num_list.setItemText(7, QCoreApplication.translate("MainWindow", u"8", None))
-        self.qu_num_list.setItemText(8, QCoreApplication.translate("MainWindow", u"9", None))
-        self.qu_num_list.setItemText(9, QCoreApplication.translate("MainWindow", u"10", None))
+        self.qu_num_list.setItemText(0, QCoreApplication.translate("MainWindow", u"Select number of questions", u"select number of questions"))
+        self.qu_num_list.setItemText(1, QCoreApplication.translate("MainWindow", u"1", u"1"))
+        self.qu_num_list.setItemText(2, QCoreApplication.translate("MainWindow", u"2", None))
+        self.qu_num_list.setItemText(3, QCoreApplication.translate("MainWindow", u"3", None))
+        self.qu_num_list.setItemText(4, QCoreApplication.translate("MainWindow", u"4", None))
+        self.qu_num_list.setItemText(5, QCoreApplication.translate("MainWindow", u"5", None))
+        self.qu_num_list.setItemText(6, QCoreApplication.translate("MainWindow", u"6", None))
+        self.qu_num_list.setItemText(7, QCoreApplication.translate("MainWindow", u"7", None))
+        self.qu_num_list.setItemText(8, QCoreApplication.translate("MainWindow", u"8", None))
+        self.qu_num_list.setItemText(9, QCoreApplication.translate("MainWindow", u"9", None))
+        self.qu_num_list.setItemText(10, QCoreApplication.translate("MainWindow", u"10", None))
 
 #if QT_CONFIG(accessibility)
         self.qu_num_list.setAccessibleName("")
 #endif // QT_CONFIG(accessibility)
-        self.qu_num_list.setCurrentText("")
+        self.qu_num_list.setCurrentText(QCoreApplication.translate("MainWindow", u"Select number of questions", u"Enter number of questions"))
         self.qu_num_list.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter number of questions", u"Enter number of questions"))
         self.qu_btn.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
-        self.pushButton.setText("")
+        self.qu_data_btn.setText("")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Questions_tap), QCoreApplication.translate("MainWindow", u"Questions", None))
         self.sum_btn.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Summerize_tab), QCoreApplication.translate("MainWindow", u"Summerize", None))

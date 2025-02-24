@@ -16,9 +16,11 @@ from OprFuncs import read_file, data_infer
 from DataAnalyzer import DataAnalyzer
 from Models import *
 from markdown import markdown
+from functools import partial
 from uiEXT.ChatBubble import ChatBubble
 from sqlalchemy.orm import sessionmaker
 from Axioradb import *
+from docx import Document
 
 #SessionLocal = sessionmaker(bind=engine)
 
@@ -27,7 +29,8 @@ class GuiFunctions():
         self.main_window = MainWindow
         self.ui = MainWindow.ui
         self.llm = llama3b
- #       self.db_session = SessionLocal()
+        # self.db_session = SessionLocal()
+        self.selected_qu_list = []  # Initialize the list to store selected questions
         self.setup_connections()
 
     def setup_connections(self):
@@ -40,6 +43,84 @@ class GuiFunctions():
         self.main_window.ui.chat_data_btn.clicked.connect(self.handle_chat_data_btn)
         self.main_window.ui.send_btn.clicked.connect(self.send_message)
         self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
+        self.main_window.ui.qu_data_btn.clicked.connect(self.handle_word_btn)  # Connect the qu_data_btn
+
+    def handle_word_btn(self):
+        fpath, _ = QFileDialog.getOpenFileName(
+            self.main_window, "Open Word File", "", "Word Files (*.docx)"
+        )
+        if fpath:
+            document = Document(fpath)
+            full_text = []
+            for para in document.paragraphs:
+                full_text.append(para.text)
+            word_content = '\n'.join(full_text)
+            
+            # Debug: Print the content of the Word file
+            print("Word file content:")
+            print(word_content)
+
+            # Extract questions from the Word content
+            questions = self.extract_questions(word_content)
+            
+            # Debug: Print the extracted questions
+            print("Extracted questions:")
+            print(questions)
+
+            # Get references to UI components
+            scroll_area = self.main_window.ui.scrollArea
+            scroll_contents = self.main_window.ui.scrollAreaWidgetContents
+
+            # Ensure proper widget hierarchy
+            if not scroll_contents.layout():
+                scroll_contents.setLayout(QVBoxLayout())
+
+            qu_layout = scroll_contents.layout()
+            qu_layout.setAlignment(Qt.AlignTop)
+
+            # Clear previous questions
+            while qu_layout.count():
+                item = qu_layout.takeAt(0)
+                if item.widget():
+                    item.widget().deleteLater()
+
+            # Add new questions with proper parenting
+            if questions:
+                for i, question in enumerate(questions, 1):
+                    question_frame = QFrame(scroll_contents)
+                    question_frame.setFrameShape(QFrame.StyledPanel)
+
+                    hbox = QHBoxLayout(question_frame)
+                    hbox.setContentsMargins(0, 0, 0, 0)  # Reduce margins
+                    hbox.setSpacing(2)  # Reduce spacing between widgets
+
+                    number_label = QLabel(f"{i}.", question_frame)
+                    number_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                    hbox.addWidget(number_label)
+
+                    question_label = QLabel(str(question), question_frame)
+                    question_label.setWordWrap(True)
+                    question_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    hbox.addWidget(question_label)
+
+                    check_box = QCheckBox(question_frame)
+                    check_box.stateChanged.connect(partial(self.handle_question_selection, question))
+                    hbox.addWidget(check_box)
+
+                    qu_layout.addWidget(question_frame)
+
+                # Ensure proper layout update
+                scroll_contents.adjustSize()
+                scroll_area.updateGeometry()
+                QApplication.processEvents()  # Force UI refresh
+            else:
+                error_label = QLabel("No questions extracted. Please check your Word file.", scroll_contents)
+                error_label.setAlignment(Qt.AlignCenter)
+                qu_layout.addWidget(error_label)
+
+            # Set widget if not already set (should be done once during initialization)
+            if scroll_area.widget() != scroll_contents:
+                scroll_area.setWidget(scroll_contents)
 
     def handle_data_button(self):
         fpath, _ = QFileDialog.getOpenFileName(
@@ -78,10 +159,6 @@ class GuiFunctions():
     def handle_btn_LLMs(self):
         print("Clicked LLM")
 
-    def handle_btn_LLMs(self):
-        #menu = QMenu()
-        print("Clicked LLM")
-
     def handle_clean_data_btn(self):
         self.cleaned_df = self.analyzer.drop_nulls()
         self.table = self.main_window.ui.tableData
@@ -89,22 +166,30 @@ class GuiFunctions():
         self.table.setColumnCount(self.cleaned_df.shape[1])  # Set number of columns
         self.table.setHorizontalHeaderLabels(self.cleaned_df.columns)  # Set column headers
         header = self.table.horizontalHeader()
-        #header.setStyleSheet("QHeaderView::section { background-color: lightgray; }")
+        # header.setStyleSheet("QHeaderView::section { background-color: lightgray; }")
         # Populate the table with data
         for i in range(self.cleaned_df.shape[0]):
             for j in range(self.cleaned_df.shape[1]):
                 self.table.setItem(i, j, QTableWidgetItem(str(self.cleaned_df.iat(i, j))))
-    
-# result = quetions_gen(llm=llm,dataframe=df1,num=2)
-# for i, question in enumerate(result, 1):
-#    print(markdown(question))
+
+    import re
+
+    def extract_questions(self, text):
+        """Extracts questions from the text by splitting on newlines."""
+        questions = [line.strip() for line in text.split('\n') if line.strip()]
+        return questions
+
     def handle_qu_num(self, index):
-        # More robust index handling
-        self.ques_num_list = self.main_window.ui.qu_num_list
-        self.num_qu = self.ques_num_list.itemData(index)  # Use itemData for numerical values
-        if not isinstance(self.num_qu, int) or self.num_qu <= 0:
-            print(f"Invalid question number: {self.num_qu}. Defaulting to 1")
+        """Handles the selection of the number of questions."""
+        self.ques_num_list = self.main_window.ui.qu_num_list  # Get the dropdown list
+        self.num_qu = self.ques_num_list.currentText()  # Get text directly
+
+        try:
+            self.num_qu = int(self.ques_num_list.currentText().strip())
+        except ValueError:
+            print(f"⚠️ Invalid selection: {self.num_qu}. Defaulting to 1")
             self.num_qu = 1
+
         print(f"Number of questions to generate: {self.num_qu}")
 
     def handle_qu_btn(self):
@@ -113,23 +198,33 @@ class GuiFunctions():
             print("Analyzer not initialized. Load data first.")
             return
 
-        # Generate questions with error handling
-        try:
-            self.g_questions = self.analyzer.questions_gen(self.num_qu)
-            if not isinstance(self.g_questions, list):
-                self.g_questions = []  # Ensure it's a list
-        except Exception as e:
-            print(f"Question generation failed: {str(e)}")
-            self.g_questions = []
+        # Generate questions with error handling and retry mechanism
+        max_retries = 3
+        retries = 0
+        while retries < max_retries:
+            try:
+                self.g_questions = self.analyzer.questions_gen(self.num_qu)
+                if not isinstance(self.g_questions, list):
+                    self.g_questions = []  # Ensure it's a list
+            except Exception as e:
+                print(f"Question generation failed: {str(e)}")
+                self.g_questions = []
+
+            # Validate the number of generated questions
+            if len(self.g_questions) == self.num_qu:
+                break
+            else:
+                print(f"Warning: Expected {self.num_qu} questions, but got {len(self.g_questions)}")
+                retries += 1
 
         # Get references to UI components
         scroll_area = self.main_window.ui.scrollArea
         scroll_contents = self.main_window.ui.scrollAreaWidgetContents
-        
+
         # Ensure proper widget hierarchy
         if not scroll_contents.layout():
             scroll_contents.setLayout(QVBoxLayout())
-        
+
         qu_layout = scroll_contents.layout()
         qu_layout.setAlignment(Qt.AlignTop)
 
@@ -144,24 +239,24 @@ class GuiFunctions():
             for i, question in enumerate(self.g_questions, 1):
                 question_frame = QFrame(scroll_contents)
                 question_frame.setFrameShape(QFrame.StyledPanel)
-                
+
                 hbox = QHBoxLayout(question_frame)
                 hbox.setContentsMargins(0, 0, 0, 0)  # Reduce margins
                 hbox.setSpacing(2)  # Reduce spacing between widgets
-                
+
                 number_label = QLabel(f"{i}.", question_frame)
                 number_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 hbox.addWidget(number_label)
-                
+
                 question_label = QLabel(str(question), question_frame)
                 question_label.setWordWrap(True)
                 question_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 hbox.addWidget(question_label)
-                
+
                 check_box = QCheckBox(question_frame)
-                check_box.stateChanged.connect(lambda state, q=question: self.handle_question_selection(q, state))
+                check_box.stateChanged.connect(partial(self.handle_question_selection, question))
                 hbox.addWidget(check_box)
-                
+
                 qu_layout.addWidget(question_frame)
 
             # Ensure proper layout update
@@ -179,8 +274,12 @@ class GuiFunctions():
 
     def handle_question_selection(self, question, state):
         if state == Qt.Checked:
+            if question not in self.selected_qu_list:
+                self.selected_qu_list.append(question)
             print(f"Question selected: {question}")
         else:
+            if question in self.selected_qu_list:
+                self.selected_qu_list.remove(question)
             print(f"Question deselected: {question}")
 
     def send_question_to_model(self, question, state):
@@ -197,13 +296,14 @@ class GuiFunctions():
         )
         if cfpath:
             chat_df = read_file()
-            chat_analyzer = DataAnalyzer(dataframe=chat_df,llm=self.llm)
+            chat_analyzer = DataAnalyzer(dataframe=chat_df, llm=self.llm)
             chat_df_anlysis = chat_analyzer.analysis_data()
             return chat_df_anlysis
-        
+
     def enter_return_release(self, event):
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
             self.send_message()
+
     def send_message(self):
         print("send_message called")  # Debugging statement
         lineEdit_chat = self.main_window.ui.lineEdit_message
