@@ -128,7 +128,12 @@ class DataAnalyzer:
     def visual(self, questions_list):
        agentres = self._visual_agent(questions_list)
        viscode = extract_code(agentres)
-       return viscode
+       if viscode:
+           return viscode
+           #exec(viscode) 
+       else:
+           print("Error: No valid code generated.")
+    
     def chat(self,question):
         prompt_template = ChatPromptTemplate.from_messages(
             [
@@ -199,7 +204,7 @@ class DataAnalyzer:
                 2. Dataset sample: {data_sample}
                 3. Dataset summary: {data_summary}
 
-            Generate Pygal code for {chart_type} chart answering:
+            Generate COMPLETE Pygal code for {chart_type} chart answering:
             Question: {question}
 
             Follow these requirements:
@@ -210,15 +215,13 @@ class DataAnalyzer:
             5. Save to SVG file
 
             Example structure:
-            import pygal
-            # Data processing
+            ```import pygal
             data = df['column'].value_counts()
-            # Chart configuration
             chart = pygal.Bar(x_label_rotation=45)
             chart.title = "Chart Title"
             chart.x_labels = data.index
             chart.add('Series', data.values)
-            chart.render_to_file('charts/chart.svg')
+            chart.render_to_file('charts/chart.svg')```
 
             Generate code for the current dataset: df
             """
@@ -252,7 +255,7 @@ class DataAnalyzer:
             instructions="""Follow EXACTLY this sequence:
             1. Use ChartSelector ONCE
             2. Use CodeGenerator ONCE
-            3. Output FINAL ANSWER with code
+            3. Output FINAL ANSWER after code
             NEVER repeat steps or tools"""
         )
         agent = create_react_agent(llm, tools, agent_prompt)
@@ -260,11 +263,10 @@ class DataAnalyzer:
             agent=agent,
             tools=tools,
             verbose=True,
-            max_iterations=3,
+            #max_iterations=5,
             handle_parsing_errors=True,
-            stop=["\nFINAL ANSWER"]  
+            stop=["</code>"]  
         )
-        #question = "Show the most teams played as home team off all time"
 
         result = agent_executor.invoke({
             "input": f"""Analyze this question and generate visualization code:
@@ -279,4 +281,4 @@ class DataAnalyzer:
             Action Input: "{question}|[chart-type]"
             FINAL ANSWER:"""
         })
-        return result
+        return result['output']
