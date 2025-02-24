@@ -65,7 +65,10 @@ class MainWindow(QMainWindow):
         widgets.btn_data.clicked.connect(self.buttonClick)
         widgets.btn_new.clicked.connect(self.buttonClick)
         widgets.btn_save.clicked.connect(self.buttonClick)
-
+        widgets.pushButton.clicked.connect(self.buttonClick)
+        widgets.pushButton_2.clicked.connect(self.buttonClick)
+        
+        
         # Set icons for buttons
         widgets.btn_home.setIcon(QIcon(r"images\icons\chat.png"))
         widgets.btn_data.setIcon(QIcon("path/to/data_icon.png"))
@@ -115,6 +118,18 @@ class MainWindow(QMainWindow):
         # GET BUTTON CLICKED
         btn = self.sender()
         btnName = btn.objectName()
+
+        if btnName == "pushButton":
+            widgets.stackedWidget.setCurrentWidget(widgets.home_2)
+            UIFunctions.resetStyle(self, btnName)
+            btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
+
+        if btnName == "pushButton_2":
+            widgets.stackedWidget.setCurrentWidget(widgets.page)
+            UIFunctions.resetStyle(self, btnName)
+            btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
+
+
 
         # SHOW HOME PAGE
         if btnName == "btn_home":

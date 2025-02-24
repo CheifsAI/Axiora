@@ -664,6 +664,13 @@ class Ui_MainWindow(object):
         self.verticalLayout_8.setSpacing(0)
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
         self.verticalLayout_8.setContentsMargins(0, 0, 0, 0)
+        self.pushButton = QPushButton(self.topMenu)
+        self.pushButton.setObjectName(u"pushButton")
+        self.pushButton.setMinimumSize(QSize(0, 45))
+        self.pushButton.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-home.png);")
+
+        self.verticalLayout_8.addWidget(self.pushButton)
+
         self.btn_home = QPushButton(self.topMenu)
         self.btn_home.setObjectName(u"btn_home")
         sizePolicy1.setHeightForWidth(self.btn_home.sizePolicy().hasHeightForWidth())
@@ -700,6 +707,13 @@ class Ui_MainWindow(object):
         self.btn_new.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-file.png);")
 
         self.verticalLayout_8.addWidget(self.btn_new)
+
+        self.pushButton_2 = QPushButton(self.topMenu)
+        self.pushButton_2.setObjectName(u"pushButton_2")
+        self.pushButton_2.setMinimumSize(QSize(0, 45))
+        self.pushButton_2.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-chart.png);")
+
+        self.verticalLayout_8.addWidget(self.pushButton_2)
 
         self.btn_save = QPushButton(self.topMenu)
         self.btn_save.setObjectName(u"btn_save")
@@ -1046,7 +1060,7 @@ class Ui_MainWindow(object):
         self.chat_scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 40, 24))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 786, 518))
         self.gridLayout_10 = QGridLayout(self.scrollAreaWidgetContents_2)
         self.gridLayout_10.setObjectName(u"gridLayout_10")
         self.chat_layout = QVBoxLayout()
@@ -1102,7 +1116,22 @@ class Ui_MainWindow(object):
         self.home_2.setObjectName(u"home_2")
         self.gridLayout_2 = QGridLayout(self.home_2)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.widget_2 = QWidget(self.home_2)
+        self.widget_2.setObjectName(u"widget_2")
+
+        self.gridLayout_2.addWidget(self.widget_2, 0, 0, 1, 1)
+
         self.stackedWidget.addWidget(self.home_2)
+        self.page = QWidget()
+        self.page.setObjectName(u"page")
+        self.gridLayout_12 = QGridLayout(self.page)
+        self.gridLayout_12.setObjectName(u"gridLayout_12")
+        self.widget_3 = QWidget(self.page)
+        self.widget_3.setObjectName(u"widget_3")
+
+        self.gridLayout_12.addWidget(self.widget_3, 0, 0, 1, 1)
+
+        self.stackedWidget.addWidget(self.page)
         self.data_page = QWidget()
         self.data_page.setObjectName(u"data_page")
         self.data_page.setStyleSheet(u"b")
@@ -1533,7 +1562,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget.setCurrentIndex(1)
         self.tabWidget.setCurrentIndex(0)
 
 
@@ -1550,9 +1579,11 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(accessibility)
         self.label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><img src=\":/icons/images/images/logo axuira.png\"/></p></body></html>", None))
         self.toggleButton.setText(QCoreApplication.translate("MainWindow", u"Hide", None))
+        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
         self.btn_home.setText(QCoreApplication.translate("MainWindow", u"Home", None))
         self.btn_data.setText(QCoreApplication.translate("MainWindow", u"Data", None))
         self.btn_new.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
+        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
         self.btn_save.setText(QCoreApplication.translate("MainWindow", u"Save", None))
         self.toggleLeftBox.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
         self.extraLabel.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))

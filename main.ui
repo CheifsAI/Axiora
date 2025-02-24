@@ -854,6 +854,22 @@ Button */
                  <number>0</number>
                 </property>
                 <item>
+                 <widget class="QPushButton" name="pushButton">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>45</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">background-image: url(:/icons/images/icons/cil-home.png);</string>
+                  </property>
+                  <property name="text">
+                   <string>PushButton</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QPushButton" name="btn_home">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -964,6 +980,22 @@ Button */
                   </property>
                   <property name="text">
                    <string>Questions</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_2">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>45</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">background-image: url(:/icons/images/icons/cil-chart.png);</string>
+                  </property>
+                  <property name="text">
+                   <string>PushButton</string>
                   </property>
                  </widget>
                 </item>
@@ -1848,7 +1880,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                       <string notr="true">background: transparent;</string>
                      </property>
                      <property name="currentIndex">
-                      <number>3</number>
+                      <number>1</number>
                      </property>
                      <widget class="QWidget" name="home">
                       <property name="styleSheet">
@@ -1871,8 +1903,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
                               <rect>
                                <x>0</x>
                                <y>0</y>
-                               <width>40</width>
-                               <height>24</height>
+                               <width>786</width>
+                               <height>518</height>
                               </rect>
                              </property>
                              <layout class="QGridLayout" name="gridLayout_10">
@@ -1948,7 +1980,18 @@ li.checked::marker { content: &quot;\2612&quot;; }
                       </layout>
                      </widget>
                      <widget class="QWidget" name="home_2">
-                      <layout class="QGridLayout" name="gridLayout_2"/>
+                      <layout class="QGridLayout" name="gridLayout_2">
+                       <item row="0" column="0">
+                        <widget class="QWidget" name="widget_2" native="true"/>
+                       </item>
+                      </layout>
+                     </widget>
+                     <widget class="QWidget" name="page">
+                      <layout class="QGridLayout" name="gridLayout_12">
+                       <item row="0" column="0">
+                        <widget class="QWidget" name="widget_3" native="true"/>
+                       </item>
+                      </layout>
                      </widget>
                      <widget class="QWidget" name="data_page">
                       <property name="styleSheet">
