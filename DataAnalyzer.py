@@ -126,40 +126,9 @@ class DataAnalyzer:
 
 
     def visual(self, questions_list):
-        #for question in question list --> self._visual_agent
-        
-        #This function prompet needs to be rewritten
-        visual_prompt = '''
-        I already have a DataFrame named 'df'. Generate **correctly formatted** matplotlib code to answer each question in {questions}.
-        Ensure the code is **indented properly** and follows Python syntax standards.
-        Use the following columns information: {data_info}. Create only the visualization code.
-        '''
-        
-        
-        visual_template = PromptTemplate(
-            input_variables=["data_info", "questions"],
-            template=visual_prompt
-        )
-        
-        
-        visual_chain = LLMChain(llm=self.llm, prompt=visual_template)
-        
-        
-        viscode = extract_code(visual_chain.run(data_info=data_info, questions=questions))
-        
-        
-        print("Generated Visualization Code:\n", viscode)
-
-        formatted_visual_prompt = visual_prompt.format(questions=questions, data_info=data_info)
-
-        self.memory.append(HumanMessage(content=formatted_visual_prompt))
-
-        self.memory.append(AIMessage(content=viscode))
-
-        
-        exec_env = {"df": self.dataframe}
-        exec(viscode, exec_env)
-
+       agentres = self._visual_agent(questions_list)
+       viscode = extract_code(agentres)
+       return viscode
     def chat(self,question):
         prompt_template = ChatPromptTemplate.from_messages(
             [
@@ -242,17 +211,16 @@ class DataAnalyzer:
 
             Example structure:
             import pygal
-            from pygal.style import Style
             # Data processing
-            data = dataframe['column'].value_counts()
+            data = df['column'].value_counts()
             # Chart configuration
-            chart = pygal.Bar(style=Style(...), x_label_rotation=45)
+            chart = pygal.Bar(x_label_rotation=45)
             chart.title = "Chart Title"
             chart.x_labels = data.index
             chart.add('Series', data.values)
             chart.render_to_file('charts/chart.svg')
 
-            Generate code for the current dataset:
+            Generate code for the current dataset: df
             """
         )
         code_chain = LLMChain(llm=llm, prompt=code_gen_prompt)
