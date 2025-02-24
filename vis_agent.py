@@ -40,16 +40,25 @@ guidelines = """▼ Chart Selection Matrix
 | Multivariate comparison            | Heatmap         |
 | Geographical data                  | Choropleth      |
 | showing both distribution and density| Violin Plot   |
-| Correlation between 3 variables    |   Bubble Chart  |
-| relative importance of regions     |   Cartogram     |
+| Correlation between 3 variables    |  Bubble Chart   |
+| relative importance of regions     |  Cartogram      |
+| Showing data with uncertainty values|Error Bar Chart |
+| Showing changes over time          | Waterfall Chart |
+| flow values; handle complex flows  | Sankey Diagram  | 
+| Comparing multiple metrics across categories| Grouped Bar Chart| 
+
 
 ▲ Special Cases:
 - Use box plots for statistical distributions
 - Use stacked bars for cumulative totals 
 - Use treemaps for visualizing hierarchical data
+- Use Stacked Area Chart for handle overlapping areas
+- Use Progress Rings/Charts for Showing Progress/Completion
+- Use Proportional Symbol Map for Comparing proportions/rates 
 - Use area charts to avoid misleading 
 - Avoid clutter and unnecessary visual elements
 - Avoid pie charts when >5 categories"""
+
 chart_selection_prompt = PromptTemplate(
     input_variables=["data_info", "data_sample", "data_summary", "guidelines", "question"],
     template="""
