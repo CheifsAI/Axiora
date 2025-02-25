@@ -57,9 +57,12 @@ class Session(Base):
     __tablename__ = "session"
     session_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
+    data_set_id = Column(Integer, ForeignKey("data_set.data_set_id", ondelete="CASCADE"), nullable=True)  # Added foreign key
     data_info = Column(Text) 
     llm_id = Column(Integer, ForeignKey("llm.llm_id", ondelete="CASCADE"), nullable=False)
     creation_date = Column(DateTime, default=datetime.utcnow)
+    summary = Column(Text)  # Added summary column
+    data_sample = Column(Text)  # Added data_sample column
 
     # Relationships
     user = relationship("users", back_populates="sessions")
@@ -69,14 +72,18 @@ class Session(Base):
     chats = relationship("Chat", back_populates="session")
     summaries = relationship("Summary", back_populates="session")
     session_memories = relationship("SessionMemory", back_populates="session")
+    primary_data_set = relationship("DataSet", foreign_keys=[data_set_id], backref="primary_session")
 
-    def __init__(self, user_id, llm_id, data_info=None):
+    def __init__(self, user_id, llm_id, data_info=None, summary=None, data_sample=None, data_set_id=None):
         self.user_id = user_id
         self.llm_id = llm_id
         self.data_info = data_info
+        self.summary = summary
+        self.data_sample = data_sample
+        self.data_set_id = data_set_id
 
     def __repr__(self):
-        return f"<Session(session_id={self.session_id}, user_id={self.user_id}, llm_id={self.llm_id}, creation_date={self.creation_date})>"
+        return f"<Session(session_id={self.session_id}, user_id={self.user_id}, llm_id={self.llm_id}, data_set_id={self.data_set_id}, creation_date={self.creation_date})>"
 
 class DataSet(Base):
     __tablename__ = "data_set"  
@@ -85,7 +92,7 @@ class DataSet(Base):
     raw_data = Column(Text)  
     transformed_data_set = Column(Text)  
     uploaded_at = Column(DateTime, default=datetime.utcnow) 
-    
+
     # Relationships
     session = relationship("Session", back_populates="data_sets")
     dashboards = relationship("Dashboard", back_populates="data_set")
@@ -97,6 +104,7 @@ class DataSet(Base):
 
     def __repr__(self):
         return f"<DataSet(data_set_id={self.data_set_id}, session_id={self.session_id}, raw_data='{self.raw_data}')>"
+
 
 class Dashboard(Base):
     __tablename__ = "dashboards"  
