@@ -4,7 +4,7 @@ from langchain.prompts import PromptTemplate
 import pandas as pd
 
 # Initialize Ollama LLM (Ensure you have Ollama installed & running)
-llm = Ollama(model="llama3.2:3b")  # Change to a different model if needed
+llm = Ollama(model="llama3.2:3b")  
 
 def data_describer(dataframe):
     # Get the description of the dataframe
@@ -34,32 +34,23 @@ chart_selection_prompt = PromptTemplate(
     You are a data analyst responsible for selecting the most appropriate chart type for a given dataset and question. Use the following chart selection guidelines:
 
     ▼ Chart Selection Matrix
-    | Scenario                          | Chart Type      |
-    |------------------------------------|-----------------|
-    | Time series analysis               | Line chart      |
-    | Comparing >3 categories            | Bar chart       |
-    | Distribution of continuous data    | Histogram       |
-    | Part-to-whole relationships        | Pie chart       |
-    | Correlation between 2 variables    | Scatter plot    |
-    | Multivariate comparison            | Heatmap         |
-    | Geographical data                  | Choropleth      |
-    | Showing both distribution and density| Violin Plot   |
-    | Correlation between 3 variables    | Bubble Chart   |
-    | Relative importance of regions     | Cartogram      |
-    | Showing data with uncertainty values| Error Bar Chart |
-    | Showing changes over time          | Waterfall Chart |
-    | Flow values; handle complex flows  | Sankey Diagram  | 
-    | Comparing multiple metrics across categories| Grouped Bar Chart |
+    | Scenario                          | Chart Type      | when to use                            |
+    |------------------------------------|----------------|----------------------------------------|
+    | Time series analysis               | Line            | Track trends over time (years, months)
+    | Comparing >3 categories            | Bar             | Compare discrete values across groups
+    | Distribution of data               | Histogram       | Show frequency distribution of data
+    | Comparing 2-5 categories           | Pie             | Show proportions (limit to 5 categories)
+    | Part-to-whole relationships        | StackedBar      | Show cumulative totals and components
+    | Multivariate comparison            | Radar           | Compare multiple quantitative variables
+    | Statistical distribution analysis  | Box             | Show quartiles and outliers
+    | Frequency distribution over time   | DateY           | Date-based time series
 
     ▲ Special Cases:
     - Use box plots for statistical distributions
     - Use stacked bars for cumulative totals 
-    - Use treemaps for visualizing hierarchical data
-    - Use Stacked Area Chart for handling overlapping areas
     - Use Progress Rings/Charts for Showing Progress/Completion
     - Use Proportional Symbol Map for Comparing proportions/rates 
     - Use area charts to avoid misleading representations
-    - Avoid clutter and unnecessary visual elements
     - Avoid pie charts when >5 categories
 
     Analyze the provided dataset information and determine the most suitable chart type.
@@ -99,7 +90,6 @@ pygal_code_prompt = PromptTemplate(
     3. Configure axis labels using df column names
     4. Save to 'charts/result.svg'
 
-    Dataset sample: {data_sample}
     Question: {question}
 
     Example for {chart_type}:
