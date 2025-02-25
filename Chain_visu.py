@@ -4,7 +4,7 @@ from langchain.prompts import PromptTemplate
 import pandas as pd
 
 # Initialize Ollama LLM (Ensure you have Ollama installed & running)
-llm = Ollama(model="llama3.2:3b")  
+llm = Ollama(model="deepseek-r1:7b")  
 
 def data_describer(dataframe):
     # Get the description of the dataframe
@@ -31,28 +31,9 @@ data_sample = dataframe.head().to_string()
 chart_selection_prompt = PromptTemplate(
     input_variables=["data_info", "data_sample", "data_summary", "question"],
     template="""
-    You are a data analyst responsible for selecting the most appropriate chart type for a given dataset and question. Use the following chart selection guidelines:
+    You are a data analyst responsible for selecting the most appropriate chart type for a given dataset and question. Use {guidelines}:
 
-    ▼ Chart Selection Matrix
-    | Scenario                          | Chart Type      | when to use                            |
-    |------------------------------------|----------------|----------------------------------------|
-    | Time series analysis               | Line            | Track trends over time (years, months)
-    | Comparing >3 categories            | Bar             | Compare discrete values across groups
-    | Distribution of data               | Histogram       | Show frequency distribution of data
-    | Comparing 2-5 categories           | Pie             | Show proportions (limit to 5 categories)
-    | Part-to-whole relationships        | StackedBar      | Show cumulative totals and components
-    | Multivariate comparison            | Radar           | Compare multiple quantitative variables
-    | Statistical distribution analysis  | Box             | Show quartiles and outliers
-    | Frequency distribution over time   | DateY           | Date-based time series
-
-    ▲ Special Cases:
-    - Use box plots for statistical distributions
-    - Use stacked bars for cumulative totals 
-    - Use Progress Rings/Charts for Showing Progress/Completion
-    - Use Proportional Symbol Map for Comparing proportions/rates 
-    - Use area charts to avoid misleading representations
-    - Avoid pie charts when >5 categories
-
+    
     Analyze the provided dataset information and determine the most suitable chart type.
 
     Dataset metadata: {data_info}
@@ -84,11 +65,12 @@ pygal_code_prompt = PromptTemplate(
     Question: {question}
     
     Generate Pygal code with these strict requirements:
-    1. Use pandas to process the dataframe, don't read the dataframe, it's already read with the name df
-    2. Start with: chart = pygal.{{chart_type}}()  # Exact match
-    3. Add data using dataframe columns
-    3. Configure axis labels using df column names
-    4. Save to 'charts/result.svg'
+    1. There's already a dataframe named df, don't read the dataframe, use pandas to process the dataframe
+    2. Ensure you are using the column names from {data_sample}
+    3. Start with: chart = pygal.{{chart_type}}()
+    4. Add data using dataframe columns
+    5. Configure axis labels using df column names
+    6. Save to 'charts/chartname.svg'
 
     Question: {question}
 
@@ -97,7 +79,7 @@ pygal_code_prompt = PromptTemplate(
     chart.title = "Chart Title"
     data = df['column'].value_counts()
     chart.add('Series', data.values)
-    chart.render_to_file('charts/result.svg')
+    chart.render_to_file('charts/chartname.svg')
 
     Actual code:
     """

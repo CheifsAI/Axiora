@@ -7,20 +7,22 @@ from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.agents import AgentExecutor, Tool, create_react_agent
 from langchain import hub
+import re
+
 
 class DataAnalyzer:
     def __init__(self,dataframe,llm):
         self.dataframe = dataframe
         self.llm = llm
         self.data_info = data_infer(dataframe)
-        self.data_describtion = data_describer(dataframe)
-        self.data_head = dataframe.head().to_string
+        self.data_summary = data_describer(dataframe)
+        self.data_sample = dataframe.head().to_string
         self.memory = []
 
     def analysis_data(self):
         data_info = self.data_info
-        data_sample = self.data_head
-        data_summary = self.data_describtion
+        data_sample = self.data_sample
+        data_summary = self.data_sample
 
         analysis_prompt = '''
         You are a data analyst. You are provided with:
@@ -83,16 +85,10 @@ class DataAnalyzer:
         return updated_df
 
 
-
-
-
-
-    import re
-
     def questions_gen(self, num):
         data_info = self.data_info
-        data_sample = self.data_head
-        data_summary = self.data_describtion
+        data_sample = self.data_sample
+        data_summary = self.data_sample
 
         question_prompt = f"""
         You are a data analyst. You are provided with:
@@ -154,18 +150,6 @@ class DataAnalyzer:
             print(f"❌ Error generating questions: {e}")
             return []
 
-
-
-
-
-    def visual(self, questions_list):
-       agentres = self._visual_agent(questions_list)
-       viscode = extract_code(agentres)
-       if viscode:
-           return viscode
-           #exec(viscode) 
-       else:
-           print("Error: No valid code generated.")
     
     def chat(self,question):
         prompt_template = ChatPromptTemplate.from_messages(
@@ -185,133 +169,101 @@ class DataAnalyzer:
         self.memory.append(AIMessage(content=response))
         return response
     
-    def _visual_agent(self,question):
+
+    def visual(self, questions_list):
+       agentres = self._visual_chain(questions_list)
+       viscode = extract_code(agentres)
+       if viscode:
+           return viscode
+           #exec(viscode) 
+       else:
+           print("Error: No valid code generated.")
+    
+    
+    def _visual_chain(self,question):
         data_info = self.data_info
-        data_sample = self.data_head
-        data_summary = self.data_describtion
+        data_sample = self.data_sample
+        data_summary = self.data_summary
         llm = self.llm
+
         guidelines = """▼ Chart Selection Matrix
-        | Scenario                          | Chart Type      |
-        |------------------------------------|-----------------|
-        | Time series analysis               | Line chart      |
-        | Comparing >3 categories            | Bar chart       |
-        | Distribution of continuous data    | Histogram       |
-        | Part-to-whole relationships        | Pie chart       |
-        | Correlation between 2 variables    | Scatter plot    |
-        | Multivariate comparison            | Heatmap         |
-        | Geographical data                  | Choropleth      |
+    | Scenario                           | Chart Type      | when to use                             |
+    |------------------------------------|-----------------|-----------------------------------------|
+    | Time series analysis               | Line            | Track trends over time (years, months)  |
+    | Comparing >3 categories            | Bar             | Compare discrete values across groups   |
+    | Distribution of data               | Histogram       | Show frequency distribution of data     |
+    | Comparing 2-5 categories           | Pie             | Show proportions (limit to 5 categories)|
+    | Part-to-whole relationships        | StackedBar      | Show cumulative totals and components   |
+    | Multivariate comparison            | Radar           | Compare multiple quantitative variables |
+    | Statistical distribution analysis  | Box             | Show quartiles and outliers             |
+    | Frequency distribution over time   | DateY           | Date-based time series                  |
 
-        ▲ Special Cases:
-        - Use box plots for statistical distributions
-        - Use stacked bars for cumulative totals
-        - Avoid pie charts when >5 categories"""
+    ▲ Special Cases:
+    - Use box plots for statistical distributions
+    - Use stacked bars for cumulative totals 
+    - Use Progress Rings/Charts for Showing Progress/Completion
+    - Use Proportional Symbol Map for Comparing proportions/rates 
+    - Use area charts to avoid misleading representations
+    - Avoid pie charts when >5 categories"""
         chart_selection_prompt = PromptTemplate(
-            input_variables=["data_info", "data_sample", "data_summary", "guidelines", "question"],
+            input_variables=["data_info", "data_sample", "data_summary", "question"],
             template="""
-            You are a data analyst. You are provided with:
-                1. Dataset metadata: {data_info}
-                2. Dataset sample: {data_sample}
-                3. Dataset summary: {data_summary}
-                Analyze this question to determine the best chart type:
-            Question: {question}
-            Respond ONLY with the chart type name (line, bar, pie, etc.), your chart type selection is based on knowledge from {guidelines}"""
-        )
-        chart_chain = LLMChain(
+            You are a data analyst responsible for selecting the most appropriate chart type for a given dataset:
+            Dataset metadata: {data_info}
+            Dataset sample: {data_sample}
+            Dataset summary: {data_summary}
+            Use {guidelines} to determine the most suitable chart type for this question : {question}
+            Respond ONLY with the chart type name (e.g., Line chart, Bar chart, Pie chart, etc.).
+            """)
+        chart_selection_chain = LLMChain(
             llm=llm,
-            prompt=chart_selection_prompt
-        )
-        def chart_selector(input_text):
-            return chart_chain.run(
-                question=input_text,
-                data_info=data_info,
-                data_sample=data_sample,
-                data_summary=data_summary,
-                guidelines=guidelines  
+            prompt=chart_selection_prompt,
+            output_key="chart_type"
             )
-
-        code_gen_prompt = PromptTemplate(
-            input_variables=["question", "chart_type", "data_info", "data_sample", "data_summary"],
+        pygal_code_prompt = PromptTemplate(
+            input_variables=["chart_type", "data_info", "data_sample", "data_summary", "question"],
             template="""
             You are provided with:
-                1. Dataset metadata: {data_info}
-                2. Dataset sample: {data_sample}
-                3. Dataset summary: {data_summary}
-
+            1. Dataset metadata: {data_info}
+            2. Dataset sample: {data_sample}
             Generate COMPLETE Pygal code for {chart_type} chart answering:
             Question: {question}
+    
+            Generate Pygal code with these strict requirements:
+            1. There's already a dataframe named df, don't read the dataframe, use pandas to process the dataframe
+            2. Ensure you are using the column names from {data_sample}
+            3. Start with: chart = pygal.{{chart_type}}()
+            4. Add data using dataframe columns
+            5. Configure axis labels using df column names
+            6. Save to 'charts/chartname.svg'
 
-            Follow these requirements:
-            1. Use pandas to process the dataframe, don't read the dataframe, it's already read with the name df
-            2. Create Pygal chart object with appropriate config
-            3. Add data using dataframe columns
-            4. Include proper labels and styling
-            5. Save to SVG file
-
-            Example structure:
-            ```import pygal
-            data = df['column'].value_counts()
-            chart = pygal.Bar(x_label_rotation=45)
-            chart.title = "Chart Title"
-            chart.x_labels = data.index
-            chart.add('Series', data.values)
-            chart.render_to_file('charts/chart.svg')```
-
-            Generate code for the current dataset: df
-            """
-        )
-        code_chain = LLMChain(llm=llm, prompt=code_gen_prompt)
-
-        def code_generator(inputs):
-            return code_chain.run(
-                question=inputs["question"],
-                chart_type=inputs["chart_type"],
-                data_info=data_info,
-                data_sample=data_sample,
-                data_summary=data_summary  
-            )
-        tools = [
-            Tool(
-                name="ChartSelector",
-                func=chart_selector,
-                description="Determine appropriate chart type for a question"
-            ),
-            Tool(
-                name="CodeGenerator",
-                func=lambda x: code_generator({
-                    "question": x.split("|")[0].strip('"').strip(),
-                    "chart_type": x.split("|")[1].strip().lower() if "|" in x else "bar"
-                }),
-                description="Generate Pygal visualization code for specified chart type"
-            )
-        ]
-        agent_prompt = hub.pull("hwchase17/react").partial(
-            instructions="""Follow EXACTLY this sequence:
-            1. Use ChartSelector ONCE
-            2. Use CodeGenerator ONCE
-            3. Output FINAL ANSWER after code
-            NEVER repeat steps or tools"""
-        )
-        agent = create_react_agent(llm, tools, agent_prompt)
-        agent_executor = AgentExecutor(
-            agent=agent,
-            tools=tools,
-            verbose=True,
-            #max_iterations=5,
-            handle_parsing_errors=True,
-            stop=["</code>"]  
-        )
-
-        result = agent_executor.invoke({
-            "input": f"""Analyze this question and generate visualization code:
             Question: {question}
-            Follow this EXACT format:
-            Thought: First analyze the question
-            Action: ChartSelector
-            Action Input: "{question}"
-            Observation: [chart-type]
-            Thought: Now generate code
-            Action: CodeGenerator
-            Action Input: "{question}|[chart-type]"
-            FINAL ANSWER:"""
-        })
-        return result['output']
+
+            Example for {chart_type}:
+            chart = pygal.{chart_type}(x_label_rotation=45)
+            chart.title = "Chart Title"
+            data = df['column'].value_counts()
+            chart.add('Series', data.values)
+            chart.render_to_file('charts/chartname.svg')
+
+            Actual code:
+            """)
+        pygal_code_chain = LLMChain(
+            llm=llm,
+            prompt=pygal_code_prompt,
+            output_key="pygal_code"
+            )
+        sequential_chain = SequentialChain(
+            chains=[chart_selection_chain, pygal_code_chain],
+            input_variables=["guidelines","data_info", "data_sample", "data_summary", "question"],
+            output_variables=["chart_type", "pygal_code"]
+            )
+        
+        vis_chain_result = sequential_chain({
+            "guidelines": guidelines,
+            "data_info": data_info,
+            "data_sample": data_sample,
+            "data_summary": data_summary,
+            "question": question
+            })
+        return vis_chain_result['pygal_code']
