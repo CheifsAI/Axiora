@@ -177,7 +177,6 @@ class DataAnalyzer:
            viscode = extract_code(vis_resp)
            if viscode:
                viscodes.append(viscode)
-               #exec(viscode) 
        return viscodes
     
     
