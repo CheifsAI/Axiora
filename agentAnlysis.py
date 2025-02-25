@@ -140,7 +140,7 @@ agent_executor = AgentExecutor(
 
 # Execute analysis
 result = agent_executor.invoke({
-    "input": "Perform complete analysis of the supply chain dataset. Follow the strict three-step process."
+    "input": "Perform complete analysis of the dataset. Follow the strict three-step process."
 })
 
 print("\nFINAL ANALYSIS:")
