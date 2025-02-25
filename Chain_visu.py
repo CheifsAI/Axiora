@@ -82,35 +82,34 @@ chart_selection_chain = LLMChain(
 
 # Step 2: Generate Pygal Code
 pygal_code_prompt = PromptTemplate(
-    input_variables=["data_info", "data_sample", "data_summary", "question", "chart_type"],
+    input_variables=["chart_type", "data_info", "data_sample", "data_summary", "question"],
     template="""
     You are provided with:
-        1. Dataset metadata: {data_info}
-        2. Dataset sample: {data_sample}
-        3. Dataset summary: {data_summary}
+    1. Dataset metadata: {data_info}
+    2. Dataset sample: {data_sample}
+    3. Dataset summary: {data_summary}
 
-    Generate Pygal code for {chart_type} chart answering:
+    Generate COMPLETE Pygal code for {chart_type} chart answering:
+    Question: {question}
+    
+    Generate Pygal code with these strict requirements:
+    1. Use pandas to process the dataframe, don't read the dataframe, it's already read with the name df
+    2. Start with: chart = pygal.{{chart_type}}()  # Exact match
+    3. Add data using dataframe columns
+    3. Configure axis labels using df column names
+    4. Save to 'charts/result.svg'
+
+    Dataset sample: {data_sample}
     Question: {question}
 
-    Follow these requirements:
-    1. Use pandas to process the dataframe, don't read the dataframe, it's already read with the name df
-    2. Create Pygal chart object with appropriate config
-    3. Add data using dataframe columns
-    4. Include proper labels and styling
-    5. Save to SVG file
-    Example structure:
-    import pygal
-    from pygal.style import Style
-    # Data processing
-    data = dataframe['column'].value_counts()
-    # Chart configuration
-    chart = pygal.Bar(style=Style(...), x_label_rotation=45)
+    Example for {chart_type}:
+    chart = pygal.{chart_type}(x_label_rotation=45)
     chart.title = "Chart Title"
-    chart.x_labels = data.index
+    data = df['column'].value_counts()
     chart.add('Series', data.values)
-    chart.render_to_file('charts/chart.svg')
+    chart.render_to_file('charts/result.svg')
 
-    Generate code for the current dataset:
+    Actual code:
     """
 )
 
@@ -128,7 +127,7 @@ sequential_chain = SequentialChain(
 )
 
 # Example usage
-question = "What is the distribution of goals scored in World Cup matches?"
+question = "How has the average number of goals per match evolved across different World Cup tournaments over time?"
 result = sequential_chain({
     "data_info": data_info,
     "data_sample": data_sample,
