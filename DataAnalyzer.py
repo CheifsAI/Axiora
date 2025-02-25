@@ -170,14 +170,15 @@ class DataAnalyzer:
         return response
     
 
-    def visual(self, questions_list):
-       agentres = self._visual_chain(questions_list)
-       viscode = extract_code(agentres)
-       if viscode:
-           return viscode
-           #exec(viscode) 
-       else:
-           print("Error: No valid code generated.")
+    def visual(self, questions_list: list):
+       viscodes = []
+       for question in questions_list:
+           vis_resp = self._visual_chain(question)
+           viscode = extract_code(vis_resp)
+           if viscode:
+               viscodes.append(viscode)
+               #exec(viscode) 
+       return viscodes
     
     
     def _visual_chain(self,question):
@@ -230,17 +231,19 @@ class DataAnalyzer:
             Question: {question}
     
             Generate Pygal code with these strict requirements:
-            1. There's already a dataframe named df, don't read the dataframe, use pandas to process the dataframe
-            2. Ensure you are using the column names from {data_sample}
-            3. Start with: chart = pygal.{{chart_type}}()
-            4. Add data using dataframe columns
-            5. Configure axis labels using df column names
-            6. Save to 'charts/chartname.svg'
+            1. NEVER CREATE OR IMPORT DATAFRAMES - one exists as 'df'
+            2. NO DATA IMPORT STATEMENTS (no pandas.read_csv)
+            3. Ensure you are using the column names from {data_sample}
+            4. Start with: chart = pygal.{{chart_type}}()
+            5. Add data using dataframe columns
+            6. Configure axis labels using df column names
+            7. Save to 'charts/chartname.svg'
 
             Question: {question}
 
-            Example for {chart_type}:
-            chart = pygal.{chart_type}(x_label_rotation=45)
+            use this structure:
+            # df is existing
+            chartname = pygal.{chart_type}(x_label_rotation=45)
             chart.title = "Chart Title"
             data = df['column'].value_counts()
             chart.add('Series', data.values)
