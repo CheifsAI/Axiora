@@ -176,7 +176,7 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon("icon.ico"))
+    app.setWindowIcon(QIcon("images/IMG_20250226_011441_442.ico"))
 
     # Set the font size for the entire application
     font = QFont("Segoe UI", 12)  # Change the font size here

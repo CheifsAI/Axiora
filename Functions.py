@@ -127,6 +127,7 @@ class GuiFunctions():
             self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)"
         )
         if fpath:
+            self.fpath = fpath
             self.location = self.main_window.ui.path_location
             self.location.setText(fpath)
             self.df = read_file(fpath)
