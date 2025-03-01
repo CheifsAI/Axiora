@@ -22,7 +22,7 @@ from sqlalchemy.orm import sessionmaker
 from Axioradb import *
 from docx import Document
 
-#SessionLocal = sessionmaker(bind=engine)
+
 
 class GuiFunctions():
     def __init__(self, MainWindow):
@@ -153,6 +153,7 @@ class GuiFunctions():
                     self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))
 
     def handle_sum_btn(self):
+        #self.sessionlocal = sessionmaker(bind=engine)
         self.summary = markdown(self.analyzer.analysis_data())
         self.summary_text = self.main_window.ui.summary_text
         self.summary_text.setMarkdown(self.summary)
