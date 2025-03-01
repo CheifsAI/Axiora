@@ -196,7 +196,6 @@ class DataAnalyzer:
     | Part-to-whole relationships        | StackedBar      | Show cumulative totals and components   |
     | Multivariate comparison            | Radar           | Compare multiple quantitative variables |
     | Statistical distribution analysis  | Box             | Show quartiles and outliers             |
-    | Frequency distribution over time   | DateY           | Date-based time series                  |
 
     ▲ Special Cases:
     - Use box plots for statistical distributions
