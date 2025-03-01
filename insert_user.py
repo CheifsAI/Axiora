@@ -1,19 +1,19 @@
 from sqlalchemy.orm import sessionmaker
-from Axioradb import engine,users
+from Axioradb import engine,users,LLM
 
 Session = sessionmaker(bind=engine)
 session = Session()
 
-cheif = users(username='cheif', email='cheifs@gmail.com', password='12345')
+llama3b = LLM(llm_name='llama3.2:3b', parameters='3', install_llm_code='ollama run llama3.2')
 
-session.add(cheif)
+session.add(llama3b)
 
 session.commit()
 
-users_list = session.query(users).all()
+llm_list = session.query(LLM).all()
 
 # Print the users
-for user in users_list:
+for user in llm_list:
     print(user)
     
 session.close()

@@ -88,7 +88,6 @@ class Session(Base):
 class DataSet(Base):
     __tablename__ = "data_set"  
     data_set_id = Column(Integer, primary_key=True, autoincrement=True)  
-    session_id = Column(Integer, ForeignKey('session.session_id', ondelete='CASCADE'), nullable=False)  
     raw_data = Column(Text)  
     transformed_data_set = Column(Text)  
     uploaded_at = Column(DateTime, default=datetime.utcnow) 
@@ -97,13 +96,12 @@ class DataSet(Base):
     session = relationship("Session", back_populates="data_sets")
     dashboards = relationship("Dashboard", back_populates="data_set")
 
-    def __init__(self, session_id, raw_data=None, transformed_data_set=None):
-        self.session_id = session_id
+    def __init__(self, raw_data=None, transformed_data_set=None):
         self.raw_data = raw_data
         self.transformed_data_set = transformed_data_set
 
     def __repr__(self):
-        return f"<DataSet(data_set_id={self.data_set_id}, session_id={self.session_id}, raw_data='{self.raw_data}')>"
+        return f"<DataSet(data_set_id={self.data_set_id},raw_data='{self.raw_data}')>"
 
 
 class Dashboard(Base):
