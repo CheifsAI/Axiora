@@ -8,7 +8,8 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.agents import AgentExecutor, Tool, create_react_agent
 from langchain import hub
 import re
-
+from modelEXT.PygalCodeComponents import PygalCodeComponents
+from langchain.output_parsers import PydanticOutputParser
 
 class DataAnalyzer:
     def __init__(self,dataframe,llm):
@@ -17,6 +18,7 @@ class DataAnalyzer:
         self.data_info = data_infer(dataframe)
         self.data_summary = data_describer(dataframe)
         self.data_sample = dataframe.head().to_string
+        self.data_cols = ", ".join(dataframe.columns)
         self.memory = []
 
     def analysis_data(self):
@@ -174,16 +176,18 @@ class DataAnalyzer:
        viscodes = []
        for question in questions_list:
            vis_resp = self._visual_chain(question)
-           viscode = extract_code(vis_resp)
-           if viscode:
-               viscodes.append(viscode)
-       return viscodes
+           print(vis_resp)
+           #viscode = extract_code(vis_resp)
+           #if viscode:
+            #   viscodes.append(viscode)
+       #return viscodes
     
     
     def _visual_chain(self,question):
         data_info = self.data_info
         data_sample = self.data_sample
         data_summary = self.data_summary
+        data_cols = self.data_cols
         llm = self.llm
 
         guidelines = """▼ Chart Selection Matrix
@@ -219,36 +223,29 @@ class DataAnalyzer:
             prompt=chart_selection_prompt,
             output_key="chart_type"
             )
+        parser = PydanticOutputParser(pydantic_object=PygalCodeComponents)
         pygal_code_prompt = PromptTemplate(
-            input_variables=["chart_type", "data_info", "data_sample", "data_summary", "question"],
+            input_variables=["chart_type", "data_info","question","data_cols"],
             template="""
-            You are provided with:
-            1. Dataset metadata: {data_info}
-            2. Dataset sample: {data_sample}
-            Generate COMPLETE Pygal code for {chart_type} chart answering:
+            Generate VALID JSON for Pygal code components following this schema:
+            {format_instructions}
+            
+            Dataset metadata: {data_info}
+            Columns: {data_cols}
             Question: {question}
-    
-            Generate Pygal code with these strict requirements:
-            1. NEVER CREATE OR IMPORT DATAFRAMES - one exists as 'df'
-            2. NO DATA IMPORT STATEMENTS (no pandas.read_csv)
-            3. Ensure you are using the column names from {data_sample}
-            4. Start with: chart = pygal.{{chart_type}}()
-            5. Add data using dataframe columns
-            6. Configure axis labels using df column names
-            7. Save to 'charts/chartname.svg'
-
-            Question: {question}
-
-            use this structure:
-            # df is existing
-            chartname = pygal.{chart_type}(x_label_rotation=45)
-            chart.title = "Chart Title"
-            data = df['column'].value_counts()
-            chart.add('Series', data.values)
-            chart.render_to_file('charts/chartname.svg')
-
-            Actual code:
-            """)
+            
+            Rules:
+            1. Output ONLY raw JSON without markdown or comments
+            2. Use exact column names from: {data_cols}
+            3. Include required imports
+            4. Use value_counts() for data preparation
+            5. x_labels must come from data.index
+            
+            """,
+            partial_variables={
+            "format_instructions": parser.get_format_instructions()
+            }
+         )
         pygal_code_chain = LLMChain(
             llm=llm,
             prompt=pygal_code_prompt,
@@ -256,7 +253,7 @@ class DataAnalyzer:
             )
         sequential_chain = SequentialChain(
             chains=[chart_selection_chain, pygal_code_chain],
-            input_variables=["guidelines","data_info", "data_sample", "data_summary", "question"],
+            input_variables=["guidelines","data_info", "data_sample", "data_summary", "question","data_cols"],
             output_variables=["chart_type", "pygal_code"]
             )
         
@@ -265,6 +262,18 @@ class DataAnalyzer:
             "data_info": data_info,
             "data_sample": data_sample,
             "data_summary": data_summary,
-            "question": question
+            "question": question,
+            "data_cols":data_cols
             })
-        return vis_chain_result['pygal_code']
+        parsed = parser.parse(vis_chain_result['pygal_code'])
+
+        code_components = [
+                        parsed.imports,
+                        parsed.data_preparation,
+                        parsed.chart_instantiation,
+                        parsed.labels_config,
+                        parsed.series_addition,
+                        parsed.rendering
+                    ]
+        #code = "\n".join(filter(None, code_components))  
+        return code_components

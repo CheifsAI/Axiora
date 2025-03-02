@@ -5,6 +5,6 @@ df = pd.read_csv("Test_Datasets/WorldCupMatches.csv")
 questions = ["Who is the most teams played as home team?","Who is the most teams played as away team?"]
 analyzer = DataAnalyzer(llm=llama3b,dataframe=df)
 agentcode = analyzer.visual(questions_list=questions)
-for code in agentcode:
-    exec(code)
-    print(f"{code}\n\n\n\n\n\n\n")
+#for code in agentcode:
+ #   exec(code)
+  #  print(f"{code}\n\n\n\n\n\n\n")
