@@ -4,8 +4,12 @@ from Custom_Widgets import *
 #from PySide6.QtCore import QSettings, QTimer
 #from PySide6.QtGui import QColor, QFont, QFontDatabase
 #from PySide6.QtWidgets import QGraphicsDropShadowEffect, QApplication, QMainWindow, QFileDialog, QPushButton, QLabel, QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton, QSizePolicy
+from PySide6.QtSvg import QSvgRenderer
+from PySide6.QtCore import QFile
+from PySide6.QtWebEngineWidgets import QWebEngineView 
 from PySide6 import QtCore
-from PySide6.QtCore import Qt
+from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtCore import Qt,QUrl
 from PySide6.QtWidgets import (QApplication, QMainWindow, QLineEdit,
                                QPushButton, QVBoxLayout, QWidget, QLabel,
                                QScrollArea, QSizePolicy, QHBoxLayout,
@@ -43,8 +47,31 @@ class GuiFunctions():
         self.main_window.ui.chat_data_btn.clicked.connect(self.handle_chat_data_btn)
         self.main_window.ui.send_btn.clicked.connect(self.send_message)
         self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
-        self.main_window.ui.qu_data_btn.clicked.connect(self.handle_word_btn)  # Connect the qu_data_btn
+        self.main_window.ui.qu_data_btn.clicked.connect(self.handle_word_btn) 
+        self.web_view = QWebEngineView()
+        self.main_window.ui.gridLayout_2.addWidget(self.web_view)
+        self.load_svg("Teams Played Away.svg") 
 
+    def load_svg(self, file_path):
+        # Debug: Check if the file exists
+        if not QFile.exists(file_path):
+            print(f"Error: File not found at {file_path}")
+            return
+
+        # Load the SVG file as an HTML page
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>SVG Viewer</title>
+        </head>
+        <body style="margin: 0; padding: 0;">
+            <object data="{file_path}" type="image/svg+xml" width="100%" height="100%"></object>
+        </body>
+        </html>
+        """
+        self.web_view.setHtml(html_content, QUrl.fromLocalFile(file_path))
+        print(f"SVG file loaded from: {file_path}")
     def handle_word_btn(self):
         fpath, _ = QFileDialog.getOpenFileName(
             self.main_window, "Open Word File", "", "Word Files (*.docx)"
