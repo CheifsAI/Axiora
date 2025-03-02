@@ -172,15 +172,38 @@ class DataAnalyzer:
         return response
     
 
-    def visual(self, questions_list: list):
-       viscodes = []
-       for question in questions_list:
-           vis_resp = self._visual_chain(question)
-           print(vis_resp)
-           #viscode = extract_code(vis_resp)
-           #if viscode:
-            #   viscodes.append(viscode)
-       #return viscodes
+    def visual(self, style, questions_list: list):
+        code_template = """import pygal
+        from pygal.style import {style}
+
+        data = df['{column}'].value_counts()
+        chart = pygal.{chart_type}(style={style}, x_label_rotation=45)
+        chart.title = '{chart_title}'
+        chart.x_labels = data.index.tolist()
+        chart.add('{chart_title}', data.values)
+        chart.render_to_file('{chart_title}.svg')
+        """
+        viscodes = []
+        for question in questions_list:
+            vis_resp = self._chart_select_chain(question)
+            print(vis_resp)
+            
+            # Extract the chart type, title, and column from the response
+            chart_type = vis_resp['chart_type']
+            chart_title = vis_resp['chart_title']
+            column = vis_resp['columns']
+            
+            # Format the code template with the extracted values
+            viscode = code_template.format(
+                style=style,
+                chart_type=chart_type,
+                chart_title=chart_title,
+                column=column
+            )
+            viscode = viscode.strip()
+            viscodes.append(viscode)
+        
+        return viscodes
     
     
     def _chart_select_chain(self, question):
@@ -189,6 +212,21 @@ class DataAnalyzer:
         data_summary = self.data_summary
         data_cols = self.data_cols
         llm = self.llm
+
+        # Mapping of chart types to valid pygal chart types
+        chart_type_mapping = {
+            "bar chart": "Bar",
+            "bar": "Bar",
+            "line chart": "Line",
+            "line": "Line",
+            "pie chart": "Pie",
+            "pie": "Pie",
+            "histogram": "Histogram",
+            "stackedbar": "StackedBar",
+            "stacked bar": "StackedBar",
+            "radar": "Radar",
+            "box": "Box",
+        }
 
         guidelines = """▼ Chart Selection Matrix
     | Scenario                           | Chart Type      | When to Use                             |
@@ -218,17 +256,16 @@ class DataAnalyzer:
             Dataset summary: {data_summary}
             Dataset columns: {data_cols}
             Use {guidelines} to determine the most suitable chart type for this question: {question}
-            Respond ONLY with the chart type name and relevant columns, separated by commas (e.g., "Line chart, Sales, Date").
+            Respond ONLY with the chart type name and and chart title and one relevant column (e.g., "Line chart, Sales, Date").
             """
         )
 
         chart_selection_chain = LLMChain(
             llm=llm,
             prompt=chart_selection_prompt,
-            output_key="chart_selection_result"  # Single output key
+            output_key="chart_selection_result" 
         )
         
-        # Execute the chain
         response = chart_selection_chain({
             "guidelines": guidelines,
             "data_info": data_info,
@@ -238,14 +275,20 @@ class DataAnalyzer:
             "data_cols": data_cols
         })
         
-        # Parse the response into chart type and columns
         result = response["chart_selection_result"].strip()
+        
+        # Clean up the result
+        result = result.replace('"', '').replace('\n', '').replace('.', '')
+        
         if "," in result:
             parts = [p.strip() for p in result.split(",")]
-            chart_type = parts[0]
-            columns = parts[1:]
+            chart_type = parts[0] # Normalize to lowercase
+            chart_title = parts[1]
+            columns = parts[2]
         else:
-            chart_type = result
+            chart_type = result  # Normalize to lowercase
             columns = []
         
-        return {"chart_type": chart_type, "columns": columns}
+        chart_type = chart_type_mapping.get(chart_type, "Bar")  # Default to "Bar" if not found
+        
+        return {"chart_type": chart_type, "chart_title": chart_title, "columns": columns}
