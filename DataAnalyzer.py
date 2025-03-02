@@ -183,7 +183,7 @@ class DataAnalyzer:
        #return viscodes
     
     
-    def _visual_chain(self,question):
+    def _chart_select_chain(self, question):
         data_info = self.data_info
         data_sample = self.data_sample
         data_summary = self.data_summary
@@ -191,7 +191,7 @@ class DataAnalyzer:
         llm = self.llm
 
         guidelines = """▼ Chart Selection Matrix
-    | Scenario                           | Chart Type      | when to use                             |
+    | Scenario                           | Chart Type      | When to Use                             |
     |------------------------------------|-----------------|-----------------------------------------|
     | Time series analysis               | Line            | Track trends over time (years, months)  |
     | Comparing >3 categories            | Bar             | Compare discrete values across groups   |
@@ -204,76 +204,48 @@ class DataAnalyzer:
     ▲ Special Cases:
     - Use box plots for statistical distributions
     - Use stacked bars for cumulative totals 
-    - Use Progress Rings/Charts for Showing Progress/Completion
-    - Use Proportional Symbol Map for Comparing proportions/rates 
+    - Use Progress Rings/Charts for progress/completion
+    - Use Proportional Symbol Map for proportions/rates 
     - Use area charts to avoid misleading representations
     - Avoid pie charts when >5 categories"""
+
         chart_selection_prompt = PromptTemplate(
-            input_variables=["data_info", "data_sample", "data_summary", "question"],
+            input_variables=["guidelines", "data_info", "data_sample", "data_summary", "question", "data_cols"],
             template="""
             You are a data analyst responsible for selecting the most appropriate chart type for a given dataset:
             Dataset metadata: {data_info}
             Dataset sample: {data_sample}
             Dataset summary: {data_summary}
-            Use {guidelines} to determine the most suitable chart type for this question : {question}
-            Respond ONLY with the chart type name (e.g., Line chart, Bar chart, Pie chart, etc.).
-            """)
+            Dataset columns: {data_cols}
+            Use {guidelines} to determine the most suitable chart type for this question: {question}
+            Respond ONLY with the chart type name and relevant columns, separated by commas (e.g., "Line chart, Sales, Date").
+            """
+        )
+
         chart_selection_chain = LLMChain(
             llm=llm,
             prompt=chart_selection_prompt,
-            output_key="chart_type"
-            )
-        parser = PydanticOutputParser(pydantic_object=PygalCodeComponents)
-        pygal_code_prompt = PromptTemplate(
-            input_variables=["chart_type", "data_info","question","data_cols"],
-            template="""
-            Generate VALID JSON for Pygal code components following this schema:
-            {format_instructions}
-            
-            Dataset metadata: {data_info}
-            Columns: {data_cols}
-            Question: {question}
-            
-            Rules:
-            1. Output ONLY raw JSON without markdown or comments
-            2. Use exact column names from: {data_cols}
-            3. Include required imports
-            4. Use value_counts() for data preparation
-            5. x_labels must come from data.index
-            
-            """,
-            partial_variables={
-            "format_instructions": parser.get_format_instructions()
-            }
-         )
-        pygal_code_chain = LLMChain(
-            llm=llm,
-            prompt=pygal_code_prompt,
-            output_key="pygal_code"
-            )
-        sequential_chain = SequentialChain(
-            chains=[chart_selection_chain, pygal_code_chain],
-            input_variables=["guidelines","data_info", "data_sample", "data_summary", "question","data_cols"],
-            output_variables=["chart_type", "pygal_code"]
-            )
+            output_key="chart_selection_result"  # Single output key
+        )
         
-        vis_chain_result = sequential_chain({
+        # Execute the chain
+        response = chart_selection_chain({
             "guidelines": guidelines,
             "data_info": data_info,
             "data_sample": data_sample,
             "data_summary": data_summary,
             "question": question,
-            "data_cols":data_cols
-            })
-        parsed = parser.parse(vis_chain_result['pygal_code'])
-
-        code_components = [
-                        parsed.imports,
-                        parsed.data_preparation,
-                        parsed.chart_instantiation,
-                        parsed.labels_config,
-                        parsed.series_addition,
-                        parsed.rendering
-                    ]
-        #code = "\n".join(filter(None, code_components))  
-        return code_components
+            "data_cols": data_cols
+        })
+        
+        # Parse the response into chart type and columns
+        result = response["chart_selection_result"].strip()
+        if "," in result:
+            parts = [p.strip() for p in result.split(",")]
+            chart_type = parts[0]
+            columns = parts[1:]
+        else:
+            chart_type = result
+            columns = []
+        
+        return {"chart_type": chart_type, "columns": columns}
