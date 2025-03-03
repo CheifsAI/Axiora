@@ -6,7 +6,8 @@ from Custom_Widgets import *
 #from PySide6.QtWidgets import QGraphicsDropShadowEffect, QApplication, QMainWindow, QFileDialog, QPushButton, QLabel, QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton, QSizePolicy
 from PySide6.QtSvg import QSvgRenderer
 from PySide6.QtCore import QFile
-from PySide6.QtWebEngineWidgets import QWebEngineView 
+from PySide6.QtWebEngineWidgets import QWebEngineView
+from PySide6.QtWebEngineCore import QWebEngineSettings
 from PySide6 import QtCore
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt,QUrl
@@ -50,29 +51,75 @@ class GuiFunctions():
         self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
         self.main_window.ui.qu_data_btn.clicked.connect(self.handle_word_btn) 
         self.web_view = QWebEngineView()
+        self.web_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.main_window.ui.gridLayout_2.addWidget(self.web_view)
-        self.load_svg("Teams Played Away.svg") 
+        self.load_svg("chartsss/average_goals.svg")
 
-    def load_svg(self, file_path):
-        # Debug: Check if the file exists
-        if not QFile.exists(file_path):
-            print(f"Error: File not found at {file_path}")
-            return
+        def load_svg(self, file_path):
+            abs_path = os.path.abspath(file_path)
+            print(f"Absolute path: {abs_path}")
 
-        # Load the SVG file as an HTML page
-        html_content = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>SVG Viewer</title>
-        </head>
-        <body style="margin: 0; padding: 0;">
-            <object data="{file_path}" type="image/svg+xml" width="100%" height="100%"></object>
-        </body>
-        </html>
-        """
-        self.web_view.setHtml(html_content, QUrl.fromLocalFile(file_path))
-        print(f"SVG file loaded from: {file_path}")
+            if not QFile.exists(abs_path):
+                print(f"Error: File not found at {abs_path}")
+                return
+
+            try:
+                with open(abs_path, "r") as f:
+                    svg_content = f.read()
+            except Exception as e:
+                print(f"Error reading SVG: {str(e)}")
+                return
+
+            # Enable required settings
+            settings = self.web_view.settings()
+            settings.setAttribute(QWebEngineSettings.LocalContentCanAccessFileUrls, True)
+            settings.setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
+
+            # Generate and load HTML
+            html_content = self.generate_html_content(abs_path)
+            base_url = QUrl.fromLocalFile(os.path.dirname(abs_path) + "/")
+            self.web_view.setHtml(html_content, base_url)
+
+        def generate_html_content(self, file_path):
+            """Generate responsive HTML wrapper for SVG"""
+            escaped_path = QUrl.fromLocalFile(file_path).toString()
+            
+            return f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>SVG Viewer</title>
+                <style>
+                    html, body {{
+                        margin: 0;
+                        padding: 0;
+                        width: 100%;
+                        height: 100%;
+                        overflow: hidden;
+                    }}
+                    .svg-container {{
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        background: transparent;
+                    }}
+                    .svg-content {{
+                        width: 100%;
+                        height: 100%;
+                        object-fit: contain;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="svg-container">
+                    <img src="{escaped_path}" class="svg-content" />
+                </div>
+            </body>
+            </html>
+            """
+
     def handle_word_btn(self):
         fpath, _ = QFileDialog.getOpenFileName(
             self.main_window, "Open Word File", "", "Word Files (*.docx)"
