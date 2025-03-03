@@ -172,7 +172,7 @@ class DataAnalyzer:
         return response
     
 
-    def visual(self, style, questions_list: list):
+    def visual(self,report, style, questions_list: list):
         code_template = """import pygal
         from pygal.style import {style}
 
@@ -181,24 +181,23 @@ class DataAnalyzer:
         chart.title = '{chart_title}'
         chart.x_labels = data.index.tolist()
         chart.add('{chart_title}', data.values)
-        chart.render_to_file('{chart_title}.svg')
+        chart.render_to_file('{report}/{chart_title}.svg')
         """
         viscodes = []
         for question in questions_list:
             vis_resp = self._chart_select_chain(question)
             print(vis_resp)
             
-            # Extract the chart type, title, and column from the response
             chart_type = vis_resp['chart_type']
             chart_title = vis_resp['chart_title']
             column = vis_resp['columns']
             
-            # Format the code template with the extracted values
             viscode = code_template.format(
                 style=style,
                 chart_type=chart_type,
                 chart_title=chart_title,
-                column=column
+                column=column,
+                report=report
             )
             viscode = viscode.strip()
             viscodes.append(viscode)
@@ -213,7 +212,6 @@ class DataAnalyzer:
         data_cols = self.data_cols
         llm = self.llm
 
-        # Mapping of chart types to valid pygal chart types
         chart_type_mapping = {
             "bar chart": "Bar",
             "bar": "Bar",
@@ -277,16 +275,15 @@ class DataAnalyzer:
         
         result = response["chart_selection_result"].strip()
         
-        # Clean up the result
         result = result.replace('"', '').replace('\n', '').replace('.', '')
         
         if "," in result:
             parts = [p.strip() for p in result.split(",")]
-            chart_type = parts[0] # Normalize to lowercase
+            chart_type = parts[0] 
             chart_title = parts[1]
             columns = parts[2]
         else:
-            chart_type = result  # Normalize to lowercase
+            chart_type = result  
             columns = []
         
         chart_type = chart_type_mapping.get(chart_type, "Bar")  # Default to "Bar" if not found

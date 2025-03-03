@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QLineEdit,
                                QFileDialog, QTableWidgetItem, QFrame, QCheckBox)
 
 #from PySide6 import uic
+import os
 from OprFuncs import read_file, data_infer
 from DataAnalyzer import DataAnalyzer
 from Models import *
@@ -155,6 +156,7 @@ class GuiFunctions():
         )
         if fpath:
             self.fpath = fpath
+            self.fname = os.path.basename(fpath)
             self.location = self.main_window.ui.path_location
             self.location.setText(fpath)
             self.df = read_file(fpath)
