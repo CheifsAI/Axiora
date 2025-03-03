@@ -54,72 +54,72 @@ class GuiFunctions():
         self.web_view = QWebEngineView()
         self.web_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.main_window.ui.gridLayout_2.addWidget(self.web_view)
-        self.load_svg("chartsss/average_goals.svg")
+        self.load_svg("chartsss/average_goals.svg")  # Now properly recognized
 
-        def load_svg(self, file_path):
-            abs_path = os.path.abspath(file_path)
-            print(f"Absolute path: {abs_path}")
+    def load_svg(self, file_path):
+        abs_path = os.path.abspath(file_path)
+        print(f"Absolute path: {abs_path}")
 
-            if not QFile.exists(abs_path):
-                print(f"Error: File not found at {abs_path}")
-                return
+        if not QFile.exists(abs_path):
+            print(f"Error: File not found at {abs_path}")
+            return
 
-            try:
-                with open(abs_path, "r") as f:
-                    svg_content = f.read()
-            except Exception as e:
-                print(f"Error reading SVG: {str(e)}")
-                return
+        try:
+            with open(abs_path, "r") as f:
+                svg_content = f.read()
+        except Exception as e:
+            print(f"Error reading SVG: {str(e)}")
+            return
 
-            # Enable required settings
-            settings = self.web_view.settings()
-            settings.setAttribute(QWebEngineSettings.LocalContentCanAccessFileUrls, True)
-            settings.setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
+        # Enable required settings
+        settings = self.web_view.settings()
+        settings.setAttribute(QWebEngineSettings.LocalContentCanAccessFileUrls, True)
+        settings.setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
 
-            # Generate and load HTML
-            html_content = self.generate_html_content(abs_path)
-            base_url = QUrl.fromLocalFile(os.path.dirname(abs_path) + "/")
-            self.web_view.setHtml(html_content, base_url)
+        # Generate and load HTML
+        html_content = self.generate_html_content(abs_path)
+        base_url = QUrl.fromLocalFile(os.path.dirname(abs_path) + "/")
+        self.web_view.setHtml(html_content, base_url)
 
-        def generate_html_content(self, file_path):
-            """Generate responsive HTML wrapper for SVG"""
-            escaped_path = QUrl.fromLocalFile(file_path).toString()
-            
-            return f"""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>SVG Viewer</title>
-                <style>
-                    html, body {{
-                        margin: 0;
-                        padding: 0;
-                        width: 100%;
-                        height: 100%;
-                        overflow: hidden;
-                    }}
-                    .svg-container {{
-                        width: 100%;
-                        height: 100%;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        background: transparent;
-                    }}
-                    .svg-content {{
-                        width: 100%;
-                        height: 100%;
-                        object-fit: contain;
-                    }}
-                </style>
-            </head>
-            <body>
-                <div class="svg-container">
-                    <img src="{escaped_path}" class="svg-content" />
-                </div>
-            </body>
-            </html>
-            """
+    def generate_html_content(self, file_path):
+        """Generate responsive HTML wrapper for SVG"""
+        escaped_path = QUrl.fromLocalFile(file_path).toString()
+        
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>SVG Viewer</title>
+            <style>
+                html, body {{
+                    margin: 0;
+                    padding: 0;
+                    width: 100%;
+                    height: 100%;
+                    overflow: hidden;
+                }}
+                .svg-container {{
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    background: transparent;
+                }}
+                .svg-content {{
+                    width: 100%;
+                    height: 100%;
+                    object-fit: contain;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="svg-container">
+                <img src="{escaped_path}" class="svg-content" />
+            </div>
+        </body>
+        </html>
+        """
 
     def handle_word_btn(self):
         fpath, _ = QFileDialog.getOpenFileName(
