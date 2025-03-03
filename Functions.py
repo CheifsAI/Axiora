@@ -5,6 +5,7 @@ from Custom_Widgets import *
 #from PySide6.QtGui import QColor, QFont, QFontDatabase
 #from PySide6.QtWidgets import QGraphicsDropShadowEffect, QApplication, QMainWindow, QFileDialog, QPushButton, QLabel, QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton, QSizePolicy
 from PySide6.QtSvg import QSvgRenderer
+import shutil
 from PySide6.QtCore import QFile
 from PySide6.QtWebEngineWidgets import QWebEngineView 
 from PySide6 import QtCore
@@ -157,6 +158,12 @@ class GuiFunctions():
         if fpath:
             self.fpath = fpath
             self.fname = os.path.basename(fpath)
+            self.rname = os.path.splitext(os.path.basename(fpath))[0]
+            os.makedirs(self.rname, exist_ok=True)  
+            destination_path = os.path.join(self.rname, self.fname)
+            shutil.copy(fpath, destination_path)
+            print(self.fname)
+            print(self.rname)            
             self.location = self.main_window.ui.path_location
             self.location.setText(fpath)
             self.df = read_file(fpath)
@@ -192,6 +199,8 @@ class GuiFunctions():
 
     def handle_clean_data_btn(self):
         self.cleaned_df = self.analyzer.drop_nulls()
+        output_path = os.path.join(self.rname, f"cleaned_{self.fname}")
+        self.cleaned_df.to_csv(output_path, index=False)
         self.table = self.main_window.ui.tableData
         self.table.setRowCount(self.cleaned_df.shape[0])  # Set number of rows
         self.table.setColumnCount(self.cleaned_df.shape[1])  # Set number of columns
@@ -201,7 +210,7 @@ class GuiFunctions():
         # Populate the table with data
         for i in range(self.cleaned_df.shape[0]):
             for j in range(self.cleaned_df.shape[1]):
-                self.table.setItem(i, j, QTableWidgetItem(str(self.cleaned_df.iat(i, j))))
+                self.table.setItem(i, j, QTableWidgetItem(str(self.cleaned_df.iat[i, j])))
 
     import re
 
