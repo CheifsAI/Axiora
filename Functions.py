@@ -25,9 +25,16 @@ from markdown import markdown
 from functools import partial
 from uiEXT.ChatBubble import ChatBubble
 from sqlalchemy.orm import sessionmaker
-from Axioradb import *
+#from Axioradb import *
 from docx import Document
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.orm import Session
+from sqlalchemy import create_engine
 
+Base = automap_base()
+DATABASE_URL = "sqlite:///axioradb.db"
+engine = create_engine(DATABASE_URL)
+Base.prepare(autoload_with=engine)
 
 
 class GuiFunctions():
@@ -35,8 +42,8 @@ class GuiFunctions():
         self.main_window = MainWindow
         self.ui = MainWindow.ui
         self.llm = llama3b
-        # self.db_session = SessionLocal()
-        self.selected_qu_list = []  # Initialize the list to store selected questions
+        self.db_session = Session(engine)
+        self.selected_qu_list = []
         self.setup_connections()
 
     def setup_connections(self):
