@@ -22,16 +22,16 @@ os.environ["QT_FONT_DPI"] = "110" # FIX Problem for High DPI and Scale above 100
 widgets = None
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, user_id):
         QMainWindow.__init__(self)
-
+        self.user_id = user_id
         # SET AS GLOBAL WIDGETS
         # ///////////////////////////////////////////////////////////////
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         global widgets
         widgets = self.ui
-        self.app_functions = GuiFunctions(self)
+        self.app_functions = GuiFunctions(self, self.user_id)
         
         # USE CUSTOM TITLE BAR | USE AS "False" FOR MAC OR LINUX
         # ///////////////////////////////////////////////////////////////
@@ -184,8 +184,8 @@ if __name__ == "__main__":
 
     login_window = LoginWindow()
 
-    def open_main():
-        main_window = MainWindow()
+    def open_main(user_id):
+        main_window = MainWindow(user_id)
         main_window.show()
         login_window.close()
 

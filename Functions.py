@@ -21,23 +21,22 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QLineEdit,
 import os
 from OprFuncs import read_file, data_infer
 from DataAnalyzer import DataAnalyzer
-from Models import *
+from LLM import *
 from markdown import markdown
 from functools import partial
 from uiEXT.ChatBubble import ChatBubble
-from sqlalchemy.orm import sessionmaker
-from Axioradb import *
+#from Axioradb import *
 from docx import Document
-
-
+from DatabaseManager import DatabaseManager
 
 class GuiFunctions():
-    def __init__(self, MainWindow):
+    def __init__(self, MainWindow,user_id):
         self.main_window = MainWindow
         self.ui = MainWindow.ui
+        self.user_id = user_id
+        self.db = DatabaseManager()
         self.llm = llama3b
-        # self.db_session = SessionLocal()
-        self.selected_qu_list = []  # Initialize the list to store selected questions
+        self.selected_qu_list = []
         self.setup_connections()
 
     def setup_connections(self):
@@ -199,24 +198,33 @@ class GuiFunctions():
                 scroll_area.setWidget(scroll_contents)
 
     def handle_data_button(self):
-        fpath, _ = QFileDialog.getOpenFileName(
+        dpath, _ = QFileDialog.getOpenFileName(
             self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)"
         )
-        if fpath:
-            self.fpath = fpath
-            self.fname = os.path.basename(fpath)
-            self.rname = os.path.splitext(os.path.basename(fpath))[0]
+        if dpath:
+            self.dpath = dpath
+            self.dname = os.path.basename(dpath)
+            self.rname = os.path.splitext(os.path.basename(dpath))[0]
             os.makedirs(self.rname, exist_ok=True)  
-            destination_path = os.path.join(self.rname, self.fname)
-            shutil.copy(fpath, destination_path)
-            print(self.fname)
-            print(self.rname)            
+            self.datasetPath = os.path.join(self.rname, self.dname)
+            shutil.copy(dpath, self.datasetPath) 
             self.location = self.main_window.ui.path_location
-            self.location.setText(fpath)
-            self.df = read_file(fpath)
+            self.location.setText(dpath)
+            self.df = read_file(dpath)
             self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
-
-            # Convert index to a column
+            self.data_info = self.analyzer.data_info
+            self.data_summary = self.analyzer.data_summary
+            self.data_sample = self.analyzer.data_sample
+            self.data_cols = self.analyzer.data_cols
+            self.datasetID = self.db.saveDataSet(path=self.datasetPath,name=self.dname) 
+            self.db.saveMetaData(id=self.datasetID,
+                                 info=self.data_info,
+                                 summary=self.data_summary,
+                                 sample=self.data_sample,
+                                 cols=self.data_cols)
+            self.sessionID = self.db.saveSession(user=self.user_id,
+                                llm=self.db.llm_id_by_name(self.llm.model),
+                                dataset=self.datasetID)
             self.df.insert(0, "Index", self.df.index)
 
             self.table = self.main_window.ui.tableData
@@ -236,7 +244,6 @@ class GuiFunctions():
                     self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))
 
     def handle_sum_btn(self):
-        #self.sessionlocal = sessionmaker(bind=engine)
         self.summary = markdown(self.analyzer.analysis_data())
         self.summary_text = self.main_window.ui.summary_text
         self.summary_text.setMarkdown(self.summary)

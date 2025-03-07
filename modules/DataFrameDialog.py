@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton, QHBoxLayout
 import pandas as pd
-from Models import llama3b
+from LLM import llama3b
 from DataAnalyzer import drop_nulls,analysis_data
 class DataFrameDialog(QDialog):
     def __init__(self, df, parent=None):

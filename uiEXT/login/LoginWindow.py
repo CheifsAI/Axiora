@@ -12,7 +12,7 @@ SessionLocal = sessionmaker(bind=engine)
 
 class LoginWindow(QMainWindow):
     # Add a custom signal that will be emitted when login is accepted
-    login_accepted = Signal()
+    login_accepted = Signal(int)
     
     def __init__(self):
         super().__init__()
@@ -79,7 +79,7 @@ class LoginWindow(QMainWindow):
                     self.ui.username.setStyleSheet("#username:focus { border: 3px solid #bdff00; }")
                     self.ui.password.setStyleSheet("#password:focus { border: 3px solid #bdff00; }")
                     # Emit the login_accepted signal after a short delay (allowing the progress/animation)
-                    QTimer.singleShot(1200, lambda: self.login_accepted.emit())
+                    QTimer.singleShot(1200, lambda: self.login_accepted.emit(user.user_id))
                 else:
                     self.ui.username.setStyleSheet("#username:focus { border: 3px solid rgb(255, 0, 127); }")
                     self.ui.password.setStyleSheet("#password:focus { border: 3px solid rgb(255, 0, 127); }")
