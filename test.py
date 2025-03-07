@@ -1,6 +1,6 @@
 import pandas as pd
 from DataAnalyzer import DataAnalyzer
-from Models import llama3b,deepseek
+from LLM import llama3b,deepseek
 import os
 
 styles=["RedBlueStyle",

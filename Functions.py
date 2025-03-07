@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QLineEdit,
 import os
 from OprFuncs import read_file, data_infer
 from DataAnalyzer import DataAnalyzer
-from Models import *
+from LLM import *
 from markdown import markdown
 from functools import partial
 from uiEXT.ChatBubble import ChatBubble

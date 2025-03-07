@@ -8,6 +8,7 @@ class DatabaseManager:
         self.Base = automap_base()
         self.Base.prepare(autoload_with=self.engine)
         self.session = Session(self.engine)
+
     def saveDataSet(self,path,name):
         dataSet = self.Base.classes.data_set
         newDataSet = dataSet(raw_data=path,dataset_name = name)
@@ -31,8 +32,14 @@ class DatabaseManager:
         session_id = newSession.data_set_id
         self.session.commit()
         return session_id
+    
     def newSum(self,session,summary_content):
         summary = self.session.summary
         newSummary = summary(session_id=session,summary_content=summary_content)
         self.session.add(newSummary)
         self.session.commit()
+
+    def get_llm_id_by_name(self, llmName: str) -> int:
+        llmTable = self.Base.classes.llm 
+        result = self.session.query(llmTable.llm_id).filter(llmTable.llm_name == llmName).first()
+        return result[0] if result else None
