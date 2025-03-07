@@ -38,9 +38,10 @@ Base.prepare(autoload_with=engine)
 
 
 class GuiFunctions():
-    def __init__(self, MainWindow):
+    def __init__(self, MainWindow,user_id):
         self.main_window = MainWindow
         self.ui = MainWindow.ui
+        self.user_id = user_id
         self.llm = llama3b
         self.db_session = Session(engine)
         self.selected_qu_list = []
@@ -159,21 +160,21 @@ class GuiFunctions():
                 scroll_area.setWidget(scroll_contents)
 
     def handle_data_button(self):
-        fpath, _ = QFileDialog.getOpenFileName(
+        dpath, _ = QFileDialog.getOpenFileName(
             self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)"
         )
-        if fpath:
-            self.fpath = fpath
-            self.fname = os.path.basename(fpath)
-            self.rname = os.path.splitext(os.path.basename(fpath))[0]
+        if dpath:
+            self.dpath = dpath
+            self.dname = os.path.basename(dpath)
+            self.dname = os.path.splitext(os.path.basename(dpath))[0]
             os.makedirs(self.rname, exist_ok=True)  
-            destination_path = os.path.join(self.rname, self.fname)
-            shutil.copy(fpath, destination_path)
-            print(self.fname)
-            print(self.rname)            
+            destination_path = os.path.join(self.dname, self.dname)
+            shutil.copy(dpath, destination_path)
+            print(self.dname)
+            print(self.dname)            
             self.location = self.main_window.ui.path_location
-            self.location.setText(fpath)
-            self.df = read_file(fpath)
+            self.location.setText(dpath)
+            self.df = read_file(dpath)
             self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
 
             # Convert index to a column
