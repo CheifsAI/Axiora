@@ -157,18 +157,27 @@ class GuiFunctions():
         if dpath:
             self.dpath = dpath
             self.dname = os.path.basename(dpath)
-            self.dname = os.path.splitext(os.path.basename(dpath))[0]
+            self.rname = os.path.splitext(os.path.basename(dpath))[0]
             os.makedirs(self.rname, exist_ok=True)  
-            destination_path = os.path.join(self.dname, self.dname)
-            shutil.copy(dpath, destination_path)
-            print(self.dname)
-            print(self.dname)            
+            self.datasetPath = os.path.join(self.rname, self.dname)
+            shutil.copy(dpath, self.datasetPath) 
             self.location = self.main_window.ui.path_location
             self.location.setText(dpath)
             self.df = read_file(dpath)
             self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
-
-            # Convert index to a column
+            self.data_info = self.analyzer.data_info
+            self.data_summary = self.analyzer.data_summary
+            self.data_sample = self.analyzer.data_sample
+            self.data_cols = self.analyzer.data_cols
+            self.datasetID = self.db.saveDataSet(path=self.datasetPath,name=self.dname) 
+            self.db.saveMetaData(id=self.datasetID,
+                                 info=self.data_info,
+                                 summary=self.data_summary,
+                                 sample=self.data_sample,
+                                 cols=self.data_cols)
+            self.sessionID = self.db.saveSession(user=self.user_id,
+                                llm=self.db.llm_id_by_name(self.llm.model),
+                                dataset=self.datasetID)
             self.df.insert(0, "Index", self.df.index)
 
             self.table = self.main_window.ui.tableData
@@ -188,7 +197,6 @@ class GuiFunctions():
                     self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))
 
     def handle_sum_btn(self):
-        #self.sessionlocal = sessionmaker(bind=engine)
         self.summary = markdown(self.analyzer.analysis_data())
         self.summary_text = self.main_window.ui.summary_text
         self.summary_text.setMarkdown(self.summary)

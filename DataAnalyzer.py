@@ -17,7 +17,7 @@ class DataAnalyzer:
         self.llm = llm
         self.data_info = data_infer(dataframe)
         self.data_summary = data_describer(dataframe)
-        self.data_sample = dataframe.head().to_string
+        self.data_sample = dataframe.head().to_string()
         self.data_cols = ", ".join(dataframe.columns)
         self.memory = []
 

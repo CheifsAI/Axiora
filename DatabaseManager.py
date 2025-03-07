@@ -18,23 +18,23 @@ class DatabaseManager:
         self.session.commit()
         return dataset_id
     
-    def SaveMetaData(self,id,info,summary,sample,cols):
-        metadata = self.Base.metadata
-        newMetadata = metadata(data_set_id=id,data_indo=info,data_summary=summary,data_sample=sample,data_columns=cols)
+    def saveMetaData(self,id,info,summary,sample,cols):
+        metadata = self.Base.classes.metadata
+        newMetadata = metadata(data_set_id=id,data_info=info,data_summary=summary,data_sample=sample,data_columns=cols)
         self.session.add(newMetadata)
         self.session.commit()
 
-    def NewSession(self,user,llm,dataset):
-        sessionTable = self.session.session
+    def saveSession(self,user,llm,dataset):
+        sessionTable = self.Base.classes.session
         newSession = sessionTable(user_id=user,llm_id=llm,data_set_id=dataset)
         self.session.add(newSession)
         self.session.flush()
-        session_id = newSession.data_set_id
+        session_id = newSession.session_id  
         self.session.commit()
         return session_id
     
-    def newSum(self,session,summary_content):
-        summary = self.session.summary
+    def saveSum(self,session,summary_content):
+        summary = self.Base.classes.summary
         newSummary = summary(session_id=session,summary_content=summary_content)
         self.session.add(newSummary)
         self.session.commit()
