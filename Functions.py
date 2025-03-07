@@ -24,26 +24,17 @@ from Models import *
 from markdown import markdown
 from functools import partial
 from uiEXT.ChatBubble import ChatBubble
-from sqlalchemy.orm import sessionmaker
 #from Axioradb import *
 from docx import Document
-from sqlalchemy.ext.automap import automap_base
-from sqlalchemy.orm import Session
-from sqlalchemy import create_engine
-
-Base = automap_base()
-DATABASE_URL = "sqlite:///axioradb.db"
-engine = create_engine(DATABASE_URL)
-Base.prepare(autoload_with=engine)
-
+from DatabaseManager import DatabaseManager
 
 class GuiFunctions():
     def __init__(self, MainWindow,user_id):
         self.main_window = MainWindow
         self.ui = MainWindow.ui
         self.user_id = user_id
+        self.db = DatabaseManager()
         self.llm = llama3b
-        self.db_session = Session(engine)
         self.selected_qu_list = []
         self.setup_connections()
 
