@@ -39,7 +39,7 @@ class DatabaseManager:
         self.session.add(newSummary)
         self.session.commit()
 
-    def get_llm_id_by_name(self, llmName: str) -> int:
+    def llm_id_by_name(self, llmName: str) -> int:
         llmTable = self.Base.classes.llm 
         result = self.session.query(llmTable.llm_id).filter(llmTable.llm_name == llmName).first()
         return result[0] if result else None
