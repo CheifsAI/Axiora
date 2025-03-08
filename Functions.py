@@ -208,8 +208,9 @@ class GuiFunctions():
 
     def handle_clean_data_btn(self):
         self.cleaned_df = self.analyzer.drop_nulls()
-        output_path = os.path.join(self.rname, f"cleaned_{self.fname}")
-        self.cleaned_df.to_csv(output_path, index=False)
+        self.cleaned_df_path = os.path.join(self.rname, f"cleaned_{self.dname}")
+        print(self.cleaned_df_path)
+        self.cleaned_df.to_csv(self.cleaned_df_path, index=False)
         self.table = self.main_window.ui.tableData
         self.table.setRowCount(self.cleaned_df.shape[0])  # Set number of rows
         self.table.setColumnCount(self.cleaned_df.shape[1])  # Set number of columns
