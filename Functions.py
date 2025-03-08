@@ -367,83 +367,66 @@ class GuiFunctions():
                 ai_msg = ChatBubble(ai_response, False, "AI")
                 self.main_window.ui.chat_layout.addWidget(ai_msg)
 
-    def generate_chart_from_response(self, response, chart_path):
-        """Generate SVG chart from model response using plotly"""
+    def process_selected_questions(self):
+        """Process selected questions and generate charts"""
+        if not self.selected_qu_list:
+            print("No questions selected!")
+            print("Debug: Current selections:", self.selected_qu_list)
+            return
+        
+        print(f"Processing {len(self.selected_qu_list)} selected questions")
+        print(f"Selected questions: {self.selected_qu_list}")
+        
         try:
-            # Try importing required packages
-            try:
-                import plotly.express as px
-                import plotly.graph_objects as go
-                import pandas as pd
-                import json
-            except ImportError as e:
-                print(f"Required package not found: {str(e)}")
-                print("Please install required packages using:")
-                print("pip install plotly kaleido pandas")
-                self.create_error_svg(chart_path, "Missing required packages. Please install plotly and kaleido.")
-                return
+            # Create chartsss directory if it doesn't exist
+            os.makedirs("chartsss", exist_ok=True)
             
-            # Get the DataFrame from the analyzer
-            try:
-                # Access the DataFrame - try different possible attribute names
-                if hasattr(self.analyzer, 'df'):
-                    data = self.analyzer.df
-                elif hasattr(self.analyzer, 'data'):
-                    data = self.analyzer.data
-                elif hasattr(self.analyzer, 'dataframe'):
-                    data = self.analyzer.dataframe
-                else:
-                    print("No DataFrame found in analyzer")
-                    self.create_error_svg(chart_path, "No data available for visualization")
-                    return
-
-                # Create visualizations based on the question and data
-                if 'Year' in data.columns:
-                    if 'Attendance' in data.columns:
-                        # Create a line plot of attendance over years
-                        yearly_attendance = data.groupby('Year')['Attendance'].mean().reset_index()
-                        fig = px.line(yearly_attendance, x='Year', y='Attendance',
-                                    title='Average Attendance Over Years')
-                    else:
-                        # Create a bar chart of matches per year
-                        year_counts = data['Year'].value_counts().sort_index()
-                        fig = px.bar(x=year_counts.index, y=year_counts.values,
-                                   title='Number of Matches per Year',
-                                   labels={'x': 'Year', 'y': 'Number of Matches'})
-                
-                elif 'Home Team Goals' in data.columns:
-                    # Create a histogram of home team goals
-                    fig = px.histogram(data, x='Home Team Goals',
-                                     title='Distribution of Home Team Goals')
-                
-                else:
-                    # Fallback to a simple text display
-                    fig = go.Figure()
-                    fig.add_annotation(text="No suitable data found for visualization",
-                                    xref="paper", yref="paper",
-                                    x=0.5, y=0.5, showarrow=False)
-
-                # Update layout for better appearance
-                fig.update_layout(
-                    template='plotly_dark',
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    margin=dict(t=50, l=50, r=50, b=50)
-                )
-
-                # Save as SVG
-                fig.write_image(chart_path, format='svg')
-                print(f"Chart saved to {chart_path}")
-                
-            except Exception as e:
-                print(f"Error creating visualization: {str(e)}")
-                self.create_error_svg(chart_path, f"Error creating visualization: {str(e)}")
-                
+            # Get visualization code for all selected questions
+            vis_codes = self.analyzer.visual(
+                report="chartsss",
+                style="DarkStyle",
+                questions_list=self.selected_qu_list
+            )
+            
+            # Execute each visualization code
+            for i, vis_code in enumerate(vis_codes):
+                try:
+                    # Create execution environment with DataFrame and required imports
+                    exec_env = {
+                        "df": self.df,
+                        "pygal": __import__('pygal'),
+                        "Style": getattr(__import__('pygal.style'), 'Style')
+                    }
+                    
+                    # Fix indentation in the visualization code
+                    fixed_code = "\\n".join(line.strip() for line in vis_code.split('\\n'))
+                    
+                    # Execute the visualization code
+                    exec(fixed_code, exec_env)
+                    
+                    # Get response from analyzer for the question
+                    response = self.analyzer.chat(self.selected_qu_list[i])
+                    print(f"Question {i+1}: {self.selected_qu_list[i]}")
+                    print(f"Response: {response}")
+                    
+                except Exception as e:
+                    print(f"Error executing visualization code for question {i+1}: {str(e)}")
+                    self.create_error_svg(f"chartsss/chart_{i+1}.svg", f"Error: {str(e)}")
+            
+            # Set up for chart display
+            self.current_chart_index = 0
+            self.total_charts = len(self.selected_qu_list)
+            
+            # Display the first chart
+            self.display_current_chart()
+            
+            # Switch to the visualization page
+            self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
+            
         except Exception as e:
-            print(f"Error generating chart: {str(e)}")
+            print(f"Error processing questions: {str(e)}")
             import traceback
             traceback.print_exc()
-            self.create_error_svg(chart_path, f"Error generating chart: {str(e)}")
 
     def create_error_svg(self, chart_path, error_message):
         """Create a simple SVG with an error message"""
@@ -461,47 +444,6 @@ class GuiFunctions():
             print(f"Error SVG created at {chart_path}")
         except Exception as e:
             print(f"Error creating error SVG: {str(e)}")
-            import traceback
-            traceback.print_exc()
-
-    def process_selected_questions(self):
-        """Process selected questions and generate charts"""
-        if not self.selected_qu_list:
-            print("No questions selected!")
-            print("Debug: Current selections:", self.selected_qu_list)  # Debug print
-            return
-        
-        print(f"Processing {len(self.selected_qu_list)} selected questions")
-        print(f"Selected questions: {self.selected_qu_list}")  # Debug print
-        
-        try:
-            # Create chartsss directory if it doesn't exist
-            os.makedirs("chartsss", exist_ok=True)
-            
-            # Process each question and generate charts
-            for i, question in enumerate(self.selected_qu_list):
-                # Get response from analyzer
-                response = self.analyzer.chat(question)
-                
-                # Generate chart for the response
-                chart_path = os.path.join("chartsss", f"chart_{i+1}.svg")
-                self.generate_chart_from_response(response, chart_path)
-                
-                # Save to session history instead of database
-                print(f"Question {i+1}: {question}")
-                print(f"Response: {response}")
-            
-            # Display the first chart in widget_3
-            if os.path.exists(os.path.join("chartsss", "chart_1.svg")):
-                self.current_chart_index = 0
-                self.total_charts = len(self.selected_qu_list)
-                self.display_current_chart()
-                
-                # Switch to the visualization page
-                self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
-                
-        except Exception as e:
-            print(f"Error processing questions: {str(e)}")
             import traceback
             traceback.print_exc()
 
