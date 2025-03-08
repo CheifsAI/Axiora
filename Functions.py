@@ -197,9 +197,11 @@ class GuiFunctions():
                     self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))
 
     def handle_sum_btn(self):
-        self.summary = markdown(self.analyzer.analysis_data())
+        self.summary = self.analyzer.analysis_data()
+        self.db.saveSummary(session=self.sessionID,summary_content=self.summary)
+        self.summary_md = markdown(self.summary)
         self.summary_text = self.main_window.ui.summary_text
-        self.summary_text.setMarkdown(self.summary)
+        self.summary_text.setMarkdown(self.summary_md)
 
     def handle_btn_LLMs(self):
         print("Clicked LLM")

@@ -32,7 +32,7 @@ class DatabaseManager:
         self.session.commit()
         return session_id
     
-    def saveSum(self,session,summary_content):
+    def saveSummary(self,session,summary_content):
         summary = self.Base.classes.summary
         newSummary = summary(session_id=session,summary_content=summary_content)
         self.session.add(newSummary)
