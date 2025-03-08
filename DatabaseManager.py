@@ -9,24 +9,23 @@ class DatabaseManager:
         self.Base.prepare(autoload_with=self.engine)
         self.session = Session(self.engine)
 
-    def saveDataSet(self,path,name):
-        dataSet = self.Base.classes.data_set
-        newDataSet = dataSet(raw_data=path,dataset_name = name)
+    def saveDataSet(self,path,name,info,summary,sample,cols):
+        dataSet = self.Base.classes.dataset
+        newDataSet = dataSet(raw_data=path,
+                             dataset_name = name,
+                             data_info=info,
+                             data_summary=summary,
+                             data_sample=sample,
+                             data_columns=cols)
         self.session.add(newDataSet)
         self.session.flush()
-        dataset_id = newDataSet.data_set_id
+        dataset_id = newDataSet.dataset_id
         self.session.commit()
         return dataset_id
-    
-    def saveMetaData(self,id,info,summary,sample,cols):
-        metadata = self.Base.classes.metadata
-        newMetadata = metadata(data_set_id=id,data_info=info,data_summary=summary,data_sample=sample,data_columns=cols)
-        self.session.add(newMetadata)
-        self.session.commit()
 
     def saveSession(self,user,llm,dataset):
         sessionTable = self.Base.classes.session
-        newSession = sessionTable(user_id=user,llm_id=llm,data_set_id=dataset)
+        newSession = sessionTable(user_id=user,llm_id=llm,dataset_id=dataset)
         self.session.add(newSession)
         self.session.flush()
         session_id = newSession.session_id  

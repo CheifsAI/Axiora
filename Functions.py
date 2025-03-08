@@ -216,12 +216,12 @@ class GuiFunctions():
             self.data_summary = self.analyzer.data_summary
             self.data_sample = self.analyzer.data_sample
             self.data_cols = self.analyzer.data_cols
-            self.datasetID = self.db.saveDataSet(path=self.datasetPath,name=self.dname) 
-            self.db.saveMetaData(id=self.datasetID,
-                                 info=self.data_info,
-                                 summary=self.data_summary,
-                                 sample=self.data_sample,
-                                 cols=self.data_cols)
+            self.datasetID = self.db.saveDataSet(path=self.datasetPath,
+                                                 name=self.dname,
+                                                 info=self.data_info,
+                                                 summary=self.data_summary,
+                                                 sample=self.data_sample,
+                                                 cols=self.data_cols) 
             self.sessionID = self.db.saveSession(user=self.user_id,
                                 llm=self.db.llm_id_by_name(self.llm.model),
                                 dataset=self.datasetID)
