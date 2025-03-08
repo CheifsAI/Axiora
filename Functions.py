@@ -38,7 +38,7 @@ class GuiFunctions():
         self.user_id = user_id
         self.db = DatabaseManager()
         self.llm = llama3b
-        self.selected_qu_list = []
+        self.selected_qu_list = []  # Initialize empty list
         self.setup_connections()
 
     def setup_connections(self):
@@ -51,8 +51,10 @@ class GuiFunctions():
         self.main_window.ui.chat_data_btn.clicked.connect(self.handle_chat_data_btn)
         self.main_window.ui.send_btn.clicked.connect(self.send_message)
         self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
-        self.main_window.ui.qu_data_btn.clicked.connect(self.handle_word_btn) 
-
+        self.main_window.ui.qu_data_btn.clicked.connect(self.handle_word_btn)
+        self.main_window.ui.pushButton_2.clicked.connect(self.display_svg)
+        # Add done button connection
+        self.main_window.ui.done_btn.clicked.connect(self.process_selected_questions)
 
     def handle_word_btn(self):
         fpath, _ = QFileDialog.getOpenFileName(
@@ -113,7 +115,9 @@ class GuiFunctions():
                     hbox.addWidget(question_label)
 
                     check_box = QCheckBox(question_frame)
-                    check_box.stateChanged.connect(partial(self.handle_question_selection, question))
+                    check_box.setObjectName(f"checkbox_{i}")  # Set unique object name
+                    check_box.setProperty("question", question)
+                    check_box.stateChanged.connect(self.handle_question_selection)
                     hbox.addWidget(check_box)
 
                     qu_layout.addWidget(question_frame)
@@ -248,6 +252,9 @@ class GuiFunctions():
                 print(f"Warning: Expected {self.num_qu} questions, but got {len(self.g_questions)}")
                 retries += 1
 
+        # Clear the selected questions list when generating new questions
+        self.selected_qu_list = []
+
         # Get references to UI components
         scroll_area = self.main_window.ui.scrollArea
         scroll_contents = self.main_window.ui.scrollAreaWidgetContents
@@ -284,10 +291,19 @@ class GuiFunctions():
                 question_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 hbox.addWidget(question_label)
 
+                # Create checkbox with the question
                 check_box = QCheckBox(question_frame)
-                check_box.stateChanged.connect(partial(self.handle_question_selection, question))
+                check_box.setObjectName(f"checkbox_{i}")
+                
+                # Create a custom slot for this specific checkbox
+                def create_slot(q):
+                    return lambda checked: self.handle_question_selection(q, checked)
+                
+                # Connect with the custom slot
+                slot = create_slot(question)
+                check_box.toggled.connect(slot)
+                
                 hbox.addWidget(check_box)
-
                 qu_layout.addWidget(question_frame)
 
             # Ensure proper layout update
@@ -303,15 +319,13 @@ class GuiFunctions():
         if scroll_area.widget() != scroll_contents:
             scroll_area.setWidget(scroll_contents)
 
-    def handle_question_selection(self, question, state):
-        if state == Qt.Checked:
+    def handle_question_selection(self, question, checked):
+        if checked:
             if question not in self.selected_qu_list:
                 self.selected_qu_list.append(question)
-            print(f"Question selected: {question}")
         else:
             if question in self.selected_qu_list:
                 self.selected_qu_list.remove(question)
-            print(f"Question deselected: {question}")
 
     def send_question_to_model(self, question, state):
         if state == Qt.Checked:
@@ -352,3 +366,247 @@ class GuiFunctions():
                 ai_response = self.analyzer.chat(user_input)
                 ai_msg = ChatBubble(ai_response, False, "AI")
                 self.main_window.ui.chat_layout.addWidget(ai_msg)
+
+    def generate_chart_from_response(self, response, chart_path):
+        """Generate SVG chart from model response using plotly"""
+        try:
+            # Try importing required packages
+            try:
+                import plotly.express as px
+                import plotly.graph_objects as go
+                import pandas as pd
+                import json
+            except ImportError as e:
+                print(f"Required package not found: {str(e)}")
+                print("Please install required packages using:")
+                print("pip install plotly kaleido pandas")
+                self.create_error_svg(chart_path, "Missing required packages. Please install plotly and kaleido.")
+                return
+            
+            # Get the DataFrame from the analyzer
+            try:
+                # Access the DataFrame - try different possible attribute names
+                if hasattr(self.analyzer, 'df'):
+                    data = self.analyzer.df
+                elif hasattr(self.analyzer, 'data'):
+                    data = self.analyzer.data
+                elif hasattr(self.analyzer, 'dataframe'):
+                    data = self.analyzer.dataframe
+                else:
+                    print("No DataFrame found in analyzer")
+                    self.create_error_svg(chart_path, "No data available for visualization")
+                    return
+
+                # Create visualizations based on the question and data
+                if 'Year' in data.columns:
+                    if 'Attendance' in data.columns:
+                        # Create a line plot of attendance over years
+                        yearly_attendance = data.groupby('Year')['Attendance'].mean().reset_index()
+                        fig = px.line(yearly_attendance, x='Year', y='Attendance',
+                                    title='Average Attendance Over Years')
+                    else:
+                        # Create a bar chart of matches per year
+                        year_counts = data['Year'].value_counts().sort_index()
+                        fig = px.bar(x=year_counts.index, y=year_counts.values,
+                                   title='Number of Matches per Year',
+                                   labels={'x': 'Year', 'y': 'Number of Matches'})
+                
+                elif 'Home Team Goals' in data.columns:
+                    # Create a histogram of home team goals
+                    fig = px.histogram(data, x='Home Team Goals',
+                                     title='Distribution of Home Team Goals')
+                
+                else:
+                    # Fallback to a simple text display
+                    fig = go.Figure()
+                    fig.add_annotation(text="No suitable data found for visualization",
+                                    xref="paper", yref="paper",
+                                    x=0.5, y=0.5, showarrow=False)
+
+                # Update layout for better appearance
+                fig.update_layout(
+                    template='plotly_dark',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    margin=dict(t=50, l=50, r=50, b=50)
+                )
+
+                # Save as SVG
+                fig.write_image(chart_path, format='svg')
+                print(f"Chart saved to {chart_path}")
+                
+            except Exception as e:
+                print(f"Error creating visualization: {str(e)}")
+                self.create_error_svg(chart_path, f"Error creating visualization: {str(e)}")
+                
+        except Exception as e:
+            print(f"Error generating chart: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            self.create_error_svg(chart_path, f"Error generating chart: {str(e)}")
+
+    def create_error_svg(self, chart_path, error_message):
+        """Create a simple SVG with an error message"""
+        try:
+            svg_content = f'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+            <svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100%" height="100%" fill="#2b2b2b"/>
+                <text x="50%" y="50%" text-anchor="middle" fill="white" font-family="Arial">
+                    {error_message}
+                </text>
+            </svg>'''
+            
+            with open(chart_path, 'w', encoding='utf-8') as f:
+                f.write(svg_content)
+            print(f"Error SVG created at {chart_path}")
+        except Exception as e:
+            print(f"Error creating error SVG: {str(e)}")
+            import traceback
+            traceback.print_exc()
+
+    def process_selected_questions(self):
+        """Process selected questions and generate charts"""
+        if not self.selected_qu_list:
+            print("No questions selected!")
+            print("Debug: Current selections:", self.selected_qu_list)  # Debug print
+            return
+        
+        print(f"Processing {len(self.selected_qu_list)} selected questions")
+        print(f"Selected questions: {self.selected_qu_list}")  # Debug print
+        
+        try:
+            # Create chartsss directory if it doesn't exist
+            os.makedirs("chartsss", exist_ok=True)
+            
+            # Process each question and generate charts
+            for i, question in enumerate(self.selected_qu_list):
+                # Get response from analyzer
+                response = self.analyzer.chat(question)
+                
+                # Generate chart for the response
+                chart_path = os.path.join("chartsss", f"chart_{i+1}.svg")
+                self.generate_chart_from_response(response, chart_path)
+                
+                # Save to session history instead of database
+                print(f"Question {i+1}: {question}")
+                print(f"Response: {response}")
+            
+            # Display the first chart in widget_3
+            if os.path.exists(os.path.join("chartsss", "chart_1.svg")):
+                self.current_chart_index = 0
+                self.total_charts = len(self.selected_qu_list)
+                self.display_current_chart()
+                
+                # Switch to the visualization page
+                self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
+                
+        except Exception as e:
+            print(f"Error processing questions: {str(e)}")
+            import traceback
+            traceback.print_exc()
+
+    def display_current_chart(self):
+        """Display the current chart in widget_3"""
+        try:
+            current_chart_path = os.path.join("chartsss", f"chart_{self.current_chart_index + 1}.svg")
+            if os.path.exists(current_chart_path):
+                # Create navigation buttons if they don't exist
+                if not hasattr(self, 'nav_widget'):
+                    self.create_navigation_controls()
+                
+                # Display the SVG
+                self.display_svg(current_chart_path)
+                
+                # Update navigation button states
+                self.prev_btn.setEnabled(self.current_chart_index > 0)
+                self.next_btn.setEnabled(self.current_chart_index < self.total_charts - 1)
+                
+                # Update chart counter label
+                self.chart_counter.setText(f"Chart {self.current_chart_index + 1} of {self.total_charts}")
+                
+        except Exception as e:
+            print(f"Error displaying chart: {str(e)}")
+            import traceback
+            traceback.print_exc()
+
+    def create_navigation_controls(self):
+        """Create navigation controls for multiple charts"""
+        # Create navigation widget
+        self.nav_widget = QWidget()
+        nav_layout = QHBoxLayout(self.nav_widget)
+        
+        # Create navigation buttons
+        self.prev_btn = QPushButton("Previous")
+        self.next_btn = QPushButton("Next")
+        self.chart_counter = QLabel()
+        
+        # Add buttons to layout
+        nav_layout.addWidget(self.prev_btn)
+        nav_layout.addWidget(self.chart_counter)
+        nav_layout.addWidget(self.next_btn)
+        
+        # Connect button signals
+        self.prev_btn.clicked.connect(self.show_previous_chart)
+        self.next_btn.clicked.connect(self.show_next_chart)
+        
+        # Add navigation widget to widget_3
+        widget_3 = self.main_window.ui.widget_3
+        if not widget_3.layout():
+            widget_3.setLayout(QVBoxLayout())
+        widget_3.layout().addWidget(self.nav_widget)
+
+    def show_previous_chart(self):
+        """Show the previous chart"""
+        if self.current_chart_index > 0:
+            self.current_chart_index -= 1
+            self.display_current_chart()
+
+    def show_next_chart(self):
+        """Show the next chart"""
+        if self.current_chart_index < self.total_charts - 1:
+            self.current_chart_index += 1
+            self.display_current_chart()
+
+    def display_svg(self, svg_path):
+        """Display an SVG file in widget_3"""
+        if os.path.exists(svg_path):
+            try:
+                # Create SVG widget
+                self.svg_widget = QSvgWidget(svg_path)
+                
+                # Configure widget
+                self.svg_widget.setMinimumSize(400, 300)
+                self.svg_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                
+                # Get widget_3 and set up layout
+                widget_3 = self.main_window.ui.widget_3
+                if not widget_3.layout():
+                    widget_3.setLayout(QVBoxLayout())
+                
+                # Clear existing content except navigation controls
+                layout = widget_3.layout()
+                while layout.count() > 1:  # Keep navigation controls
+                    item = layout.takeAt(1)
+                    if item.widget():
+                        item.widget().deleteLater()
+                
+                # Add SVG widget
+                layout.addWidget(self.svg_widget)
+                
+                # Show everything
+                self.svg_widget.show()
+                widget_3.show()
+                
+                # Switch to the page containing widget_3
+                self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
+                
+                return self.svg_widget
+                
+            except Exception as e:
+                print(f"Error displaying SVG: {str(e)}")
+                import traceback
+                traceback.print_exc()
+                return None
+        else:
+            print(f"SVG file not found: {svg_path}")
+            return None
