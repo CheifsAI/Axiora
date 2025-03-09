@@ -9,3 +9,12 @@ groq
 langchain_groq
 beautifulsoup4
 sentence_transformers
+QT-PyQt-PySide-Custom-Widgets
+PySide6
+pandas
+langchain
+langchain_ollama
+markdown
+python-docx
+bcrypt
+passlib

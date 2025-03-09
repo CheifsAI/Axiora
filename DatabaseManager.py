@@ -22,6 +22,20 @@ class DatabaseManager:
         dataset_id = newDataSet.dataset_id
         self.session.commit()
         return dataset_id
+    def saveCleanDataset(self,ogID,path,name,info,summary,sample,cols):
+        cleandataset = self.Base.classes.cleanDataset
+        newCleanDataset = cleandataset(original_dataset_id=ogID,
+                            raw_data=path,
+                             dataset_name = name,
+                             data_info=info,
+                             data_summary=summary,
+                             data_sample=sample,
+                             data_columns=cols)
+        self.session.add(newCleanDataset)
+        self.session.flush()
+        clean_dataset_id = newCleanDataset.clean_dataset_id
+        self.session.commit()
+        return clean_dataset_id
 
     def saveSession(self,user,llm,dataset):
         sessionTable = self.Base.classes.session
@@ -32,6 +46,13 @@ class DatabaseManager:
         self.session.commit()
         return session_id
     
+    def saveCleanSession(self, sessId, cleandataset):
+        sessionTable = self.Base.classes.session
+        sessionRow = self.session.query(sessionTable).filter(sessionTable.session_id == sessId).first()
+        if sessionRow:
+            sessionRow.clean_dataset_id = cleandataset
+            self.session.commit()
+
     def saveSummary(self,session,summary_content):
         summary = self.Base.classes.summary
         newSummary = summary(session_id=session,summary_content=summary_content)
