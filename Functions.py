@@ -401,7 +401,7 @@ class GuiFunctions():
             
             # Execute each visualization code
             for i, code in enumerate(vis_codes):
-                try:
+                #try:
                     # Import required modules in the execution environment
                     exec_env = {
                         'df': self.analyzer.dataframe,
@@ -413,11 +413,11 @@ class GuiFunctions():
                     code = "\n".join(line.strip() for line in code.splitlines() if line.strip())
                     
                     # Replace the chart rendering path to use numbered filenames
-                    chart_path = os.path.join(self.rname, f"chart_{i+1}.svg")
-                    code = code.replace(
-                        "chart.render_to_file('{report}/{chart_title}.svg')",
-                        f"chart.render_to_file(r'{chart_path}')"
-                    )
+                    #chart_path = os.path.join(self.rname, f"chart_{i+1}.svg")
+                    #code = code.replace(
+                      #  "chart.render_to_file('{report}/{chart_title}.svg')",
+                     #   f"chart.render_to_file(r'{chart_path}')"
+                    #)
                     
                     print(f"Executing visualization code for question {i+1}:")
                     print(code)
@@ -426,16 +426,16 @@ class GuiFunctions():
                     exec(code, exec_env)
                     
                     # Verify the file was created
-                    if os.path.exists(chart_path):
-                        print(f"Successfully created chart: {chart_path}")
-                    else:
-                        print(f"Failed to create chart: {chart_path}")
-                        self.create_error_svg(chart_path, f"Error generating chart for question {i+1}")
+                    #if os.path.exists(chart_path):
+                     #   print(f"Successfully created chart: {chart_path}")
+                    #else:
+                     #   print(f"Failed to create chart: {chart_path}")
+                      #  self.create_error_svg(chart_path, f"Error generating chart for question {i+1}")
                     
-                except Exception as e:
-                    print(f"Error executing visualization code for question {i+1}: {str(e)}")
-                    error_file = os.path.join(self.rname, f"chart_{i+1}.svg")
-                    self.create_error_svg(error_file, f"Error: {str(e)}")
+                #except Exception as e:
+                 #   print(f"Error executing visualization code for question {i+1}: {str(e)}")
+                  #  error_file = os.path.join(self.rname, f"chart_{i+1}.svg")
+                   # self.create_error_svg(error_file, f"Error: {str(e)}")
             
             # Set up for chart display
             self.current_chart_index = 0
@@ -479,8 +479,23 @@ class GuiFunctions():
                 print("No current chart index set")
                 return
             
-            # Construct the chart path using the dataset directory
-            current_chart_path = os.path.join(self.rname, f"chart_{self.current_chart_index + 1}.svg")
+            # Get a list of all .svg files in the directory
+            svg_files = [f for f in os.listdir(self.rname) if f.endswith('.svg')]
+            
+            # Check if there are any .svg files
+            if not svg_files:
+                print("No SVG files found in the directory")
+                return
+            
+            # Ensure the current_chart_index is within bounds
+            if self.current_chart_index < 0 or self.current_chart_index >= len(svg_files):
+                print("Invalid chart index")
+                return
+            
+            # Get the current chart file
+            current_chart_file = svg_files[self.current_chart_index]
+            current_chart_path = os.path.join(self.rname, current_chart_file)
+            
             print(f"Looking for chart at: {current_chart_path}")
             
             if os.path.exists(current_chart_path):
@@ -495,11 +510,11 @@ class GuiFunctions():
                     # Update navigation button states
                     if hasattr(self, 'prev_btn') and hasattr(self, 'next_btn'):
                         self.prev_btn.setEnabled(self.current_chart_index > 0)
-                        self.next_btn.setEnabled(self.current_chart_index < self.total_charts - 1)
+                        self.next_btn.setEnabled(self.current_chart_index < len(svg_files) - 1)
                     
                     # Update chart counter label
                     if hasattr(self, 'chart_counter'):
-                        self.chart_counter.setText(f"Chart {self.current_chart_index + 1} of {self.total_charts}")
+                        self.chart_counter.setText(f"Chart {self.current_chart_index + 1} of {len(svg_files)}")
                 else:
                     print("Failed to display SVG widget")
             else:
