@@ -193,19 +193,34 @@ class GuiFunctions():
 
     def handle_clean_data_btn(self):
         self.cleaned_df = self.analyzer.drop_nulls()
-        output_path = os.path.join(self.rname, f"cleaned_{self.dname}")
-        print(output_path)
-        self.cleaned_df.to_csv(output_path, index=False)
+        self.dname = f"cleaned_{self.dname}"
+        self.cleaned_df_path = os.path.join(self.rname, self.dname)
+        print(self.cleaned_df_path)
+        self.cleaned_df.to_csv(self.cleaned_df_path, index=False)
+        self.df = self.cleaned_df
+        self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
+        self.data_info = self.analyzer.data_info
+        self.data_summary = self.analyzer.data_summary
+        self.data_sample = self.analyzer.data_sample
+        self.data_cols = self.analyzer.data_cols
+        self.datasetID = self.db.saveCleanDataset(ogID=self.datasetID,
+                                path=self.cleaned_df_path,
+                                name=self.dname,
+                                info=self.data_info,
+                                summary=self.data_summary,
+                                sample=self.data_sample,
+                                cols=self.data_cols)
+        self.db.saveCleanSession(sessId=self.sessionID,cleandataset=self.datasetID)
         self.table = self.main_window.ui.tableData
-        self.table.setRowCount(self.cleaned_df.shape[0])  # Set number of rows
-        self.table.setColumnCount(self.cleaned_df.shape[1])  # Set number of columns
-        self.table.setHorizontalHeaderLabels(self.cleaned_df.columns)  # Set column headers
+        self.table.setRowCount(self.df.shape[0])  # Set number of rows
+        self.table.setColumnCount(self.df.shape[1])  # Set number of columns
+        self.table.setHorizontalHeaderLabels(self.df.columns)  # Set column headers
         header = self.table.horizontalHeader()
         # header.setStyleSheet("QHeaderView::section { background-color: lightgray; }")
         # Populate the table with data
-        for i in range(self.cleaned_df.shape[0]):
-            for j in range(self.cleaned_df.shape[1]):
-                self.table.setItem(i, j, QTableWidgetItem(str(self.cleaned_df.iat[i, j])))
+        for i in range(self.df.shape[0]):
+            for j in range(self.df.shape[1]):
+                self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))
 
     import re
 
