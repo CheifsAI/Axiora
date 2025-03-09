@@ -391,14 +391,51 @@ class GuiFunctions():
         
         print(f"Processing {len(self.selected_qu_list)} selected questions")
         print(f"Selected questions: {self.selected_qu_list}")
-        vis_codes = self.analyzer.visual(questions_list=self.selected_qu_list,report=self.rname)
-        for i,code in enumerate(vis_codes):
-            code =  "\n".join(line.strip() for line in code.splitlines() if line.strip())
-            print(code)
-            exec(code, {'df': self.analyzer.dataframe})
-
-            #print(f"Error executing visualization code for question {i+1}")
-            #self.create_error_svg(f"{self.rname}/chart_{i+1}.svg")
+        
+        try:
+            # Get visualization code for all selected questions
+            vis_codes = self.analyzer.visual(
+                questions_list=self.selected_qu_list,
+                report=self.rname  # Use the dataset directory
+            )
+            
+            # Execute each visualization code
+            for i, code in enumerate(vis_codes):
+                try:
+                    # Import required modules in the execution environment
+                    exec_env = {
+                        'df': self.analyzer.dataframe,
+                        #'pygal': __import__('pygal'),
+                        #'RedBlueStyle': getattr(__import__('pygal.style'), 'RedBlueStyle')
+                    }
+                    
+                    # Clean up the code and ensure proper file path
+                    code = "\n".join(line.strip() for line in code.splitlines() if line.strip())
+                    
+                    # Replace the chart rendering path to use numbered filenames
+                    chart_path = os.path.join(self.rname, f"chart_{i+1}.svg")
+                    code = code.replace(
+                        "chart.render_to_file('{report}/{chart_title}.svg')",
+                        f"chart.render_to_file(r'{chart_path}')"
+                    )
+                    
+                    print(f"Executing visualization code for question {i+1}:")
+                    print(code)
+                    
+                    # Execute the visualization code
+                    exec(code, exec_env)
+                    
+                    # Verify the file was created
+                    if os.path.exists(chart_path):
+                        print(f"Successfully created chart: {chart_path}")
+                    else:
+                        print(f"Failed to create chart: {chart_path}")
+                        self.create_error_svg(chart_path, f"Error generating chart for question {i+1}")
+                    
+                except Exception as e:
+                    print(f"Error executing visualization code for question {i+1}: {str(e)}")
+                    error_file = os.path.join(self.rname, f"chart_{i+1}.svg")
+                    self.create_error_svg(error_file, f"Error: {str(e)}")
             
             # Set up for chart display
             self.current_chart_index = 0
@@ -409,6 +446,11 @@ class GuiFunctions():
             
             # Switch to the visualization page
             self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
+            
+        except Exception as e:
+            print(f"Error processing questions: {str(e)}")
+            import traceback
+            traceback.print_exc()
 
     def create_error_svg(self, chart_path, error_message):
         """Create a simple SVG with an error message"""
@@ -432,21 +474,38 @@ class GuiFunctions():
     def display_current_chart(self):
         """Display the current chart in widget_3"""
         try:
+            # Ensure we have a valid chart index
+            if not hasattr(self, 'current_chart_index'):
+                print("No current chart index set")
+                return
+            
+            # Construct the chart path using the dataset directory
             current_chart_path = os.path.join(self.rname, f"chart_{self.current_chart_index + 1}.svg")
+            print(f"Looking for chart at: {current_chart_path}")
+            
             if os.path.exists(current_chart_path):
+                print(f"Found chart file: {current_chart_path}")
+                
                 # Create navigation buttons if they don't exist
                 if not hasattr(self, 'nav_widget'):
                     self.create_navigation_controls()
                 
                 # Display the SVG
-                self.display_svg(current_chart_path)
-                
-                # Update navigation button states
-                self.prev_btn.setEnabled(self.current_chart_index > 0)
-                self.next_btn.setEnabled(self.current_chart_index < self.total_charts - 1)
-                
-                # Update chart counter label
-                self.chart_counter.setText(f"Chart {self.current_chart_index + 1} of {self.total_charts}")
+                if self.display_svg(current_chart_path):
+                    # Update navigation button states
+                    if hasattr(self, 'prev_btn') and hasattr(self, 'next_btn'):
+                        self.prev_btn.setEnabled(self.current_chart_index > 0)
+                        self.next_btn.setEnabled(self.current_chart_index < self.total_charts - 1)
+                    
+                    # Update chart counter label
+                    if hasattr(self, 'chart_counter'):
+                        self.chart_counter.setText(f"Chart {self.current_chart_index + 1} of {self.total_charts}")
+                else:
+                    print("Failed to display SVG widget")
+            else:
+                print(f"Chart file not found: {current_chart_path}")
+                # Create error SVG if chart is missing
+                self.create_error_svg(current_chart_path, "Chart file not found")
                 
         except Exception as e:
             print(f"Error displaying chart: {str(e)}")
@@ -493,44 +552,47 @@ class GuiFunctions():
 
     def display_svg(self, svg_path):
         """Display an SVG file in widget_3"""
-        if os.path.exists(svg_path):
-            try:
-                # Create SVG widget
-                self.svg_widget = QSvgWidget(svg_path)
-                
-                # Configure widget
-                self.svg_widget.setMinimumSize(400, 300)
-                self.svg_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                
-                # Get widget_3 and set up layout
-                widget_3 = self.main_window.ui.widget_3
-                if not widget_3.layout():
-                    widget_3.setLayout(QVBoxLayout())
-                
-                # Clear existing content except navigation controls
-                layout = widget_3.layout()
-                while layout.count() > 1:  # Keep navigation controls
-                    item = layout.takeAt(1)
-                    if item.widget():
-                        item.widget().deleteLater()
-                
-                # Add SVG widget
-                layout.addWidget(self.svg_widget)
-                
-                # Show everything
-                self.svg_widget.show()
-                widget_3.show()
-                
-                # Switch to the page containing widget_3
-                self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
-                
-                return self.svg_widget
-                
-            except Exception as e:
-                print(f"Error displaying SVG: {str(e)}")
-                import traceback
-                traceback.print_exc()
+        try:
+            # Verify the file exists and is a valid path
+            if not isinstance(svg_path, str):
+                raise ValueError("SVG path must be a string")
+            
+            if not os.path.exists(svg_path):
+                print(f"SVG file not found: {svg_path}")
                 return None
-        else:
-            print(f"SVG file not found: {svg_path}")
+            
+            # Create SVG widget
+            self.svg_widget = QSvgWidget()
+            self.svg_widget.load(svg_path)  # Load the SVG file
+            
+            # Configure widget
+            self.svg_widget.setMinimumSize(400, 300)
+            self.svg_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            
+            # Get widget_3 and set up layout
+            widget_3 = self.main_window.ui.widget_3
+            if not widget_3.layout():
+                widget_3.setLayout(QVBoxLayout())
+            
+            # Clear existing content except navigation controls
+            layout = widget_3.layout()
+            while layout.count() > 1:  # Keep navigation controls
+                item = layout.takeAt(1)
+                if item.widget():
+                    item.widget().deleteLater()
+            
+            # Add SVG widget
+            layout.addWidget(self.svg_widget)
+            
+            # Show everything
+            self.svg_widget.show()
+            widget_3.show()
+            
+            print(f"Successfully displayed SVG from: {svg_path}")
+            return self.svg_widget
+            
+        except Exception as e:
+            print(f"Error displaying SVG: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return None
