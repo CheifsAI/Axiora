@@ -176,11 +176,11 @@ class DataAnalyzer:
         code_template = """import pygal
         from pygal.style import RedBlueStyle
 
-        data = df['{column}'].value_counts()
+        data = df["{column}"].value_counts()
         chart = pygal.{chart_type}(style=RedBlueStyle, x_label_rotation=45)
         chart.title = '{chart_title}'
-        chart.x_labels = data.index.tolist()
-        chart.add('{chart_title}', data.values)
+        chart.x_labels = [str(x) for x in data.index.tolist()]  # Convert all labels to strings
+        chart.add('{column}', data.values)  # Use original column name for legend
         chart.render_to_file('{report}/{chart_title}.svg')
         """
         viscodes = []
@@ -191,6 +191,10 @@ class DataAnalyzer:
             chart_type = vis_resp['chart_type']
             chart_title = vis_resp['chart_title']
             column = vis_resp['columns']
+            
+            # Clean up column name and chart title
+            if column in self.dataframe.columns:  # Verify column exists
+                chart_title = f"{column} Distribution"  # Use simple distribution title
             
             viscode = code_template.format(
                 chart_type=chart_type,
@@ -245,16 +249,16 @@ class DataAnalyzer:
     - Avoid pie charts when >5 categories"""
 
         chart_selection_prompt = PromptTemplate(
-            input_variables=["guidelines", "data_info", "data_sample", "data_summary", "question", "data_cols"],
-            template="""
-            You are a data analyst responsible for selecting the most appropriate chart type for a given dataset:
-            Dataset metadata: {data_info}
-            Dataset sample: {data_sample}
-            Dataset summary: {data_summary}
-            Dataset columns: {data_cols}
-            Use {guidelines} to determine the most suitable chart type for this question: {question}
-            Respond ONLY with the chart type name and and chart title and one relevant column (e.g., "Line chart, Sales, Date").
-            """
+            input_variables=["data_cols", "question"],
+            template="""Based on the available columns: {data_cols}
+            Select the most appropriate visualization for this question: {question}
+            
+            Respond in this exact format:
+            chart_type: [type]
+            column: [single column name]
+            
+            The column MUST be one of the available columns listed above.
+            The chart_type should be one of: bar, line, pie, histogram, stackedbar, radar, box"""
         )
 
         chart_selection_chain = LLMChain(
@@ -264,27 +268,36 @@ class DataAnalyzer:
         )
         
         response = chart_selection_chain({
-            "guidelines": guidelines,
-            "data_info": data_info,
-            "data_sample": data_sample,
-            "data_summary": data_summary,
-            "question": question,
-            "data_cols": data_cols
+            "data_cols": data_cols,
+            "question": question
         })
         
         result = response["chart_selection_result"].strip()
         
-        result = result.replace('"', '').replace('\n', '').replace('.', '')
+        # Parse the response
+        chart_type = None
+        column = None
         
-        if "," in result:
-            parts = [p.strip() for p in result.split(",")]
-            chart_type = parts[0] 
-            chart_title = parts[1]
-            columns = parts[2]
-        else:
-            chart_type = result  
-            columns = []
+        for line in result.split('\n'):
+            if 'chart_type:' in line.lower():
+                chart_type = line.split(':')[1].strip().lower()
+            elif 'column:' in line.lower():
+                column = line.split(':')[1].strip()
         
-        chart_type = chart_type_mapping.get(chart_type, "Bar")  # Default to "Bar" if not found
+        # Validate and clean up
+        if not chart_type or not column:
+            chart_type = "Bar"  # default
+            column = self.dataframe.columns[0]  # fallback to first column
+            
+        chart_type = chart_type_mapping.get(chart_type, "Bar")
         
-        return {"chart_type": chart_type, "chart_title": chart_title, "columns": columns}
+        # Verify column exists in dataframe
+        if column not in self.dataframe.columns:
+            print(f"Warning: Column '{column}' not found. Available columns: {self.data_cols}")
+            column = self.dataframe.columns[0]  # fallback to first column
+            
+        return {
+            "chart_type": chart_type,
+            "chart_title": column,  # Use column name as chart title
+            "columns": column
+        }
