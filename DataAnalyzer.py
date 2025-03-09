@@ -172,12 +172,12 @@ class DataAnalyzer:
         return response
     
 
-    def visual(self,report, style, questions_list: list):
+    def visual(self,report, questions_list: list):
         code_template = """import pygal
-        from pygal.style import {style}
+        from pygal.style import RedBlueStyle
 
         data = df['{column}'].value_counts()
-        chart = pygal.{chart_type}(style={style}, x_label_rotation=45)
+        chart = pygal.{chart_type}(style=RedBlueStyle, x_label_rotation=45)
         chart.title = '{chart_title}'
         chart.x_labels = data.index.tolist()
         chart.add('{chart_title}', data.values)
@@ -193,7 +193,6 @@ class DataAnalyzer:
             column = vis_resp['columns']
             
             viscode = code_template.format(
-                style=style,
                 chart_type=chart_type,
                 chart_title=chart_title,
                 column=column,

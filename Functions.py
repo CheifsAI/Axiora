@@ -391,42 +391,14 @@ class GuiFunctions():
         
         print(f"Processing {len(self.selected_qu_list)} selected questions")
         print(f"Selected questions: {self.selected_qu_list}")
-        
-        try:
-            # Create chartsss directory if it doesn't exist
-            os.makedirs("chartsss", exist_ok=True)
-            
-            # Get visualization code for all selected questions
-            vis_codes = self.analyzer.visual(
-                report="chartsss",
-                style="DarkStyle",
-                questions_list=self.selected_qu_list
-            )
-            
-            # Execute each visualization code
-            for i, vis_code in enumerate(vis_codes):
-                try:
-                    # Create execution environment with DataFrame and required imports
-                    exec_env = {
-                        "df": self.df,
-                        "pygal": __import__('pygal'),
-                        "Style": getattr(__import__('pygal.style'), 'Style')
-                    }
-                    
-                    # Fix indentation in the visualization code
-                    fixed_code = "\\n".join(line.strip() for line in vis_code.split('\\n'))
-                    
-                    # Execute the visualization code
-                    exec(fixed_code, exec_env)
-                    
-                    # Get response from analyzer for the question
-                    response = self.analyzer.chat(self.selected_qu_list[i])
-                    print(f"Question {i+1}: {self.selected_qu_list[i]}")
-                    print(f"Response: {response}")
-                    
-                except Exception as e:
-                    print(f"Error executing visualization code for question {i+1}: {str(e)}")
-                    self.create_error_svg(f"chartsss/chart_{i+1}.svg", f"Error: {str(e)}")
+        vis_codes = self.analyzer.visual(questions_list=self.selected_qu_list,report=self.rname)
+        for i,code in enumerate(vis_codes):
+            code =  "\n".join(line.strip() for line in code.splitlines() if line.strip())
+            print(code)
+            exec(code, {'df': self.analyzer.dataframe})
+
+            #print(f"Error executing visualization code for question {i+1}")
+            #self.create_error_svg(f"{self.rname}/chart_{i+1}.svg")
             
             # Set up for chart display
             self.current_chart_index = 0
@@ -437,11 +409,6 @@ class GuiFunctions():
             
             # Switch to the visualization page
             self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
-            
-        except Exception as e:
-            print(f"Error processing questions: {str(e)}")
-            import traceback
-            traceback.print_exc()
 
     def create_error_svg(self, chart_path, error_message):
         """Create a simple SVG with an error message"""
@@ -465,7 +432,7 @@ class GuiFunctions():
     def display_current_chart(self):
         """Display the current chart in widget_3"""
         try:
-            current_chart_path = os.path.join("chartsss", f"chart_{self.current_chart_index + 1}.svg")
+            current_chart_path = os.path.join(self.rname, f"chart_{self.current_chart_index + 1}.svg")
             if os.path.exists(current_chart_path):
                 # Create navigation buttons if they don't exist
                 if not hasattr(self, 'nav_widget'):
