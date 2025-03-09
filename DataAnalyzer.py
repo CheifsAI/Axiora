@@ -209,9 +209,9 @@ class DataAnalyzer:
     
     
     def _chart_select_chain(self, question):
-        data_info = self.data_info
-        data_sample = self.data_sample
-        data_summary = self.data_summary
+       # data_info = self.data_info
+       # data_sample = self.data_sample
+       # data_summary = self.data_summary
         data_cols = self.data_cols
         llm = self.llm
 
@@ -252,6 +252,7 @@ class DataAnalyzer:
             input_variables=["data_cols", "question"],
             template="""Based on the available columns: {data_cols}
             Select the most appropriate visualization for this question: {question}
+            based on {guidelines} 
             
             Respond in this exact format:
             chart_type: [type]
@@ -269,7 +270,8 @@ class DataAnalyzer:
         
         response = chart_selection_chain({
             "data_cols": data_cols,
-            "question": question
+            "question": question,
+            "guidelines":guidelines
         })
         
         result = response["chart_selection_result"].strip()
