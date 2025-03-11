@@ -6,6 +6,7 @@ from sqlalchemy import (
     Column, String, Integer, CHAR, SmallInteger,
     Text, DateTime
 )
+from sqlalchemy import func
 from sqlalchemy.orm import relationship, declarative_base
 
 engine = create_engine("sqlite:///axioradb.db")
@@ -61,7 +62,7 @@ class Dataset(Base):
     dataset_id = Column(Integer, primary_key=True, autoincrement=True)
     dataset_name = Column(Text, nullable=False)
     raw_data = Column(Text, nullable=False)
-    uploaded_at = Column(DateTime, default="CURRENT_TIMESTAMP")
+    uploaded_at = Column(DateTime, default=func.now())
     data_info = Column(Text)
     data_summary = Column(Text)
     data_sample = Column(Text)
@@ -90,7 +91,7 @@ class CleanDataset(Base):
     dataset_name = Column(Text, nullable=False)
     raw_data = Column(Text, nullable=False)
     original_dataset_id = Column(Integer, ForeignKey("dataset.dataset_id"))
-    cleaned_at = Column(DateTime, default="CURRENT_TIMESTAMP")
+    cleaned_at = Column(DateTime, default=func.now())
     data_info = Column(Text)
     data_summary = Column(Text)
     data_sample = Column(Text)
@@ -121,7 +122,7 @@ class Session(Base):
     llm_id = Column(Integer, ForeignKey("llm.llm_id"))
     dataset_id = Column(Integer, ForeignKey("dataset.dataset_id"))
     clean_dataset_id = Column(Integer, ForeignKey("cleanDataset.clean_dataset_id"))
-    creation_date = Column(DateTime, default="CURRENT_TIMESTAMP")
+    creation_date = Column(DateTime, default=func.now())
     
     # Relationships
     user = relationship("User", back_populates="sessions")
@@ -150,7 +151,7 @@ class SessionMemory(Base):
     message_id = Column(Integer, primary_key=True, autoincrement=True)
     session_id = Column(Integer, ForeignKey("session.session_id", ondelete="CASCADE"))
     llm_id = Column(Integer, ForeignKey("llm.llm_id"))
-    message_date = Column(DateTime, nullable=False)
+    message_date = Column(DateTime, default=func.now(),nullable=False)
     prompt = Column(Text)
     response = Column(Text)
     additional_kwargs = Column(Text)
