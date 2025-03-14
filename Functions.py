@@ -438,6 +438,9 @@ class GuiFunctions():
                 self.main_window.ui.chat_layout.addWidget(ai_msg)
 
     def process_selected_questions(self):
+        for qu in self.selected_qu_list:
+            self.db.saveQuestion(sessID=self.sessionID,
+                                 question=qu)
         """Process selected questions and generate charts"""
         if not self.selected_qu_list:
             print("No questions selected!")

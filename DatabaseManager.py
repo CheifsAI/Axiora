@@ -1,8 +1,8 @@
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import create_engine
-from Axioradb import engine,Dataset,CleanDataset,Session,Summary,LLM
-from datetime import datetime
+from Axioradb import engine,Dataset,CleanDataset,Session,Summary,LLM, Questions
+from sqlalchemy import func
 
 class DatabaseManager:
     def __init__(self):
@@ -66,3 +66,11 @@ class DatabaseManager:
         #llmTable = self.Base.classes.llm 
         result = self.session.query(LLM.llm_id).filter(LLM.llm_name == llmName).first()
         return result[0] if result else None
+    def saveQuestion(self,sessID, question):
+        max_question_num = self.session.query(func.max(Questions.question_num)).filter(Questions.session_id == sessID).scalar()
+        if max_question_num is None:
+            max_question_num = 0
+        new_question_num = max_question_num + 1
+        newQu = Questions(question_num = new_question_num, session_id=sessID, question=question)
+        self.session.add(newQu)
+        self.session.commit()
