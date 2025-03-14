@@ -1,7 +1,7 @@
 #from Custom_Widgets import *
 #from Custom_Widgets.QAppSettings import QAppSettings
 #from Custom_Widgets.QCustomTipOverlay import QCustomTipOverlay
-from PySide6.QtCore import QSettings, QTimer
+from PySide6.QtCore import QSettings, QTimer, QThread, Signal
 from PySide6.QtGui import QColor, QFont, QFontDatabase
 from PySide6.QtWidgets import (QGraphicsDropShadowEffect, QApplication, QMainWindow, 
                              QFileDialog, QPushButton, QLabel, QDialog, QVBoxLayout, 
@@ -31,6 +31,21 @@ from uiEXT.ChatBubble import ChatBubble
 from docx import Document
 from DatabaseManager import DatabaseManager
 
+class SummaryWorker(QThread):
+    finished = Signal(str)
+    error = Signal(str)
+
+    def __init__(self, analyzer):
+        super().__init__()
+        self.analyzer = analyzer
+
+    def run(self):
+        try:
+            summary = self.analyzer.analysis_data()
+            self.finished.emit(summary)
+        except Exception as e:
+            self.error.emit(str(e))
+
 class GuiFunctions():
     def __init__(self, MainWindow,user_id):
         self.main_window = MainWindow
@@ -40,6 +55,10 @@ class GuiFunctions():
         self.llm = llama3b
         self.selected_qu_list = []  # Initialize empty list
         self.setup_connections()
+        self.summary_worker = None  # Initialize worker as None
+        self.loading_timer = QTimer()
+        self.loading_timer.timeout.connect(self.update_loading_animation)
+        self.loading_dots = 0
 
     def setup_connections(self):
         self.main_window.ui.openfile_btn.clicked.connect(self.handle_data_button)
@@ -182,11 +201,47 @@ class GuiFunctions():
                     self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))
 
     def handle_sum_btn(self):
-        self.summary = self.analyzer.analysis_data()
-        self.db.saveSummary(session=self.sessionID,summary_content=self.summary)
-        self.summary_md = markdown(self.summary)
-        self.summary_text = self.main_window.ui.summary_text
-        self.summary_text.setMarkdown(self.summary_md)
+        # Disable the summary button and start loading animation
+        self.main_window.ui.sum_btn.setEnabled(False)
+        self.main_window.ui.sum_btn.setText("Generating")
+        self.loading_timer.start(500)  # Update every 500ms
+        
+        # Create and configure the worker
+        self.summary_worker = SummaryWorker(self.analyzer)
+        self.summary_worker.finished.connect(self.handle_summary_complete)
+        self.summary_worker.error.connect(self.handle_summary_error)
+        self.summary_worker.start()
+
+    def handle_summary_complete(self, summary):
+        try:
+            # Stop loading animation
+            self.loading_timer.stop()
+            self.main_window.ui.sum_btn.setText("Generate Summary")
+            
+            # Save to database and update UI
+            self.db.saveSummary(session=self.sessionID, summary_content=summary)
+            summary_md = markdown(summary)
+            self.main_window.ui.summary_text.setMarkdown(summary_md)
+        except Exception as e:
+            print(f"Error handling summary completion: {str(e)}")
+        finally:
+            # Reset UI state
+            self.main_window.ui.sum_btn.setEnabled(True)
+            self.main_window.ui.sum_btn.setText("Generate Summary")
+            if self.summary_worker:
+                self.summary_worker.deleteLater()
+                self.summary_worker = None
+
+    def handle_summary_error(self, error_message):
+        # Stop loading animation
+        self.loading_timer.stop()
+        self.main_window.ui.sum_btn.setText("Generate Summary")
+        print(f"Error generating summary: {error_message}")
+        self.main_window.ui.sum_btn.setEnabled(True)
+        
+        if self.summary_worker:
+            self.summary_worker.deleteLater()
+            self.summary_worker = None
 
     def handle_btn_LLMs(self):
         print("Clicked LLM")
@@ -611,3 +666,7 @@ class GuiFunctions():
             import traceback
             traceback.print_exc()
             return None
+
+    def update_loading_animation(self):
+        self.loading_dots = (self.loading_dots + 1) % 4
+        self.main_window.ui.sum_btn.setText(f"Generating{'.' * self.loading_dots}")
