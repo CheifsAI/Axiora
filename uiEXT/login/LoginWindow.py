@@ -5,7 +5,7 @@ from PySide6.QtGui import QColor, QPixmap
 from uiEXT.login.ui_login import Ui_Login 
 from uiEXT.login.circular_progress import CircularProgress
 from sqlalchemy.orm import sessionmaker  
-from Axioradb import engine, users
+from Axioradb import engine, User
 
 counter = 0
 SessionLocal = sessionmaker(bind=engine)
@@ -72,7 +72,7 @@ class LoginWindow(QMainWindow):
 
             db = SessionLocal()
             try:
-                user = db.query(users).filter(users.username == username).first()
+                user = db.query(User).filter(User.username == username).first()
                 if user and user.check_password(password):
                     self.ui.user_description.setText(f"Welcome {username}!")
                     self.ui.user_description.setStyleSheet("#user_description { color: #bdff00 }")
