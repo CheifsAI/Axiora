@@ -18,8 +18,10 @@ class User(Base):
     username = Column(String, nullable=False, unique=True)
     password_hash = Column(String, nullable=False)
     email = Column(String)
+    preferred_llm = Column(Integer, ForeignKey('llm.llm_id'), nullable=True)
     
     sessions = relationship("Session", back_populates="user")
+    llm = relationship("LLM", back_populates="users")
 
     def __init__(self, username, email, password):
         self.username = username
@@ -46,6 +48,7 @@ class LLM(Base):
     # Relationships
     sessions = relationship("Session", back_populates="llm")
     session_memories = relationship("SessionMemory", back_populates="llm")
+    users = relationship("User", back_populates="llm")  
 
     def __init__(self, llm_name, parameters=None, install_llm_code=None):
         self.llm_name = llm_name
