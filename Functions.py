@@ -1,7 +1,7 @@
 #from Custom_Widgets import *
 #from Custom_Widgets.QAppSettings import QAppSettings
 #from Custom_Widgets.QCustomTipOverlay import QCustomTipOverlay
-from PySide6.QtCore import QSettings, QTimer
+from PySide6.QtCore import QSettings, QTimer, QThread, Signal
 from PySide6.QtGui import QColor, QFont, QFontDatabase
 from PySide6.QtWidgets import (QGraphicsDropShadowEffect, QApplication, QMainWindow, 
                              QFileDialog, QPushButton, QLabel, QDialog, QVBoxLayout, 
@@ -31,6 +31,21 @@ from uiEXT.ChatBubble import ChatBubble
 from docx import Document
 from DatabaseManager import DatabaseManager
 
+class SummaryWorker(QThread):
+    finished = Signal(str)
+    error = Signal(str)
+
+    def __init__(self, analyzer):
+        super().__init__()
+        self.analyzer = analyzer
+
+    def run(self):
+        try:
+            summary = self.analyzer.analysis_data()
+            self.finished.emit(summary)
+        except Exception as e:
+            self.error.emit(str(e))
+
 class GuiFunctions():
     def __init__(self, MainWindow,user_id):
         self.main_window = MainWindow
@@ -40,6 +55,10 @@ class GuiFunctions():
         self.llm = llama3b
         self.selected_qu_list = []  # Initialize empty list
         self.setup_connections()
+        self.summary_worker = None  # Initialize worker as None
+        self.loading_timer = QTimer()
+        self.loading_timer.timeout.connect(self.update_loading_animation)
+        self.loading_dots = 0
 
     def setup_connections(self):
         self.main_window.ui.openfile_btn.clicked.connect(self.handle_data_button)
@@ -182,11 +201,47 @@ class GuiFunctions():
                     self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))
 
     def handle_sum_btn(self):
-        self.summary = self.analyzer.analysis_data()
-        self.db.saveSummary(session=self.sessionID,summary_content=self.summary)
-        self.summary_md = markdown(self.summary)
-        self.summary_text = self.main_window.ui.summary_text
-        self.summary_text.setMarkdown(self.summary_md)
+        # Disable the summary button and start loading animation
+        self.main_window.ui.sum_btn.setEnabled(False)
+        self.main_window.ui.sum_btn.setText("Generating")
+        self.loading_timer.start(500)  # Update every 500ms
+        
+        # Create and configure the worker
+        self.summary_worker = SummaryWorker(self.analyzer)
+        self.summary_worker.finished.connect(self.handle_summary_complete)
+        self.summary_worker.error.connect(self.handle_summary_error)
+        self.summary_worker.start()
+
+    def handle_summary_complete(self, summary):
+        try:
+            # Stop loading animation
+            self.loading_timer.stop()
+            self.main_window.ui.sum_btn.setText("Generate Summary")
+            
+            # Save to database and update UI
+            self.db.saveSummary(session=self.sessionID, summary_content=summary)
+            summary_md = markdown(summary)
+            self.main_window.ui.summary_text.setMarkdown(summary_md)
+        except Exception as e:
+            print(f"Error handling summary completion: {str(e)}")
+        finally:
+            # Reset UI state
+            self.main_window.ui.sum_btn.setEnabled(True)
+            self.main_window.ui.sum_btn.setText("Generate Summary")
+            if self.summary_worker:
+                self.summary_worker.deleteLater()
+                self.summary_worker = None
+
+    def handle_summary_error(self, error_message):
+        # Stop loading animation
+        self.loading_timer.stop()
+        self.main_window.ui.sum_btn.setText("Generate Summary")
+        print(f"Error generating summary: {error_message}")
+        self.main_window.ui.sum_btn.setEnabled(True)
+        
+        if self.summary_worker:
+            self.summary_worker.deleteLater()
+            self.summary_worker = None
 
     def handle_btn_LLMs(self):
         print("Clicked LLM")
@@ -393,40 +448,49 @@ class GuiFunctions():
         print(f"Selected questions: {self.selected_qu_list}")
         
         try:
-            # Create chartsss directory if it doesn't exist
-            os.makedirs("chartsss", exist_ok=True)
-            
             # Get visualization code for all selected questions
             vis_codes = self.analyzer.visual(
-                report="chartsss",
-                style="DarkStyle",
-                questions_list=self.selected_qu_list
+                questions_list=self.selected_qu_list,
+                report=self.rname  # Use the dataset directory
             )
             
             # Execute each visualization code
-            for i, vis_code in enumerate(vis_codes):
-                try:
-                    # Create execution environment with DataFrame and required imports
+            for i, code in enumerate(vis_codes):
+                #try:
+                    # Import required modules in the execution environment
                     exec_env = {
-                        "df": self.df,
-                        "pygal": __import__('pygal'),
-                        "Style": getattr(__import__('pygal.style'), 'Style')
+                        'df': self.analyzer.dataframe,
+                        #'pygal': __import__('pygal'),
+                        #'RedBlueStyle': getattr(__import__('pygal.style'), 'RedBlueStyle')
                     }
                     
-                    # Fix indentation in the visualization code
-                    fixed_code = "\\n".join(line.strip() for line in vis_code.split('\\n'))
+                    # Clean up the code and ensure proper file path
+                    code = "\n".join(line.strip() for line in code.splitlines() if line.strip())
+                    
+                    # Replace the chart rendering path to use numbered filenames
+                    #chart_path = os.path.join(self.rname, f"chart_{i+1}.svg")
+                    #code = code.replace(
+                      #  "chart.render_to_file('{report}/{chart_title}.svg')",
+                     #   f"chart.render_to_file(r'{chart_path}')"
+                    #)
+                    
+                    print(f"Executing visualization code for question {i+1}:")
+                    print(code)
                     
                     # Execute the visualization code
-                    exec(fixed_code, exec_env)
+                    exec(code, exec_env)
                     
-                    # Get response from analyzer for the question
-                    response = self.analyzer.chat(self.selected_qu_list[i])
-                    print(f"Question {i+1}: {self.selected_qu_list[i]}")
-                    print(f"Response: {response}")
+                    # Verify the file was created
+                    #if os.path.exists(chart_path):
+                     #   print(f"Successfully created chart: {chart_path}")
+                    #else:
+                     #   print(f"Failed to create chart: {chart_path}")
+                      #  self.create_error_svg(chart_path, f"Error generating chart for question {i+1}")
                     
-                except Exception as e:
-                    print(f"Error executing visualization code for question {i+1}: {str(e)}")
-                    self.create_error_svg(f"chartsss/chart_{i+1}.svg", f"Error: {str(e)}")
+                #except Exception as e:
+                 #   print(f"Error executing visualization code for question {i+1}: {str(e)}")
+                  #  error_file = os.path.join(self.rname, f"chart_{i+1}.svg")
+                   # self.create_error_svg(error_file, f"Error: {str(e)}")
             
             # Set up for chart display
             self.current_chart_index = 0
@@ -465,21 +529,53 @@ class GuiFunctions():
     def display_current_chart(self):
         """Display the current chart in widget_3"""
         try:
-            current_chart_path = os.path.join("chartsss", f"chart_{self.current_chart_index + 1}.svg")
+            # Ensure we have a valid chart index
+            if not hasattr(self, 'current_chart_index'):
+                print("No current chart index set")
+                return
+            
+            # Get a list of all .svg files in the directory
+            svg_files = [f for f in os.listdir(self.rname) if f.endswith('.svg')]
+            
+            # Check if there are any .svg files
+            if not svg_files:
+                print("No SVG files found in the directory")
+                return
+            
+            # Ensure the current_chart_index is within bounds
+            if self.current_chart_index < 0 or self.current_chart_index >= len(svg_files):
+                print("Invalid chart index")
+                return
+            
+            # Get the current chart file
+            current_chart_file = svg_files[self.current_chart_index]
+            current_chart_path = os.path.join(self.rname, current_chart_file)
+            
+            print(f"Looking for chart at: {current_chart_path}")
+            
             if os.path.exists(current_chart_path):
+                print(f"Found chart file: {current_chart_path}")
+                
                 # Create navigation buttons if they don't exist
                 if not hasattr(self, 'nav_widget'):
                     self.create_navigation_controls()
                 
                 # Display the SVG
-                self.display_svg(current_chart_path)
-                
-                # Update navigation button states
-                self.prev_btn.setEnabled(self.current_chart_index > 0)
-                self.next_btn.setEnabled(self.current_chart_index < self.total_charts - 1)
-                
-                # Update chart counter label
-                self.chart_counter.setText(f"Chart {self.current_chart_index + 1} of {self.total_charts}")
+                if self.display_svg(current_chart_path):
+                    # Update navigation button states
+                    if hasattr(self, 'prev_btn') and hasattr(self, 'next_btn'):
+                        self.prev_btn.setEnabled(self.current_chart_index > 0)
+                        self.next_btn.setEnabled(self.current_chart_index < len(svg_files) - 1)
+                    
+                    # Update chart counter label
+                    if hasattr(self, 'chart_counter'):
+                        self.chart_counter.setText(f"Chart {self.current_chart_index + 1} of {len(svg_files)}")
+                else:
+                    print("Failed to display SVG widget")
+            else:
+                print(f"Chart file not found: {current_chart_path}")
+                # Create error SVG if chart is missing
+                self.create_error_svg(current_chart_path, "Chart file not found")
                 
         except Exception as e:
             print(f"Error displaying chart: {str(e)}")
@@ -526,44 +622,51 @@ class GuiFunctions():
 
     def display_svg(self, svg_path):
         """Display an SVG file in widget_3"""
-        if os.path.exists(svg_path):
-            try:
-                # Create SVG widget
-                self.svg_widget = QSvgWidget(svg_path)
-                
-                # Configure widget
-                self.svg_widget.setMinimumSize(400, 300)
-                self.svg_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                
-                # Get widget_3 and set up layout
-                widget_3 = self.main_window.ui.widget_3
-                if not widget_3.layout():
-                    widget_3.setLayout(QVBoxLayout())
-                
-                # Clear existing content except navigation controls
-                layout = widget_3.layout()
-                while layout.count() > 1:  # Keep navigation controls
-                    item = layout.takeAt(1)
-                    if item.widget():
-                        item.widget().deleteLater()
-                
-                # Add SVG widget
-                layout.addWidget(self.svg_widget)
-                
-                # Show everything
-                self.svg_widget.show()
-                widget_3.show()
-                
-                # Switch to the page containing widget_3
-                self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
-                
-                return self.svg_widget
-                
-            except Exception as e:
-                print(f"Error displaying SVG: {str(e)}")
-                import traceback
-                traceback.print_exc()
+        try:
+            # Verify the file exists and is a valid path
+            if not isinstance(svg_path, str):
+                raise ValueError("SVG path must be a string")
+            
+            if not os.path.exists(svg_path):
+                print(f"SVG file not found: {svg_path}")
                 return None
-        else:
-            print(f"SVG file not found: {svg_path}")
+            
+            # Create SVG widget
+            self.svg_widget = QSvgWidget()
+            self.svg_widget.load(svg_path)  # Load the SVG file
+            
+            # Configure widget
+            self.svg_widget.setMinimumSize(400, 300)
+            self.svg_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            
+            # Get widget_3 and set up layout
+            widget_3 = self.main_window.ui.widget_3
+            if not widget_3.layout():
+                widget_3.setLayout(QVBoxLayout())
+            
+            # Clear existing content except navigation controls
+            layout = widget_3.layout()
+            while layout.count() > 1:  # Keep navigation controls
+                item = layout.takeAt(1)
+                if item.widget():
+                    item.widget().deleteLater()
+            
+            # Add SVG widget
+            layout.addWidget(self.svg_widget)
+            
+            # Show everything
+            self.svg_widget.show()
+            widget_3.show()
+            
+            print(f"Successfully displayed SVG from: {svg_path}")
+            return self.svg_widget
+            
+        except Exception as e:
+            print(f"Error displaying SVG: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return None
+
+    def update_loading_animation(self):
+        self.loading_dots = (self.loading_dots + 1) % 4
+        self.main_window.ui.sum_btn.setText(f"Generating{'.' * self.loading_dots}")

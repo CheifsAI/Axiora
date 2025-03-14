@@ -1,17 +1,17 @@
 from sqlalchemy.ext.automap import automap_base
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import create_engine
+from Axioradb import engine,Dataset,CleanDataset,Session,Summary,LLM
+from datetime import datetime
 
 class DatabaseManager:
-    def __init__(self, DATABASE_URL = "sqlite:///axioradb.db"):
-        self.engine = create_engine(DATABASE_URL)
-        self.Base = automap_base()
-        self.Base.prepare(autoload_with=self.engine)
-        self.session = Session(self.engine)
+    def __init__(self):
+        SessionLocal = sessionmaker(bind=engine)
+        self.session = SessionLocal()
 
     def saveDataSet(self,path,name,info,summary,sample,cols):
-        dataSet = self.Base.classes.dataset
-        newDataSet = dataSet(raw_data=path,
+        #dataSet = self.Base.classes.dataset
+        newDataSet = Dataset(raw_data=path,
                              dataset_name = name,
                              data_info=info,
                              data_summary=summary,
@@ -23,9 +23,10 @@ class DatabaseManager:
         self.session.commit()
         return dataset_id
     def saveCleanDataset(self,ogID,path,name,info,summary,sample,cols):
-        cleandataset = self.Base.classes.cleanDataset
-        newCleanDataset = cleandataset(original_dataset_id=ogID,
+        #cleandataset = self.Base.classes.cleanDataset
+        newCleanDataset = CleanDataset(original_dataset_id=ogID,
                             raw_data=path,
+                            #uploaded_at=datetime.now(),
                              dataset_name = name,
                              data_info=info,
                              data_summary=summary,
@@ -38,8 +39,10 @@ class DatabaseManager:
         return clean_dataset_id
 
     def saveSession(self,user,llm,dataset):
-        sessionTable = self.Base.classes.session
-        newSession = sessionTable(user_id=user,llm_id=llm,dataset_id=dataset)
+        #sessionTable = self.Base.classes.session
+        newSession = Session(user_id=user,
+                             llm_id=llm,
+                             dataset_id=dataset)
         self.session.add(newSession)
         self.session.flush()
         session_id = newSession.session_id  
@@ -47,19 +50,19 @@ class DatabaseManager:
         return session_id
     
     def saveCleanSession(self, sessId, cleandataset):
-        sessionTable = self.Base.classes.session
-        sessionRow = self.session.query(sessionTable).filter(sessionTable.session_id == sessId).first()
+        #sessionTable = self.Base.classes.session
+        sessionRow = self.session.query(Session).filter(Session.session_id == sessId).first()
         if sessionRow:
             sessionRow.clean_dataset_id = cleandataset
             self.session.commit()
 
     def saveSummary(self,session,summary_content):
-        summary = self.Base.classes.summary
-        newSummary = summary(session_id=session,summary_content=summary_content)
+        #summary = self.Base.classes.summary
+        newSummary = Summary(session_id=session,summary_content=summary_content)
         self.session.add(newSummary)
         self.session.commit()
 
     def llm_id_by_name(self, llmName: str) -> int:
-        llmTable = self.Base.classes.llm 
-        result = self.session.query(llmTable.llm_id).filter(llmTable.llm_name == llmName).first()
+        #llmTable = self.Base.classes.llm 
+        result = self.session.query(LLM.llm_id).filter(LLM.llm_name == llmName).first()
         return result[0] if result else None
