@@ -6,6 +6,7 @@ from uiEXT.login.ui_login import Ui_Login
 from uiEXT.login.circular_progress import CircularProgress
 from sqlalchemy.orm import sessionmaker  
 from Axioradb import engine, User
+import os
 
 counter = 0
 SessionLocal = sessionmaker(bind=engine)
@@ -47,10 +48,13 @@ class LoginWindow(QMainWindow):
         self.ui.bg.setGraphicsEffect(self.shadow)
 
         # ADD LOGO IMAGE
-        logo_path = r"images\images\logo axuira.png"
+        logo_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 
+                                "images", "images", "IMG_20250226_011441_442.jpg")
         pixmap = QPixmap(logo_path)
         if not pixmap.isNull():
-            self.ui.logo.setPixmap(pixmap)
+            scaled_pixmap = pixmap.scaled(100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.ui.logo.setPixmap(scaled_pixmap)
+            self.ui.logo.setAlignment(Qt.AlignCenter)
         else:
             print(f"Could not create pixmap from {logo_path}")
 

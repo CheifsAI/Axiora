@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy import (
     PrimaryKeyConstraint, create_engine, ForeignKey,
     Column, String, Integer, CHAR, SmallInteger,
-    Text, DateTime
+    Text, DateTime, Boolean
 )
 from sqlalchemy import func
 from sqlalchemy.orm import relationship, declarative_base
@@ -159,16 +159,15 @@ class SessionMemory(Base):
     response = Column(Text)
     additional_kwargs = Column(Text)
     response_metadata = Column(Text)
-    chat = Column(Text)
+    chat = Column(Boolean)
     
     # Relationships
     session = relationship("Session", back_populates="session_memories")
     llm = relationship("LLM", back_populates="session_memories")
 
-    def __init__(self, session_id, llm_id, message_date, prompt=None, response=None, additional_kwargs=None, response_metadata=None, chat=False):
+    def __init__(self, session_id, llm_id, prompt, response, additional_kwargs=None, response_metadata=None, chat=False):
         self.session_id = session_id
         self.llm_id = llm_id
-        self.message_date = message_date
         self.prompt = prompt
         self.response = response
         self.additional_kwargs = additional_kwargs
@@ -176,7 +175,7 @@ class SessionMemory(Base):
         self.chat = chat
 
     def __repr__(self):
-        return f"<SessionMemory(message_id={self.message_id}, session_id={self.session_id})>"
+        return f"<SessionMemory(message_id={self.message_id}, session_id={self.session_id}, prompet={self.prompt}, response={self.response}, message_date={self.message_date})>"
 
 
 # 7. Summary Table
@@ -239,17 +238,17 @@ class Dashboards(Base):
 class Charts(Base):
     __tablename__ = "charts"
     chart_id = Column(Integer, primary_key=True, autoincrement=True)
-    chart_type = Column(String(255), nullable=False)
+    chart_path = Column(String(255), nullable=False)
     dashboard_id = Column(Integer, ForeignKey("dashboards.dashboard_id", ondelete="CASCADE"))
     chart_style = Column(Text)
     chart_code = Column(Text)
     
     # Relationships
     dashboard = relationship("Dashboards", back_populates="charts")
-    columns = relationship("Columns", back_populates="chart", cascade="all, delete-orphan")
+   # columns = relationship("Columns", back_populates="chart", cascade="all, delete-orphan")
 
-    def __init__(self, chart_type, dashboard_id, chart_style=None, chart_code=None):
-        self.chart_type = chart_type
+    def __init__(self, chart_path, dashboard_id, chart_style=None, chart_code=None):
+        self.chart_path = chart_path
         self.dashboard_id = dashboard_id
         self.chart_style = chart_style
         self.chart_code = chart_code
@@ -259,7 +258,7 @@ class Charts(Base):
 
 
 # 11. Columns Table
-class Columns(Base):
+"""class Columns(Base):
     __tablename__ = "columns"
     column_id = Column(Integer, primary_key=True, autoincrement=True)
     chart_id = Column(Integer, ForeignKey("charts.chart_id", ondelete="CASCADE"))
@@ -274,6 +273,7 @@ class Columns(Base):
 
     def __repr__(self):
         return f"<Columns(column_id={self.column_id}, chart_id={self.chart_id})>"
+        """
 
 
 # 12. FinalReport Table

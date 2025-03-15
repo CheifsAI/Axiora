@@ -14,16 +14,94 @@
 #
 # ///////////////////////////////////////////////////////////////
 
-# MAIN FILE
-# ///////////////////////////////////////////////////////////////
-from Axiora import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
+from . app_settings import Settings
 
 # GLOBALS
 # ///////////////////////////////////////////////////////////////
 GLOBAL_STATE = False
 GLOBAL_TITLE_BAR = True
 
-class UIFunctions(MainWindow):
+class CustomGrip(QWidget):
+    def __init__(self, parent, edge, disable_color = False):
+        QWidget.__init__(self)
+        self.parent = parent
+        self.setParent(parent)
+        self.edge = edge
+        self.disable_color = disable_color
+
+        # SHOW TOP GRIP
+        if edge == Qt.TopEdge:
+            self.setCursor(Qt.SizeVerCursor)
+            self.resizeFunc = self.resizeTop
+
+        # SHOW BOTTOM GRIP
+        elif edge == Qt.BottomEdge:
+            self.setCursor(Qt.SizeVerCursor)
+            self.resizeFunc = self.resizeBottom
+
+        # SHOW LEFT GRIP
+        elif edge == Qt.LeftEdge:
+            self.setCursor(Qt.SizeHorCursor)
+            self.resizeFunc = self.resizeLeft
+
+        # SHOW RIGHT GRIP
+        elif edge == Qt.RightEdge:
+            self.setCursor(Qt.SizeHorCursor)
+            self.resizeFunc = self.resizeRight
+
+        # SHOW NORMAL GRIP
+        else:
+            self.setCursor(Qt.ArrowCursor)
+
+    def resizeLeft(self, event):
+        delta = event.pos()
+        width = max(self.parent.minimumWidth(), self.parent.width() - delta.x())
+        geo = self.parent.geometry()
+        geo.setLeft(geo.right() - width)
+        self.parent.setGeometry(geo)
+        event.accept()
+
+    def resizeTop(self, event):
+        delta = event.pos()
+        height = max(self.parent.minimumHeight(), self.parent.height() - delta.y())
+        geo = self.parent.geometry()
+        geo.setTop(geo.bottom() - height)
+        self.parent.setGeometry(geo)
+        event.accept()
+
+    def resizeRight(self, event):
+        delta = event.pos()
+        width = max(self.parent.minimumWidth(), self.parent.width() + delta.x())
+        self.parent.resize(width, self.parent.height())
+        event.accept()
+
+    def resizeBottom(self, event):
+        delta = event.pos()
+        height = max(self.parent.minimumHeight(), self.parent.height() + delta.y())
+        self.parent.resize(self.parent.width(), height)
+        event.accept()
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.mousePos = event.pos()
+
+    def mouseMoveEvent(self, event):
+        if self.edge and not self.parent.isMaximized():
+            self.resizeFunc(event)
+
+    def paintEvent(self, event):
+        if not self.disable_color:
+            qp = QPainter()
+            qp.begin(self)
+            qp.setPen(Qt.NoPen)
+            qp.setBrush(QColor(255, 255, 255, 1))
+            qp.drawRect(self.rect())
+            qp.end()
+
+class UIFunctions(QMainWindow):
     # MAXIMIZE/RESTORE
     # ///////////////////////////////////////////////////////////////
     def maximize_restore(self):

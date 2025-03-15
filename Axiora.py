@@ -1,10 +1,11 @@
 import sys
 import os
 import platform
+import ctypes
 from Functions import GuiFunctions
 from uiEXT.login.LoginWindow import LoginWindow
-from PySide6.QtWidgets import QApplication, QMainWindow, QHeaderView
-from PySide6.QtGui import QIcon, QFont
+from PySide6.QtWidgets import QApplication, QMainWindow, QHeaderView, QLabel, QVBoxLayout
+from PySide6.QtGui import QIcon, QFont, QPixmap
 
 def resizeEvent(self, event):
     new_size = max(10, self.width() // 100)  
@@ -52,6 +53,28 @@ class MainWindow(QMainWindow):
         # SET UI DEFINITIONS
         # ///////////////////////////////////////////////////////////////
         UIFunctions.uiDefinitions(self)
+
+        # Set icons for buttons
+        widgets.btn_home.setIcon(QIcon(r"images\icons\chat.png"))
+        
+        # Set the logo
+        logo_path = os.path.join(os.path.dirname(__file__), "images", "images", "IMG_20250226_011441_442.jpg")
+        logo_pixmap = QPixmap(logo_path)
+        if not logo_pixmap.isNull():
+            scaled_pixmap = logo_pixmap.scaled(40, 40, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            # Create a QLabel for the logo in the topLogoInfo frame
+            logo_label = QLabel()
+            logo_label.setPixmap(scaled_pixmap)
+            logo_label.setAlignment(Qt.AlignCenter)
+            # Add the label to the topLogoInfo frame
+            layout = QVBoxLayout(widgets.topLogoInfo)
+            layout.setContentsMargins(0, 0, 0, 0)
+            layout.addWidget(logo_label)
+            # Set the logo in the main label if it exists
+            if hasattr(widgets, 'label'):
+                widgets.label.setPixmap(scaled_pixmap)
+        else:
+            print(f"Could not load logo from {logo_path}")
 
         # QTableWidget PARAMETERS
         # ///////////////////////////////////////////////////////////////
@@ -176,16 +199,44 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon("images/IMG_20250226_011441_442.ico"))
-
+    
+    # Set up the application ID for Windows
+    if platform.system() == 'Windows':
+        myappid = 'mycompany.axiora.version1'  # arbitrary string
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    
+    # Set the application icon that will appear in taskbar
+    # Try multiple icon formats
+    icon_paths = [
+        "images/images/IMG_20250226_011441_442.ico",  # First try .ico
+        "images/images/IMG_20250226_011441_442.jpg",  # Then try .jpg
+        "images/IMG_20250226_011441_442.ico",         # Try alternate paths
+        "images/IMG_20250226_011441_442.jpg",
+    ]
+    
+    icon = None
+    for icon_path in icon_paths:
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+            break
+    
+    if icon:
+        app.setWindowIcon(icon)  # Set icon for the entire application
+    else:
+        print("Warning: Could not find icon file in any of the expected locations")
+    
     # Set the font size for the entire application
-    font = QFont("Segoe UI", 12)  # Change the font size here
+    font = QFont("Segoe UI", 12)
     app.setFont(font)
 
     login_window = LoginWindow()
+    if icon:
+        login_window.setWindowIcon(icon)  # Set icon for login window
 
     def open_main(user_id):
         main_window = MainWindow(user_id)
+        if icon:
+            main_window.setWindowIcon(icon)  # Set icon for main window
         main_window.show()
         login_window.close()
 

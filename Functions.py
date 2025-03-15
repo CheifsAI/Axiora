@@ -52,13 +52,17 @@ class GuiFunctions():
         self.ui = MainWindow.ui
         self.user_id = user_id
         self.db = DatabaseManager()
-        self.llm = llama3b
-        self.selected_qu_list = []  # Initialize empty list
+        self.llm = llama3b  
+        self.selected_qu_list = [] 
         self.setup_connections()
-        self.summary_worker = None  # Initialize worker as None
+        self.summary_worker = None 
         self.loading_timer = QTimer()
         self.loading_timer.timeout.connect(self.update_loading_animation)
         self.loading_dots = 0
+        #self.sessionID = None
+        
+        # Connect LLM selection change
+        self.ui.llm_combo.currentTextChanged.connect(self.handle_llm_change)
 
     def setup_connections(self):
         self.main_window.ui.openfile_btn.clicked.connect(self.handle_data_button)
@@ -182,6 +186,7 @@ class GuiFunctions():
             self.sessionID = self.db.saveSession(user=self.user_id,
                                 llm=self.db.llm_id_by_name(self.llm.model),
                                 dataset=self.datasetID)
+            self.analyzer.session_id = self.sessionID
             self.df.insert(0, "Index", self.df.index)
 
             self.table = self.main_window.ui.tableData
@@ -254,6 +259,7 @@ class GuiFunctions():
         self.cleaned_df.to_csv(self.cleaned_df_path, index=False)
         self.df = self.cleaned_df
         self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
+        self.analyzer.session_id = self.sessionID
         self.data_info = self.analyzer.data_info
         self.data_summary = self.analyzer.data_summary
         self.data_sample = self.analyzer.data_sample
@@ -438,6 +444,10 @@ class GuiFunctions():
                 self.main_window.ui.chat_layout.addWidget(ai_msg)
 
     def process_selected_questions(self):
+        for qu in self.selected_qu_list:
+            self.db.saveQuestion(sessID=self.sessionID,
+                                 question=qu)
+        self.dashboardID = self.db.addDashboard(sessID=self.sessionID)
         """Process selected questions and generate charts"""
         if not self.selected_qu_list:
             print("No questions selected!")
@@ -449,13 +459,13 @@ class GuiFunctions():
         
         try:
             # Get visualization code for all selected questions
-            vis_codes = self.analyzer.visual(
+            self.vis_codes = self.analyzer.visual(
                 questions_list=self.selected_qu_list,
                 report=self.rname  # Use the dataset directory
             )
             
             # Execute each visualization code
-            for i, code in enumerate(vis_codes):
+            for i, code in enumerate(self.vis_codes):
                 #try:
                     # Import required modules in the execution environment
                     exec_env = {
@@ -536,7 +546,9 @@ class GuiFunctions():
             
             # Get a list of all .svg files in the directory
             svg_files = [f for f in os.listdir(self.rname) if f.endswith('.svg')]
-            
+            for chart in svg_files:
+                self.db.saveCharts(dashID=self.dashboardID,path=chart)
+
             # Check if there are any .svg files
             if not svg_files:
                 print("No SVG files found in the directory")
@@ -670,3 +682,16 @@ class GuiFunctions():
     def update_loading_animation(self):
         self.loading_dots = (self.loading_dots + 1) % 4
         self.main_window.ui.sum_btn.setText(f"Generating{'.' * self.loading_dots}")
+
+    def handle_llm_change(self, model_name):
+        """Handle LLM model selection change"""
+        if model_name == "llama3b":
+            self.llm = llama3b
+        elif model_name == "phi35":
+            self.llm = phi35
+            
+        # Update analyzer if it exists
+        if hasattr(self, 'analyzer'):
+            self.analyzer.llm = self.llm
+            
+        print(f"LLM model changed to: {model_name}")
