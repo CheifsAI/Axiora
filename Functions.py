@@ -52,13 +52,16 @@ class GuiFunctions():
         self.ui = MainWindow.ui
         self.user_id = user_id
         self.db = DatabaseManager()
-        self.llm = llama3b
+        self.llm = llama3b  # Default LLM
         self.selected_qu_list = []  # Initialize empty list
         self.setup_connections()
         self.summary_worker = None  # Initialize worker as None
         self.loading_timer = QTimer()
         self.loading_timer.timeout.connect(self.update_loading_animation)
         self.loading_dots = 0
+        
+        # Connect LLM selection change
+        self.ui.llm_combo.currentTextChanged.connect(self.handle_llm_change)
 
     def setup_connections(self):
         self.main_window.ui.openfile_btn.clicked.connect(self.handle_data_button)
@@ -670,3 +673,16 @@ class GuiFunctions():
     def update_loading_animation(self):
         self.loading_dots = (self.loading_dots + 1) % 4
         self.main_window.ui.sum_btn.setText(f"Generating{'.' * self.loading_dots}")
+
+    def handle_llm_change(self, model_name):
+        """Handle LLM model selection change"""
+        if model_name == "llama3b":
+            self.llm = llama3b
+        elif model_name == "phi35":
+            self.llm = phi35
+            
+        # Update analyzer if it exists
+        if hasattr(self, 'analyzer'):
+            self.analyzer.llm = self.llm
+            
+        print(f"LLM model changed to: {model_name}")

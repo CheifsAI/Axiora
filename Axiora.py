@@ -3,8 +3,8 @@ import os
 import platform
 from Functions import GuiFunctions
 from uiEXT.login.LoginWindow import LoginWindow
-from PySide6.QtWidgets import QApplication, QMainWindow, QHeaderView
-from PySide6.QtGui import QIcon, QFont
+from PySide6.QtWidgets import QApplication, QMainWindow, QHeaderView, QLabel, QVBoxLayout
+from PySide6.QtGui import QIcon, QFont, QPixmap
 
 def resizeEvent(self, event):
     new_size = max(10, self.width() // 100)  
@@ -52,6 +52,28 @@ class MainWindow(QMainWindow):
         # SET UI DEFINITIONS
         # ///////////////////////////////////////////////////////////////
         UIFunctions.uiDefinitions(self)
+
+        # Set icons for buttons
+        widgets.btn_home.setIcon(QIcon(r"images\icons\chat.png"))
+        
+        # Set the logo
+        logo_path = os.path.join(os.path.dirname(__file__), "images", "images", "IMG_20250226_011441_442.jpg")
+        logo_pixmap = QPixmap(logo_path)
+        if not logo_pixmap.isNull():
+            scaled_pixmap = logo_pixmap.scaled(40, 40, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            # Create a QLabel for the logo in the topLogoInfo frame
+            logo_label = QLabel()
+            logo_label.setPixmap(scaled_pixmap)
+            logo_label.setAlignment(Qt.AlignCenter)
+            # Add the label to the topLogoInfo frame
+            layout = QVBoxLayout(widgets.topLogoInfo)
+            layout.setContentsMargins(0, 0, 0, 0)
+            layout.addWidget(logo_label)
+            # Set the logo in the main label if it exists
+            if hasattr(widgets, 'label'):
+                widgets.label.setPixmap(scaled_pixmap)
+        else:
+            print(f"Could not load logo from {logo_path}")
 
         # QTableWidget PARAMETERS
         # ///////////////////////////////////////////////////////////////
