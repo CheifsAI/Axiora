@@ -441,6 +441,10 @@ class GuiFunctions():
                 self.main_window.ui.chat_layout.addWidget(ai_msg)
 
     def process_selected_questions(self):
+        for qu in self.selected_qu_list:
+            self.db.saveQuestion(sessID=self.sessionID,
+                                 question=qu)
+        self.dashboardID = self.db.addDashboard(sessID=self.sessionID)
         """Process selected questions and generate charts"""
         if not self.selected_qu_list:
             print("No questions selected!")
@@ -452,13 +456,13 @@ class GuiFunctions():
         
         try:
             # Get visualization code for all selected questions
-            vis_codes = self.analyzer.visual(
+            self.vis_codes = self.analyzer.visual(
                 questions_list=self.selected_qu_list,
                 report=self.rname  # Use the dataset directory
             )
             
             # Execute each visualization code
-            for i, code in enumerate(vis_codes):
+            for i, code in enumerate(self.vis_codes):
                 #try:
                     # Import required modules in the execution environment
                     exec_env = {
@@ -539,7 +543,9 @@ class GuiFunctions():
             
             # Get a list of all .svg files in the directory
             svg_files = [f for f in os.listdir(self.rname) if f.endswith('.svg')]
-            
+            for chart in svg_files:
+                self.db.saveCharts(dashID=self.dashboardID,path=chart)
+
             # Check if there are any .svg files
             if not svg_files:
                 print("No SVG files found in the directory")
