@@ -52,13 +52,14 @@ class GuiFunctions():
         self.ui = MainWindow.ui
         self.user_id = user_id
         self.db = DatabaseManager()
-        self.llm = llama3b  # Default LLM
-        self.selected_qu_list = []  # Initialize empty list
+        self.llm = llama3b  
+        self.selected_qu_list = [] 
         self.setup_connections()
-        self.summary_worker = None  # Initialize worker as None
+        self.summary_worker = None 
         self.loading_timer = QTimer()
         self.loading_timer.timeout.connect(self.update_loading_animation)
         self.loading_dots = 0
+        #self.sessionID = None
         
         # Connect LLM selection change
         self.ui.llm_combo.currentTextChanged.connect(self.handle_llm_change)
@@ -185,6 +186,7 @@ class GuiFunctions():
             self.sessionID = self.db.saveSession(user=self.user_id,
                                 llm=self.db.llm_id_by_name(self.llm.model),
                                 dataset=self.datasetID)
+            self.analyzer.session_id = self.sessionID
             self.df.insert(0, "Index", self.df.index)
 
             self.table = self.main_window.ui.tableData
@@ -257,6 +259,7 @@ class GuiFunctions():
         self.cleaned_df.to_csv(self.cleaned_df_path, index=False)
         self.df = self.cleaned_df
         self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
+        self.analyzer.session_id = self.sessionID
         self.data_info = self.analyzer.data_info
         self.data_summary = self.analyzer.data_summary
         self.data_sample = self.analyzer.data_sample

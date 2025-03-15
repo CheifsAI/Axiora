@@ -1,7 +1,7 @@
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import create_engine
-from Axioradb import engine,Dataset,CleanDataset,Session,Summary,LLM, Questions, Dashboards, Charts
+from Axioradb import engine,Dataset,CleanDataset,Session,Summary,LLM, Questions, Dashboards, Charts, SessionMemory
 from sqlalchemy import func
 
 class DatabaseManager:
@@ -66,6 +66,7 @@ class DatabaseManager:
         #llmTable = self.Base.classes.llm 
         result = self.session.query(LLM.llm_id).filter(LLM.llm_name == llmName).first()
         return result[0] if result else None
+    
     def saveQuestion(self,sessID, question):
         max_question_num = self.session.query(func.max(Questions.question_num)).filter(Questions.session_id == sessID).scalar()
         if max_question_num is None:
@@ -74,6 +75,7 @@ class DatabaseManager:
         newQu = Questions(question_num = new_question_num, session_id=sessID, question=question)
         self.session.add(newQu)
         self.session.commit()
+
     def addDashboard(self,sessID):
         newDash = Dashboards(session_id=sessID)
         self.session.add(newDash)
@@ -81,8 +83,17 @@ class DatabaseManager:
         dashboard_id = newDash.dashboard_id  
         self.session.commit()
         return dashboard_id
+    
     def saveCharts(self,dashID,path):
         newChart = Charts(dashboard_id=dashID,chart_path=path)
         self.session.add(newChart)
         self.session.commit()
 
+    def saveMemory(self,sessID,llm,prompet,response,chat):
+        newMessage = SessionMemory(session_id=sessID,
+                                   llm_id=llm,
+                                   prompt=prompet,
+                                   response=response,
+                                   chat=chat)
+        self.session.add(newMessage)
+        self.session.commit()

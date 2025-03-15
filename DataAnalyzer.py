@@ -10,7 +10,7 @@ from langchain import hub
 import re
 from modelEXT.PygalCodeComponents import PygalCodeComponents
 from langchain.output_parsers import PydanticOutputParser
-
+from DatabaseManager import DatabaseManager
 class DataAnalyzer:
     def __init__(self,dataframe,llm):
         self.dataframe = dataframe
@@ -19,6 +19,8 @@ class DataAnalyzer:
         self.data_summary = data_describer(dataframe)
         self.data_sample = dataframe.head().to_string()
         self.data_cols = ", ".join(dataframe.columns)
+        self.db = DatabaseManager()
+        self.session_id = None
         self.memory = []
 
     def analysis_data(self):
@@ -49,8 +51,11 @@ class DataAnalyzer:
         formatted_analysis_prompt = analysis_prompt.format(data_info=data_info,data_sample=data_sample,data_summary=data_summary)
         self.memory.append(HumanMessage(content=formatted_analysis_prompt))
         self.memory.append(AIMessage(content=analysis))
-
-        
+        self.db.saveMemory(sessID=self.session_id,
+                           llm=self.db.llm_id_by_name(self.llm.model),
+                           prompet=formatted_analysis_prompt,
+                           response=analysis,
+                           chat=False)
         return analysis        
 
     # Drop Nulls
@@ -145,6 +150,11 @@ class DataAnalyzer:
             )
             self.memory.append(HumanMessage(content=formatted_question_prompt))
             self.memory.append(AIMessage(content="\n".join(questions_list)))
+            self.db.saveMemory(sessID=self.session_id,
+                           llm=self.db.llm_id_by_name(self.llm.model),
+                           prompet=formatted_question_prompt,
+                           response="\n".join(questions_list),
+                           chat=False)
 
             return questions_list
 
@@ -167,6 +177,12 @@ class DataAnalyzer:
         chain = prompt_template | self.llm
 
         response = chain.invoke({"input": question, "memory":self.memory})
+        self.db.saveMemory(sessID=self.session_id,
+                           llm=self.db.llm_id_by_name(self.llm.model),
+                           prompet=question,
+                           response=response,
+                           chat=True)
+
         self.memory.append(HumanMessage(content=question))
         self.memory.append(AIMessage(content=response))
         return response
