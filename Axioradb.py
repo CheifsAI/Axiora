@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from sqlalchemy import (
     PrimaryKeyConstraint, create_engine, ForeignKey,
     Column, String, Integer, CHAR, SmallInteger,
-    Text, DateTime
+    Text, DateTime, Boolean
 )
 from sqlalchemy import func
 from sqlalchemy.orm import relationship, declarative_base
@@ -159,16 +159,15 @@ class SessionMemory(Base):
     response = Column(Text)
     additional_kwargs = Column(Text)
     response_metadata = Column(Text)
-    chat = Column(Text)
+    chat = Column(Boolean)
     
     # Relationships
     session = relationship("Session", back_populates="session_memories")
     llm = relationship("LLM", back_populates="session_memories")
 
-    def __init__(self, session_id, llm_id, message_date, prompt=None, response=None, additional_kwargs=None, response_metadata=None, chat=False):
+    def __init__(self, session_id, llm_id, prompt, response, additional_kwargs=None, response_metadata=None, chat=False):
         self.session_id = session_id
         self.llm_id = llm_id
-        self.message_date = message_date
         self.prompt = prompt
         self.response = response
         self.additional_kwargs = additional_kwargs
@@ -176,7 +175,7 @@ class SessionMemory(Base):
         self.chat = chat
 
     def __repr__(self):
-        return f"<SessionMemory(message_id={self.message_id}, session_id={self.session_id})>"
+        return f"<SessionMemory(message_id={self.message_id}, session_id={self.session_id}, prompet={self.prompt}, response={self.response}, message_date={self.message_date})>"
 
 
 # 7. Summary Table
