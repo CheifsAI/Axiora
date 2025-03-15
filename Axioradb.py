@@ -239,17 +239,17 @@ class Dashboards(Base):
 class Charts(Base):
     __tablename__ = "charts"
     chart_id = Column(Integer, primary_key=True, autoincrement=True)
-    chart_type = Column(String(255), nullable=False)
+    chart_path = Column(String(255), nullable=False)
     dashboard_id = Column(Integer, ForeignKey("dashboards.dashboard_id", ondelete="CASCADE"))
     chart_style = Column(Text)
     chart_code = Column(Text)
     
     # Relationships
     dashboard = relationship("Dashboards", back_populates="charts")
-    columns = relationship("Columns", back_populates="chart", cascade="all, delete-orphan")
+   # columns = relationship("Columns", back_populates="chart", cascade="all, delete-orphan")
 
-    def __init__(self, chart_type, dashboard_id, chart_style=None, chart_code=None):
-        self.chart_type = chart_type
+    def __init__(self, chart_path, dashboard_id, chart_style=None, chart_code=None):
+        self.chart_path = chart_path
         self.dashboard_id = dashboard_id
         self.chart_style = chart_style
         self.chart_code = chart_code
@@ -259,7 +259,7 @@ class Charts(Base):
 
 
 # 11. Columns Table
-class Columns(Base):
+"""class Columns(Base):
     __tablename__ = "columns"
     column_id = Column(Integer, primary_key=True, autoincrement=True)
     chart_id = Column(Integer, ForeignKey("charts.chart_id", ondelete="CASCADE"))
@@ -274,6 +274,7 @@ class Columns(Base):
 
     def __repr__(self):
         return f"<Columns(column_id={self.column_id}, chart_id={self.chart_id})>"
+        """
 
 
 # 12. FinalReport Table
