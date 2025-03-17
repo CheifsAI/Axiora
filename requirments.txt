@@ -1,14 +1,6 @@
+protobuf
+cx_Freeze
 langchain_core
-arxiv
-WikipediaQueryRun
-FAISS
-chromadb
-langchain_core
-arxiv
-groq
-langchain_groq
-beautifulsoup4
-sentence_transformers
 QT-PyQt-PySide-Custom-Widgets
 PySide6
 pandas
@@ -18,3 +10,5 @@ markdown
 python-docx
 bcrypt
 passlib
+SQLAlchemy
+pygal
