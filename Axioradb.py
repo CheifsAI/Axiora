@@ -1,5 +1,5 @@
 from passlib.hash import bcrypt
-from datetime import datetime
+from sqlalchemy.orm import sessionmaker
 import sqlalchemy as sa
 from sqlalchemy import (
     PrimaryKeyConstraint, create_engine, ForeignKey,
@@ -296,3 +296,13 @@ class FinalReport(Base):
     def __repr__(self):
         return f"<FinalReport(report_id={self.report_id}, session_id={self.session_id})>"   
 Base.metadata.create_all(engine)
+
+Session = sessionmaker(bind=engine)
+session = Session()
+
+llama = LLM(llm_name="llama3.2:3b", parameters=3, install_llm_code="ollama run llama3.2:3b")
+session.add(llama)
+cheif = User(username="cheif", password="12345", email="cheif@gmail.com")
+session.add(cheif)
+session.commit()
+session.close()
