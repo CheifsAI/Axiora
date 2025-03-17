@@ -300,9 +300,15 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-llama = LLM(llm_name="llama3.2:3b", parameters=3, install_llm_code="ollama run llama3.2:3b")
-session.add(llama)
-cheif = User(username="cheif", password="12345", email="cheif@gmail.com")
-session.add(cheif)
+llama = session.query(LLM).filter_by(llm_name="llama3.2:3b").first()
+if not llama:
+    llama = LLM(llm_name="llama3.2:3b", parameters=3, install_llm_code="ollama run llama3.2:3b")
+    session.add(llama)
+
+cheif = session.query(User).filter_by(username="cheif").first()
+if not cheif:
+    cheif = User(username="cheif", password="12345", email="cheif@gmail.com")
+    session.add(cheif)
+
 session.commit()
 session.close()
