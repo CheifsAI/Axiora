@@ -1,5 +1,4 @@
 import sys
-import platform
 import os
 import platform
 import ctypes
@@ -41,7 +40,6 @@ class MainWindow(QMainWindow):
             Settings.ENABLE_CUSTOM_TITLE_BAR = True
         else:
             Settings.ENABLE_CUSTOM_TITLE_BAR = False
-
 
         # APP NAME
         # ///////////////////////////////////////////////////////////////
