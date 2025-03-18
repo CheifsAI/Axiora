@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QLineEdit,
 
 #from PySide6 import uic
 import os
+import subprocess
 from OprFuncs import read_file, data_infer
 from DataAnalyzer import DataAnalyzer
 from LLM import *
@@ -686,8 +687,14 @@ class GuiFunctions():
     def handle_llm_change(self, model_name):
         """Handle LLM model selection change"""
         if model_name == "llama3b":
+            llm = llama3b.model
+            if not self.is_model_installed(llm):
+                self.install_model(self.db.llm_installtion_code(llm.model))
             self.llm = llama3b
         elif model_name == "phi35":
+            llm = phi35.model
+            if not self.is_model_installed(llm):
+                self.install_model(self.db.llm_installtion_code(llm.model))
             self.llm = phi35
             
         # Update analyzer if it exists
@@ -695,3 +702,15 @@ class GuiFunctions():
             self.analyzer.llm = self.llm
             
         print(f"LLM model changed to: {model_name}")
+
+
+    def is_model_installed(self, model_name):
+        # Run `ollama list` to check if the model is installed
+        result = subprocess.run(["ollama", "list"], capture_output=True, text=True)
+        return model_name in result.stdout
+
+    def install_model(self, install_code):
+        # Execute the installation code in the terminal
+        process = subprocess.run(install_code, shell=True, capture_output=True, text=True)
+        if process.returncode != 0:
+            raise RuntimeError(f"Failed to install model: {process.stderr}")

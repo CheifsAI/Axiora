@@ -297,6 +297,7 @@ class FinalReport(Base):
         return f"<FinalReport(report_id={self.report_id}, session_id={self.session_id})>"   
 Base.metadata.create_all(engine)
 
+""""
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -311,4 +312,4 @@ if not cheif:
     session.add(cheif)
 
 session.commit()
-session.close()
+session.close()"""

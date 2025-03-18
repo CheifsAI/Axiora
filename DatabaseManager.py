@@ -67,6 +67,11 @@ class DatabaseManager:
         result = self.session.query(LLM.llm_id).filter(LLM.llm_name == llmName).first()
         return result[0] if result else None
     
+    def llm_installtion_code(self,llmName: str) -> int:
+        llm = self.session.query(LLM).filter_by(llm_name=llmName).first()
+        return llm.install_llm_code
+
+    
     def saveQuestion(self,sessID, question):
         max_question_num = self.session.query(func.max(Questions.question_num)).filter(Questions.session_id == sessID).scalar()
         if max_question_num is None:
