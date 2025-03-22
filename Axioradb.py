@@ -147,7 +147,7 @@ class Report(Base):
         self.clean_dataset_id = clean_dataset_id
 
     def __repr__(self):
-        return f"<Report(report_id={self.report_id}, user_id={self.user_id})>"
+        return f"<Report(report_id={self.report_id},report_name={self.report_name}, user_id={self.user_id})>"
 
 
 # 6. ReportMemory Table (previously SessionMemory)

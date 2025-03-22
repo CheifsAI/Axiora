@@ -33,6 +33,7 @@ class MainWindow(QMainWindow):
         global widgets
         widgets = self.ui
         self.app_functions = GuiFunctions(self, self.user_id)
+        self.load_reports()
         
         # USE CUSTOM TITLE BAR | USE AS "False" FOR MAC OR LINUX
         # ///////////////////////////////////////////////////////////////
@@ -109,7 +110,7 @@ class MainWindow(QMainWindow):
         # EXTRA RIGHT BOX
         def openCloseRightBox():
             UIFunctions.toggleRightBox(self, True)
-        widgets.settingsTopBtn.clicked.connect(openCloseRightBox)
+        widgets.optionsTopBtn.clicked.connect(openCloseRightBox)
 
         # SHOW APP
         # ///////////////////////////////////////////////////////////////
@@ -132,7 +133,25 @@ class MainWindow(QMainWindow):
         # ///////////////////////////////////////////////////////////////
         widgets.stackedWidget.setCurrentWidget(widgets.home)
         widgets.btn_home.setStyleSheet(UIFunctions.selectMenu(widgets.btn_home.styleSheet()))
-
+    def load_reports(self):
+        #self.report_list.clear()
+        reports = self.app_functions.db.get_user_reports(self.user_id)
+        for report in reports:
+            report_btn = QPushButton(self.ui.topMenus)
+            report_btn.setObjectName(report['name'])
+            sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            sizePolicy1.setHeightForWidth(report_btn.sizePolicy().hasHeightForWidth())
+            report_btn.setSizePolicy(sizePolicy1)
+            report_btn.setMinimumSize(QSize(0, 45))
+           # report_btn.setFont(Qfont)
+            report_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+            report_btn.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+            report_btn.setText(report['name'])
+            report_logo = "images\icons\cil-report-colored-1.png"
+            pixmap_report_logo = QPixmap(report_logo)
+            logo_icon = QIcon(pixmap_report_logo)
+            report_btn.setIcon(logo_icon)
+            self.ui.verticalLayout_14.addWidget(report_btn)
     def applyTheme(self, themeFile):
         with open(themeFile, "r") as file:
             self.setStyleSheet(file.read())

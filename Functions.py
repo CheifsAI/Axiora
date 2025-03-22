@@ -192,18 +192,7 @@ class GuiFunctions():
             self.analyzer.report_id = self.reportID
             self.df.insert(0, "Index", self.df.index)
 
-            self.session_btn = QPushButton(self.main_window.ui.topMenus)
-            self.session_btn.setObjectName(u"session_btn")
-            sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-            sizePolicy1.setHeightForWidth(self.session_btn.sizePolicy().hasHeightForWidth())
-            self.session_btn.setSizePolicy(sizePolicy1)
-            self.session_btn.setMinimumSize(QSize(0, 45))
-           # self.session_btn.setFont(Qfont)
-            self.session_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-            self.session_btn.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-            self.session_btn.setText(f"{self.rname}")
-            #self.session_btn.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-code.png);")
-            self.main_window.ui.verticalLayout_14.addWidget(self.session_btn)
+
 
             self.table = self.main_window.ui.tableData
             self.table.setRowCount(self.df.shape[0])  # Set number of rows
