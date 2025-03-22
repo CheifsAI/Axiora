@@ -20,7 +20,7 @@ class DataAnalyzer:
         self.data_sample = dataframe.head().to_string()
         self.data_cols = ", ".join(dataframe.columns)
         self.db = DatabaseManager()
-        self.session_id = None
+        self.report_id = None
         self.memory = []
 
     def analysis_data(self):
@@ -51,7 +51,7 @@ class DataAnalyzer:
         formatted_analysis_prompt = analysis_prompt.format(data_info=data_info,data_sample=data_sample,data_summary=data_summary)
         self.memory.append(HumanMessage(content=formatted_analysis_prompt))
         self.memory.append(AIMessage(content=analysis))
-        self.db.saveMemory(sessID=self.session_id,
+        self.db.saveMemory(reportID=self.report_id,
                            llm=self.db.llm_id_by_name(self.llm.model),
                            prompet=formatted_analysis_prompt,
                            response=analysis,
@@ -150,7 +150,7 @@ class DataAnalyzer:
             )
             self.memory.append(HumanMessage(content=formatted_question_prompt))
             self.memory.append(AIMessage(content="\n".join(questions_list)))
-            self.db.saveMemory(sessID=self.session_id,
+            self.db.saveMemory(reportID=self.report_id,
                            llm=self.db.llm_id_by_name(self.llm.model),
                            prompet=formatted_question_prompt,
                            response="\n".join(questions_list),
@@ -177,7 +177,7 @@ class DataAnalyzer:
         chain = prompt_template | self.llm
 
         response = chain.invoke({"input": question, "memory":self.memory})
-        self.db.saveMemory(sessID=self.session_id,
+        self.db.saveMemory(reportID=self.report_id,
                            llm=self.db.llm_id_by_name(self.llm.model),
                            prompet=question,
                            response=response,

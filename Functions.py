@@ -185,10 +185,11 @@ class GuiFunctions():
                                                  summary=self.data_summary,
                                                  sample=self.data_sample,
                                                  cols=self.data_cols) 
-            self.sessionID = self.db.saveSession(user=self.user_id,
+            self.reportID = self.db.saveReport(user=self.user_id,
                                 llm=self.db.llm_id_by_name(self.llm.model),
-                                dataset=self.datasetID)
-            self.analyzer.session_id = self.sessionID
+                                dataset=self.datasetID,
+                                rname = self.rname)
+            self.analyzer.report_id = self.reportID
             self.df.insert(0, "Index", self.df.index)
 
             self.session_btn = QPushButton(self.main_window.ui.topMenus)
@@ -239,7 +240,7 @@ class GuiFunctions():
             self.main_window.ui.sum_btn.setText("Generate Summary")
             
             # Save to database and update UI
-            self.db.saveSummary(session=self.sessionID, summary_content=summary)
+            self.db.saveSummary(reportID=self.reportID, summary_content=summary)
             summary_md = markdown(summary)
             self.main_window.ui.summary_text.setMarkdown(summary_md)
         except Exception as e:
@@ -274,7 +275,7 @@ class GuiFunctions():
         self.cleaned_df.to_csv(self.cleaned_df_path, index=False)
         self.df = self.cleaned_df
         self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
-        self.analyzer.session_id = self.sessionID
+        self.analyzer.session_id = self.reportID
         self.data_info = self.analyzer.data_info
         self.data_summary = self.analyzer.data_summary
         self.data_sample = self.analyzer.data_sample
@@ -286,7 +287,7 @@ class GuiFunctions():
                                 summary=self.data_summary,
                                 sample=self.data_sample,
                                 cols=self.data_cols)
-        self.db.saveCleanSession(sessId=self.sessionID,cleandataset=self.datasetID)
+        self.db.saveCleanDatasetReport(reportId=self.reportID,cleandataset=self.datasetID)
         self.table = self.main_window.ui.tableData
         self.table.setRowCount(self.df.shape[0])  # Set number of rows
         self.table.setColumnCount(self.df.shape[1])  # Set number of columns
@@ -460,9 +461,9 @@ class GuiFunctions():
 
     def process_selected_questions(self):
         for qu in self.selected_qu_list:
-            self.db.saveQuestion(sessID=self.sessionID,
+            self.db.saveQuestion(reportID=self.reportID,
                                  question=qu)
-        self.dashboardID = self.db.addDashboard(sessID=self.sessionID)
+        self.dashboardID = self.db.addDashboard(reportID=self.reportID)
         """Process selected questions and generate charts"""
         if not self.selected_qu_list:
             print("No questions selected!")

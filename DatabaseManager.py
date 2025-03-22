@@ -1,7 +1,7 @@
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import create_engine
-from Axioradb import engine,Dataset,CleanDataset,Session,Summary,LLM, Questions, Dashboards, Charts, SessionMemory
+from Axioradb import engine,Dataset,CleanDataset,Report,Summary,LLM, Questions, Dashboards, Charts, ReportMemory
 from sqlalchemy import func
 
 class DatabaseManager:
@@ -38,27 +38,28 @@ class DatabaseManager:
         self.session.commit()
         return clean_dataset_id
 
-    def saveSession(self,user,llm,dataset):
+    def saveReport(self,rname,user,llm,dataset):
         #sessionTable = self.Base.classes.session
-        newSession = Session(user_id=user,
+        newReport = Report(user_id=user,
                              llm_id=llm,
-                             dataset_id=dataset)
-        self.session.add(newSession)
+                             dataset_id=dataset,
+                             report_name=rname)
+        self.session.add(newReport)
         self.session.flush()
-        session_id = newSession.session_id  
+        report_id = newReport.report_id  
         self.session.commit()
-        return session_id
+        return report_id
     
-    def saveCleanSession(self, sessId, cleandataset):
+    def saveCleanDatasetReport(self, reportId, cleandataset):
         #sessionTable = self.Base.classes.session
-        sessionRow = self.session.query(Session).filter(Session.session_id == sessId).first()
-        if sessionRow:
-            sessionRow.clean_dataset_id = cleandataset
+        reportRow = self.session.query(Report).filter(Report.report_id == reportId).first()
+        if reportRow:
+            reportRow.clean_dataset_id = cleandataset
             self.session.commit()
 
-    def saveSummary(self,session,summary_content):
+    def saveSummary(self,reportID,summary_content):
         #summary = self.Base.classes.summary
-        newSummary = Summary(session_id=session,summary_content=summary_content)
+        newSummary = Summary(report_id=reportID,summary_content=summary_content)
         self.session.add(newSummary)
         self.session.commit()
 
@@ -72,17 +73,17 @@ class DatabaseManager:
         return llm.install_llm_code
 
     
-    def saveQuestion(self,sessID, question):
-        max_question_num = self.session.query(func.max(Questions.question_num)).filter(Questions.session_id == sessID).scalar()
+    def saveQuestion(self,reportID, question):
+        max_question_num = self.session.query(func.max(Questions.question_num)).filter(Questions.report_id == reportID).scalar()
         if max_question_num is None:
             max_question_num = 0
         new_question_num = max_question_num + 1
-        newQu = Questions(question_num = new_question_num, session_id=sessID, question=question)
+        newQu = Questions(question_num = new_question_num, report_id=reportID, question=question)
         self.session.add(newQu)
         self.session.commit()
 
-    def addDashboard(self,sessID):
-        newDash = Dashboards(session_id=sessID)
+    def addDashboard(self,reportID):
+        newDash = Dashboards(report_id=reportID)
         self.session.add(newDash)
         self.session.flush()
         dashboard_id = newDash.dashboard_id  
@@ -94,11 +95,14 @@ class DatabaseManager:
         self.session.add(newChart)
         self.session.commit()
 
-    def saveMemory(self,sessID,llm,prompet,response,chat):
-        newMessage = SessionMemory(session_id=sessID,
+    def saveMemory(self,reportID,llm,prompet,response,chat):
+        newMessage = ReportMemory(report_id=reportID,
                                    llm_id=llm,
                                    prompt=prompet,
                                    response=response,
                                    chat=chat)
         self.session.add(newMessage)
         self.session.commit()
+    #def get_user_sessions(self, user_id):
+     #   sessions = self.session.query(Session).filter(Session.user_id == user_id).all()
+      #  return [{'id': session.session_id, 'name': session.dataset.dataset_name} for session in sessions]

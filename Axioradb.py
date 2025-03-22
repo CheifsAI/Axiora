@@ -20,7 +20,7 @@ class User(Base):
     email = Column(String)
     preferred_llm = Column(Integer, ForeignKey('llm.llm_id'), nullable=True)
     
-    sessions = relationship("Session", back_populates="user")
+    reports = relationship("Report", back_populates="user")
     llm = relationship("LLM", back_populates="users")
 
     def __init__(self, username, email, password):
@@ -46,8 +46,8 @@ class LLM(Base):
     install_llm_code = Column(String)
     
     # Relationships
-    sessions = relationship("Session", back_populates="llm")
-    session_memories = relationship("SessionMemory", back_populates="llm")
+    reports = relationship("Report", back_populates="llm")
+    report_memories = relationship("ReportMemory", back_populates="llm")
     users = relationship("User", back_populates="llm")  
 
     def __init__(self, llm_name, parameters=None, install_llm_code=None):
@@ -72,7 +72,7 @@ class Dataset(Base):
     data_columns = Column(Text)
     
     # Relationships
-    sessions = relationship("Session", back_populates="dataset")
+    reports = relationship("Report", back_populates="dataset")
     clean_datasets = relationship("CleanDataset", back_populates="original_dataset")
 
     def __init__(self, dataset_name, raw_data, data_info=None, data_summary=None, data_sample=None, data_columns=None):
@@ -102,7 +102,7 @@ class CleanDataset(Base):
     
     # Relationships
     original_dataset = relationship("Dataset", back_populates="clean_datasets")
-    sessions = relationship("Session", back_populates="clean_dataset")
+    reports = relationship("Report", back_populates="clean_dataset")
 
     def __init__(self, dataset_name, raw_data, original_dataset_id, data_info=None, data_summary=None, data_sample=None, data_columns=None):
         self.dataset_name = dataset_name
@@ -117,44 +117,46 @@ class CleanDataset(Base):
         return f"<CleanDataset(clean_dataset_id={self.clean_dataset_id}, dataset_name='{self.dataset_name}')>"
 
 
-# 5. Session Table
-class Session(Base):
-    __tablename__ = "session"
-    session_id = Column(Integer, primary_key=True, autoincrement=True)
+# 5. Report Table (previously Session)
+class Report(Base):
+    __tablename__ = "report"
+    report_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("users.user_id"))
     llm_id = Column(Integer, ForeignKey("llm.llm_id"))
+    report_name = Column(Text, nullable=False)
     dataset_id = Column(Integer, ForeignKey("dataset.dataset_id"))
     clean_dataset_id = Column(Integer, ForeignKey("cleanDataset.clean_dataset_id"))
     creation_date = Column(DateTime, default=func.now())
     
     # Relationships
-    user = relationship("User", back_populates="sessions")
-    llm = relationship("LLM", back_populates="sessions")
-    dataset = relationship("Dataset", back_populates="sessions")
-    clean_dataset = relationship("CleanDataset", back_populates="sessions")
-    session_memories = relationship("SessionMemory", back_populates="session", cascade="all, delete-orphan")
-    summary = relationship("Summary", back_populates="session", uselist=False, cascade="all, delete-orphan")
-    questions = relationship("Questions", back_populates="session", cascade="all, delete-orphan")
-    dashboards = relationship("Dashboards", back_populates="session", cascade="all, delete-orphan")
-    final_reports = relationship("FinalReport", back_populates="session", cascade="all, delete-orphan")
+    user = relationship("User", back_populates="reports")
+    llm = relationship("LLM", back_populates="reports")
+    dataset = relationship("Dataset", back_populates="reports")
+    clean_dataset = relationship("CleanDataset", back_populates="reports")
+    report_memories = relationship("ReportMemory", back_populates="report", cascade="all, delete-orphan")
+    summary = relationship("Summary", back_populates="report", uselist=False, cascade="all, delete-orphan")
+    questions = relationship("Questions", back_populates="report", cascade="all, delete-orphan")
+    dashboards = relationship("Dashboards", back_populates="report", cascade="all, delete-orphan")
+    final_reports = relationship("FinalReport", back_populates="report", cascade="all, delete-orphan")
 
-    def __init__(self, user_id, llm_id, dataset_id, clean_dataset_id=None):
+    def __init__(self, report_name, user_id, llm_id, dataset_id, clean_dataset_id=None):
         self.user_id = user_id
         self.llm_id = llm_id
         self.dataset_id = dataset_id
+        self.report_name = report_name
         self.clean_dataset_id = clean_dataset_id
 
     def __repr__(self):
-        return f"<Session(session_id={self.session_id}, user_id={self.user_id})>"
+        return f"<Report(report_id={self.report_id}, user_id={self.user_id})>"
 
 
-# 6. SessionMemory Table
-class SessionMemory(Base):
-    __tablename__ = "session_memory"
+# 6. ReportMemory Table (previously SessionMemory)
+class ReportMemory(Base):
+    __tablename__ = "report_memory"
     message_id = Column(Integer, primary_key=True, autoincrement=True)
-    session_id = Column(Integer, ForeignKey("session.session_id", ondelete="CASCADE"))
+    report_id = Column(Integer, ForeignKey("report.report_id", ondelete="CASCADE"))
     llm_id = Column(Integer, ForeignKey("llm.llm_id"))
-    message_date = Column(DateTime, default=func.now(),nullable=False)
+    message_date = Column(DateTime, default=func.now(), nullable=False)
     prompt = Column(Text)
     response = Column(Text)
     additional_kwargs = Column(Text)
@@ -162,11 +164,11 @@ class SessionMemory(Base):
     chat = Column(Boolean)
     
     # Relationships
-    session = relationship("Session", back_populates="session_memories")
-    llm = relationship("LLM", back_populates="session_memories")
+    report = relationship("Report", back_populates="report_memories")
+    llm = relationship("LLM", back_populates="report_memories")
 
-    def __init__(self, session_id, llm_id, prompt, response, additional_kwargs=None, response_metadata=None, chat=False):
-        self.session_id = session_id
+    def __init__(self, report_id, llm_id, prompt, response, additional_kwargs=None, response_metadata=None, chat=False):
+        self.report_id = report_id
         self.llm_id = llm_id
         self.prompt = prompt
         self.response = response
@@ -175,63 +177,63 @@ class SessionMemory(Base):
         self.chat = chat
 
     def __repr__(self):
-        return f"<SessionMemory(message_id={self.message_id}, session_id={self.session_id}, prompet={self.prompt}, response={self.response}, message_date={self.message_date})>"
+        return f"<ReportMemory(message_id={self.message_id}, report_id={self.report_id}, prompt={self.prompt}, response={self.response}, message_date={self.message_date})>"
 
 
 # 7. Summary Table
 class Summary(Base):
     __tablename__ = "summary"
-    session_id = Column(Integer, ForeignKey("session.session_id", ondelete="CASCADE"), primary_key=True)
+    report_id = Column(Integer, ForeignKey("report.report_id", ondelete="CASCADE"), primary_key=True)
     summary_content = Column(Text)
     
     # Relationship
-    session = relationship("Session", back_populates="summary")
+    report = relationship("Report", back_populates="summary")
 
-    def __init__(self, session_id, summary_content=None):
-        self.session_id = session_id
+    def __init__(self, report_id, summary_content=None):
+        self.report_id = report_id
         self.summary_content = summary_content
 
     def __repr__(self):
-        return f"<Summary(session_id={self.session_id})>"
+        return f"<Summary(report_id={self.report_id})>"
 
 
 # 8. Questions Table
 class Questions(Base):
     __tablename__ = "questions"
     question_num = Column(Integer, primary_key=True)
-    session_id = Column(Integer, ForeignKey("session.session_id", ondelete="CASCADE"), primary_key=True)
+    report_id = Column(Integer, ForeignKey("report.report_id", ondelete="CASCADE"), primary_key=True)
     question = Column(Text)
     answer = Column(Text)
     
     # Relationship
-    session = relationship("Session", back_populates="questions")
+    report = relationship("Report", back_populates="questions")
 
-    def __init__(self, question_num, session_id, question, answer=None):
+    def __init__(self, question_num, report_id, question, answer=None):
         self.question_num = question_num
-        self.session_id = session_id
+        self.report_id = report_id
         self.question = question
         self.answer = answer
 
     def __repr__(self):
-        return f"<Questions(question_num={self.question_num}, session_id={self.session_id})>"
+        return f"<Questions(question_num={self.question_num}, report_id={self.report_id})>"
 
 
 # 9. Dashboards Table
 class Dashboards(Base):
     __tablename__ = "dashboards"
     dashboard_id = Column(Integer, primary_key=True, autoincrement=True)
-    session_id = Column(Integer, ForeignKey("session.session_id", ondelete="CASCADE"))
+    report_id = Column(Integer, ForeignKey("report.report_id", ondelete="CASCADE"))
     
     # Relationships
-    session = relationship("Session", back_populates="dashboards")
+    report = relationship("Report", back_populates="dashboards")
     charts = relationship("Charts", back_populates="dashboard", cascade="all, delete-orphan")
     final_reports = relationship("FinalReport", back_populates="dashboard", cascade="all, delete-orphan")
 
-    def __init__(self, session_id):
-        self.session_id = session_id
+    def __init__(self, report_id):
+        self.report_id = report_id
 
     def __repr__(self):
-        return f"<Dashboards(dashboard_id={self.dashboard_id}, session_id={self.session_id})>"
+        return f"<Dashboards(dashboard_id={self.dashboard_id}, report_id={self.report_id})>"
 
 
 # 10. Charts Table
@@ -245,7 +247,6 @@ class Charts(Base):
     
     # Relationships
     dashboard = relationship("Dashboards", back_populates="charts")
-   # columns = relationship("Columns", back_populates="chart", cascade="all, delete-orphan")
 
     def __init__(self, chart_path, dashboard_id, chart_style=None, chart_code=None):
         self.chart_path = chart_path
@@ -279,24 +280,24 @@ class Charts(Base):
 # 12. FinalReport Table
 class FinalReport(Base):
     __tablename__ = "final_report"
-    report_id = Column(Integer, primary_key=True, autoincrement=True)
-    session_id = Column(Integer, ForeignKey("session.session_id", ondelete="CASCADE"), nullable=False)
+    final_report_id = Column(Integer, primary_key=True, autoincrement=True)
+    report_id = Column(Integer, ForeignKey("report.report_id", ondelete="CASCADE"), nullable=False)
     recommendation = Column(Text, nullable=False)
     dashboard_id = Column(Integer, ForeignKey("dashboards.dashboard_id", ondelete="CASCADE"), nullable=False)
     
     # Relationships
-    session = relationship("Session", back_populates="final_reports")
+    report = relationship("Report", back_populates="final_reports")
     dashboard = relationship("Dashboards", back_populates="final_reports")
 
-    def __init__(self, session_id, recommendation, dashboard_id):
-        self.session_id = session_id
+    def __init__(self, report_id, recommendation, dashboard_id):
+        self.report_id = report_id
         self.recommendation = recommendation
         self.dashboard_id = dashboard_id
 
     def __repr__(self):
-        return f"<FinalReport(report_id={self.report_id}, session_id={self.session_id})>"   
-Base.metadata.create_all(engine)
+        return f"<FinalReport(final_report_id={self.final_report_id}, report_id={self.report_id})>"
 
+Base.metadata.create_all(engine)
 """"
 Session = sessionmaker(bind=engine)
 session = Session()
