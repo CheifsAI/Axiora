@@ -8,12 +8,13 @@ from PySide6.QtWidgets import (QGraphicsDropShadowEffect, QApplication, QMainWin
                              QTableWidget, QTableWidgetItem, QSizePolicy)
 from PySide6.QtSvg import QSvgRenderer
 import shutil
+from PySide6.QtGui import QCursor
 from PySide6.QtCore import QFile
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWebEngineCore import QWebEngineSettings
 from PySide6 import QtCore
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt,QUrl
+from PySide6.QtCore import Qt,QUrl,QSize
 from PySide6.QtWidgets import (QApplication, QMainWindow, QLineEdit,
                                QPushButton, QVBoxLayout, QWidget, QLabel,
                                QScrollArea, QSizePolicy, QHBoxLayout,
@@ -21,6 +22,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QLineEdit,
 
 #from PySide6 import uic
 import os
+import subprocess
 from OprFuncs import read_file, data_infer
 from DataAnalyzer import DataAnalyzer
 from LLM import *
@@ -59,7 +61,7 @@ class GuiFunctions():
         self.loading_timer = QTimer()
         self.loading_timer.timeout.connect(self.update_loading_animation)
         self.loading_dots = 0
-        #self.sessionID = None
+        #self.reportID = None
         
         # Connect LLM selection change
         self.ui.llm_combo.currentTextChanged.connect(self.handle_llm_change)
@@ -172,35 +174,34 @@ class GuiFunctions():
             self.location = self.main_window.ui.path_location
             self.location.setText(dpath)
             self.df = read_file(dpath)
-            self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
-            self.data_info = self.analyzer.data_info
-            self.data_summary = self.analyzer.data_summary
-            self.data_sample = self.analyzer.data_sample
-            self.data_cols = self.analyzer.data_cols
+            self._analyzer_attributes()
             self.datasetID = self.db.saveDataSet(path=self.datasetPath,
                                                  name=self.dname,
                                                  info=self.data_info,
                                                  summary=self.data_summary,
                                                  sample=self.data_sample,
                                                  cols=self.data_cols) 
-            self.sessionID = self.db.saveSession(user=self.user_id,
+            self.reportID = self.db.saveReport(user=self.user_id,
                                 llm=self.db.llm_id_by_name(self.llm.model),
-                                dataset=self.datasetID)
-            self.analyzer.session_id = self.sessionID
+                                dataset=self.datasetID,
+                                rname = self.rname)
+            self.analyzer.report_id = self.reportID
+            self._show_df()
+            
+    def _analyzer_attributes(self):
+            self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
+            self.data_info = self.analyzer.data_info
+            self.data_summary = self.analyzer.data_summary
+            self.data_sample = self.analyzer.data_sample
+            self.data_cols = self.analyzer.data_cols
+    def _show_df(self):
             self.df.insert(0, "Index", self.df.index)
-
             self.table = self.main_window.ui.tableData
-            self.table.setRowCount(self.df.shape[0])  # Set number of rows
-            self.table.setColumnCount(self.df.shape[1])  # Set number of columns (including index)
-
-            # Ensure column headers are correctly applied
+            self.table.setRowCount(self.df.shape[0])  
+            self.table.setColumnCount(self.df.shape[1])  
             self.table.setHorizontalHeaderLabels(self.df.columns.astype(str))
-
-            # Ensure visibility and auto-resizing
             self.table.horizontalHeader().setVisible(True)
             self.table.resizeColumnsToContents()
-
-            # Populate the table with data
             for i in range(self.df.shape[0]):
                 for j in range(self.df.shape[1]):
                     self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))
@@ -216,6 +217,9 @@ class GuiFunctions():
         self.summary_worker.finished.connect(self.handle_summary_complete)
         self.summary_worker.error.connect(self.handle_summary_error)
         self.summary_worker.start()
+    def _update_summary_text(self,summary):
+            summary_md = markdown(summary)
+            self.main_window.ui.summary_text.setMarkdown(summary_md)
 
     def handle_summary_complete(self, summary):
         try:
@@ -224,9 +228,8 @@ class GuiFunctions():
             self.main_window.ui.sum_btn.setText("Generate Summary")
             
             # Save to database and update UI
-            self.db.saveSummary(session=self.sessionID, summary_content=summary)
-            summary_md = markdown(summary)
-            self.main_window.ui.summary_text.setMarkdown(summary_md)
+            self.db.saveSummary(reportID=self.reportID, summary_content=summary)
+            self._update_summary_text(summary)
         except Exception as e:
             print(f"Error handling summary completion: {str(e)}")
         finally:
@@ -259,7 +262,7 @@ class GuiFunctions():
         self.cleaned_df.to_csv(self.cleaned_df_path, index=False)
         self.df = self.cleaned_df
         self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
-        self.analyzer.session_id = self.sessionID
+        self.analyzer.session_id = self.reportID
         self.data_info = self.analyzer.data_info
         self.data_summary = self.analyzer.data_summary
         self.data_sample = self.analyzer.data_sample
@@ -271,7 +274,7 @@ class GuiFunctions():
                                 summary=self.data_summary,
                                 sample=self.data_sample,
                                 cols=self.data_cols)
-        self.db.saveCleanSession(sessId=self.sessionID,cleandataset=self.datasetID)
+        self.db.saveCleanDatasetReport(reportId=self.reportID,cleandataset=self.datasetID)
         self.table = self.main_window.ui.tableData
         self.table.setRowCount(self.df.shape[0])  # Set number of rows
         self.table.setColumnCount(self.df.shape[1])  # Set number of columns
@@ -445,9 +448,9 @@ class GuiFunctions():
 
     def process_selected_questions(self):
         for qu in self.selected_qu_list:
-            self.db.saveQuestion(sessID=self.sessionID,
+            self.db.saveQuestion(reportID=self.reportID,
                                  question=qu)
-        self.dashboardID = self.db.addDashboard(sessID=self.sessionID)
+        self.dashboardID = self.db.addDashboard(reportID=self.reportID)
         """Process selected questions and generate charts"""
         if not self.selected_qu_list:
             print("No questions selected!")
@@ -686,8 +689,14 @@ class GuiFunctions():
     def handle_llm_change(self, model_name):
         """Handle LLM model selection change"""
         if model_name == "llama3b":
+            llm = llama3b.model
+            if not self.is_model_installed(llm):
+                self.install_model(self.db.llm_installtion_code(llm.model))
             self.llm = llama3b
         elif model_name == "phi35":
+            llm = phi35.model
+            if not self.is_model_installed(llm):
+                self.install_model(self.db.llm_installtion_code(llm.model))
             self.llm = phi35
             
         # Update analyzer if it exists
@@ -695,3 +704,15 @@ class GuiFunctions():
             self.analyzer.llm = self.llm
             
         print(f"LLM model changed to: {model_name}")
+
+
+    def is_model_installed(self, model_name):
+        # Run `ollama list` to check if the model is installed
+        result = subprocess.run(["ollama", "list"], capture_output=True, text=True)
+        return model_name in result.stdout
+
+    def install_model(self, install_code):
+        # Execute the installation code in the terminal
+        process = subprocess.run(install_code, shell=True, capture_output=True, text=True)
+        if process.returncode != 0:
+            raise RuntimeError(f"Failed to install model: {process.stderr}")
