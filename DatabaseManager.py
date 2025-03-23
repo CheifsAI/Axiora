@@ -103,6 +103,19 @@ class DatabaseManager:
                                    chat=chat)
         self.session.add(newMessage)
         self.session.commit()
+
     def get_user_reports(self, user_id):
        reports = self.session.query(Report).filter(Report.user_id == user_id).all()
        return [{'id': report.report_id, 'name': report.report_name} for report in reports]
+    
+    def get_report_dataset(self, reportID):
+        data_set = self.session.query(Dataset.raw_data)\
+        .join(Report, Report.dataset_id == Dataset.dataset_id)\
+        .filter(Report.report_id == reportID)\
+        .first()
+        return data_set[0] if data_set else None
+    
+    def get_report_summary(self, reportID):
+        summary = self.session.query(Summary.summary_content).filter(Summary.report_id == reportID).first()
+        summary = summary[0] if summary else None
+        return summary

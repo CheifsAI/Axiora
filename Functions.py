@@ -61,7 +61,7 @@ class GuiFunctions():
         self.loading_timer = QTimer()
         self.loading_timer.timeout.connect(self.update_loading_animation)
         self.loading_dots = 0
-        #self.sessionID = None
+        #self.reportID = None
         
         # Connect LLM selection change
         self.ui.llm_combo.currentTextChanged.connect(self.handle_llm_change)
@@ -174,11 +174,7 @@ class GuiFunctions():
             self.location = self.main_window.ui.path_location
             self.location.setText(dpath)
             self.df = read_file(dpath)
-            self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
-            self.data_info = self.analyzer.data_info
-            self.data_summary = self.analyzer.data_summary
-            self.data_sample = self.analyzer.data_sample
-            self.data_cols = self.analyzer.data_cols
+            self._analyzer_attributes()
             self.datasetID = self.db.saveDataSet(path=self.datasetPath,
                                                  name=self.dname,
                                                  info=self.data_info,
@@ -190,22 +186,22 @@ class GuiFunctions():
                                 dataset=self.datasetID,
                                 rname = self.rname)
             self.analyzer.report_id = self.reportID
+            self._show_df()
+            
+    def _analyzer_attributes(self):
+            self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
+            self.data_info = self.analyzer.data_info
+            self.data_summary = self.analyzer.data_summary
+            self.data_sample = self.analyzer.data_sample
+            self.data_cols = self.analyzer.data_cols
+    def _show_df(self):
             self.df.insert(0, "Index", self.df.index)
-
-
-
             self.table = self.main_window.ui.tableData
-            self.table.setRowCount(self.df.shape[0])  # Set number of rows
-            self.table.setColumnCount(self.df.shape[1])  # Set number of columns (including index)
-
-            # Ensure column headers are correctly applied
+            self.table.setRowCount(self.df.shape[0])  
+            self.table.setColumnCount(self.df.shape[1])  
             self.table.setHorizontalHeaderLabels(self.df.columns.astype(str))
-
-            # Ensure visibility and auto-resizing
             self.table.horizontalHeader().setVisible(True)
             self.table.resizeColumnsToContents()
-
-            # Populate the table with data
             for i in range(self.df.shape[0]):
                 for j in range(self.df.shape[1]):
                     self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))

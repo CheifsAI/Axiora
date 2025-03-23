@@ -6,6 +6,7 @@ from Functions import GuiFunctions
 from uiEXT.login.LoginWindow import LoginWindow
 from PySide6.QtWidgets import QApplication, QMainWindow, QHeaderView, QLabel, QVBoxLayout
 from PySide6.QtGui import QIcon, QFont, QPixmap
+from OprFuncs import read_file
 
 def resizeEvent(self, event):
     new_size = max(10, self.width() // 100)  
@@ -133,6 +134,7 @@ class MainWindow(QMainWindow):
         # ///////////////////////////////////////////////////////////////
         widgets.stackedWidget.setCurrentWidget(widgets.home)
         widgets.btn_home.setStyleSheet(UIFunctions.selectMenu(widgets.btn_home.styleSheet()))
+
     def load_reports(self):
         #self.report_list.clear()
         reports = self.app_functions.db.get_user_reports(self.user_id)
@@ -147,11 +149,35 @@ class MainWindow(QMainWindow):
             report_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
             report_btn.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
             report_btn.setText(report['name'])
+            report_btn.setProperty("report_id", report['id'])
+            report_btn.setProperty("report_name", report['name'])
+
             report_logo = "images\icons\cil-report-colored-1.png"
             pixmap_report_logo = QPixmap(report_logo)
             logo_icon = QIcon(pixmap_report_logo)
             report_btn.setIcon(logo_icon)
+
+            report_btn.clicked.connect(self.report_button_clicked)
             self.ui.verticalLayout_14.addWidget(report_btn)
+
+    def report_button_clicked(self):
+        btn = self.sender()
+        report_id = btn.property("report_id")
+        report_name = btn.property("report_name")
+        print(f"Report '{report_name}' (ID: {report_id}) clicked!")
+        self.load_report(report_id)
+    
+    def load_report(self,report_id):
+        self.app_functions.reportID = report_id
+        report_dataset = self.app_functions.db.get_report_dataset(report_id)
+        self.app_functions.dname = os.path.basename(report_dataset)
+        self.app_functions.rname = os.path.splitext(os.path.basename(report_dataset))[0]
+        self.app_functions.df = read_file(report_dataset)
+        self.app_functions._analyzer_attributes()
+        self.app_functions._show_df()
+
+
+    # You can add more logic here, such as loading the report data, etc.
     def applyTheme(self, themeFile):
         with open(themeFile, "r") as file:
             self.setStyleSheet(file.read())
