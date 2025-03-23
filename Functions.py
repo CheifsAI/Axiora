@@ -217,6 +217,9 @@ class GuiFunctions():
         self.summary_worker.finished.connect(self.handle_summary_complete)
         self.summary_worker.error.connect(self.handle_summary_error)
         self.summary_worker.start()
+    def _update_summary_text(self,summary):
+            summary_md = markdown(summary)
+            self.main_window.ui.summary_text.setMarkdown(summary_md)
 
     def handle_summary_complete(self, summary):
         try:
@@ -226,8 +229,7 @@ class GuiFunctions():
             
             # Save to database and update UI
             self.db.saveSummary(reportID=self.reportID, summary_content=summary)
-            summary_md = markdown(summary)
-            self.main_window.ui.summary_text.setMarkdown(summary_md)
+            self._update_summary_text(summary)
         except Exception as e:
             print(f"Error handling summary completion: {str(e)}")
         finally:

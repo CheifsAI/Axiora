@@ -175,6 +175,9 @@ class MainWindow(QMainWindow):
         self.app_functions.df = read_file(report_dataset)
         self.app_functions._analyzer_attributes()
         self.app_functions._show_df()
+        summary = self.app_functions.db.get_report_summary(report_id)
+        if summary:
+            self.app_functions._update_summary_text(summary)
 
 
     # You can add more logic here, such as loading the report data, etc.
