@@ -38,12 +38,27 @@ def extract_code(input_text):
 def read_file(path):
     _, extension = os.path.splitext(path)    
     if extension == ".csv":
-        df = pd.read_csv(path)
+        encodings_to_try = ['utf-8', 'latin1', 'cp1252', 'utf-16']
+        for encoding in encodings_to_try:
+            try:
+                df = pd.read_csv(path, encoding=encoding)
+                print(f"Successfully read CSV with encoding: {encoding}")
+                return df
+            except UnicodeDecodeError:
+                continue
+            except Exception as e:
+                raise ValueError(f"Failed to read CSV with encoding {encoding}: {e}")
+    
     elif extension in [".xls", ".xlsx"]:
-        df = pd.read_excel(path)
+        try:
+            df = pd.read_excel(path)
+            return df
+        except Exception as e:
+            raise ValueError(f"Failed to read Excel file: {e}")
+    
     else:
-        raise ValueError(f"Unsupported file format: {extension}")
-    return df
+        raise ValueError(f"Unsupported file format: '{extension}'. Expected '.csv', '.xls', or '.xlsx'.")
+
 
 def extract_questions(generated_text):
     # Split the text by lines and filter out empty lines

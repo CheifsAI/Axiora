@@ -109,6 +109,14 @@ class DatabaseManager:
        return [{'id': report.report_id, 'name': report.report_name} for report in reports]
     
     def get_report_dataset(self, reportID):
+        clean_data_set = self.session.query(CleanDataset.raw_data)\
+        .join(Report, Report.clean_dataset_id == CleanDataset.clean_dataset_id)\
+        .filter(Report.report_id == reportID)\
+        .first()
+        
+        if clean_data_set:
+            return clean_data_set[0]
+        
         data_set = self.session.query(Dataset.raw_data)\
         .join(Report, Report.dataset_id == Dataset.dataset_id)\
         .filter(Report.report_id == reportID)\

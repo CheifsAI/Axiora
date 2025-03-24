@@ -195,7 +195,8 @@ class GuiFunctions():
             self.data_sample = self.analyzer.data_sample
             self.data_cols = self.analyzer.data_cols
     def _show_df(self):
-            self.df.insert(0, "Index", self.df.index)
+            if "Index" not in self.df.columns:
+                self.df.insert(0, "Index", self.df.index)
             self.table = self.main_window.ui.tableData
             self.table.setRowCount(self.df.shape[0])  
             self.table.setColumnCount(self.df.shape[1])  
@@ -261,12 +262,7 @@ class GuiFunctions():
         print(self.cleaned_df_path)
         self.cleaned_df.to_csv(self.cleaned_df_path, index=False)
         self.df = self.cleaned_df
-        self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
-        self.analyzer.session_id = self.reportID
-        self.data_info = self.analyzer.data_info
-        self.data_summary = self.analyzer.data_summary
-        self.data_sample = self.analyzer.data_sample
-        self.data_cols = self.analyzer.data_cols
+        self._analyzer_attributes()
         self.datasetID = self.db.saveCleanDataset(ogID=self.datasetID,
                                 path=self.cleaned_df_path,
                                 name=self.dname,
@@ -275,18 +271,7 @@ class GuiFunctions():
                                 sample=self.data_sample,
                                 cols=self.data_cols)
         self.db.saveCleanDatasetReport(reportId=self.reportID,cleandataset=self.datasetID)
-        self.table = self.main_window.ui.tableData
-        self.table.setRowCount(self.df.shape[0])  # Set number of rows
-        self.table.setColumnCount(self.df.shape[1])  # Set number of columns
-        self.table.setHorizontalHeaderLabels(self.df.columns)  # Set column headers
-        header = self.table.horizontalHeader()
-        # header.setStyleSheet("QHeaderView::section { background-color: lightgray; }")
-        # Populate the table with data
-        for i in range(self.df.shape[0]):
-            for j in range(self.df.shape[1]):
-                self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))
-
-    import re
+        self._show_df()
 
     def extract_questions(self, text):
         """Extracts questions from the text by splitting on newlines."""
@@ -406,14 +391,7 @@ class GuiFunctions():
             if question in self.selected_qu_list:
                 self.selected_qu_list.remove(question)
 
-    def send_question_to_model(self, question, state):
-        if state == Qt.Checked:
-            response = self.analyzer.chat(question)
-            ai_msg = ChatBubble(str(response), False, "AI")
-            self.main_window.ui.chat_layout.addWidget(ai_msg)
-        else:
-            print(f"Question unchecked: {question}")
-
+#
     def handle_chat_data_btn(self):
         cfpath, _ = QFileDialog.getOpenFileName(
             self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)"
