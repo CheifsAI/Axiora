@@ -76,6 +76,7 @@ class GuiFunctions():
         self.main_window.ui.save_qu_btn.clicked.connect(self.handle_save_qu_btn)
         self.main_window.ui.chat_data_btn.clicked.connect(self.handle_chat_data_btn)
         self.main_window.ui.send_btn.clicked.connect(self.send_message)
+        self.lineEdit_chat = self.main_window.ui.lineEdit_message
         self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
         self.main_window.ui.qu_data_btn.clicked.connect(self.handle_word_btn)
         self.main_window.ui.pushButton_2.clicked.connect(self.display_svg)
@@ -186,7 +187,6 @@ class GuiFunctions():
                                 llm=self.db.llm_id_by_name(self.llm.model),
                                 dataset=self.datasetID,
                                 rname = self.rname)
-            self.analyzer.report_id = self.reportID
             self._show_df()
             
     def _analyzer_attributes(self):
@@ -196,6 +196,7 @@ class GuiFunctions():
             self.data_sample = self.analyzer.data_sample
             self.data_cols = self.analyzer.data_cols
     def _show_df(self):
+            self.analyzer.report_id = self.reportID
             if "Index" not in self.df.columns:
                 self.df.insert(0, "Index", self.df.index)
             self.table = self.main_window.ui.tableData
@@ -415,15 +416,20 @@ class GuiFunctions():
     def enter_return_release(self, event):
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
             self.send_message()
+    def _add_user_message(self,user_input):
+            user_msg = ChatBubble(user_input, True, "You")
+            self.main_window.ui.chat_layout.addWidget(user_msg)
+            self.lineEdit_chat.clear()
+    def _add_ai_message(self,ai_response):
+        ai_msg = ChatBubble(ai_response, False, "AI")
+        self.main_window.ui.chat_layout.addWidget(ai_msg)
+
 
     def send_message(self):
         print("send_message called")  # Debugging statement
-        lineEdit_chat = self.main_window.ui.lineEdit_message
-        user_input = lineEdit_chat.text()
+        user_input = self.lineEdit_chat.text()
         if user_input:
-            user_msg = ChatBubble(user_input, True, "You")
-            self.main_window.ui.chat_layout.addWidget(user_msg)
-            lineEdit_chat.clear()
+            self._add_user_message(user_input=user_input)
             if not hasattr(self, 'analyzer') or not self.analyzer:
                 print("Analyzer not initialized!")
                 ai_response = "Upload a dataset first."
@@ -431,8 +437,7 @@ class GuiFunctions():
                 self.main_window.ui.chat_layout.addWidget(ai_msg)
             else:
                 ai_response = self.analyzer.chat(user_input)
-                ai_msg = ChatBubble(ai_response, False, "AI")
-                self.main_window.ui.chat_layout.addWidget(ai_msg)
+                self._add_ai_message(ai_response)
 
     def process_selected_questions(self):
         for qu in self.selected_qu_list:

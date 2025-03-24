@@ -168,6 +168,7 @@ class MainWindow(QMainWindow):
         self.load_report(report_id)
     
     def load_report(self,report_id):
+        self._clear_chat_display()
         self.app_functions.reportID = report_id
         report_dataset = self.app_functions.db.get_report_dataset(report_id)
         self.app_functions.dname = os.path.basename(report_dataset)
@@ -184,8 +185,22 @@ class MainWindow(QMainWindow):
         if questions:
             self.app_functions.g_questions = questions
             self.app_functions._ques_add()
+        chat_history = self.app_functions.db.get_report_chat(report_id)
+        if chat_history:
+            for prompt, response, _ in chat_history:
+                if prompt:
+                    self.app_functions._add_user_message(prompt)
+                    if response:
+                        self.app_functions._add_ai_message(response)
+
+
         
 
+    def _clear_chat_display(self):
+        if self.ui.chat_layout.count() > 0:
+            item = self.ui.chat_layout.takeAt(self.ui.chat_layout.count() - 1)
+            if item.widget():
+                item.widget().deleteLater()
 
 
     # You can add more logic here, such as loading the report data, etc.

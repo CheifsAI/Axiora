@@ -130,3 +130,24 @@ class DatabaseManager:
     def get_report_questions(self, reportID):
         questions = self.session.query(Questions.question).filter(Questions.report_id == reportID).order_by(Questions.question_num).all()
         return [qu[0] for qu in questions] if questions else None
+    
+    def get_report_chat(self, reportID):
+        chat_history = self.session.query(
+            ReportMemory.prompt,
+            ReportMemory.response,
+            ReportMemory.message_date
+        ).filter(
+            ReportMemory.report_id == reportID,
+            ReportMemory.chat == True
+        ).order_by(ReportMemory.message_date).all()
+        return chat_history if chat_history else None
+    
+    def get_report_memory(self, reportID):
+        memory = self.session.query(ReportMemory.response)\
+            .filter(ReportMemory.report_id == reportID)\
+            .filter(ReportMemory.chat == False)\
+            .order_by(ReportMemory.message_date)\
+            .all()
+        return [response[0] for response in memory] if memory else None
+
+
