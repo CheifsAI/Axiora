@@ -1385,16 +1385,17 @@ class Ui_MainWindow(object):
         self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
         self.qu_num_list.setObjectName(u"qu_num_list")
         self.qu_num_list.setAutoFillBackground(False)
         self.qu_num_list.setEditable(True)
         self.qu_num_list.setDuplicatesEnabled(True)
 
         self.gridLayout_4.addWidget(self.qu_num_list, 1, 0, 1, 2)
+
+        self.save_qu_btn = QPushButton(self.qu_widget)
+        self.save_qu_btn.setObjectName(u"save_qu_btn")
+
+        self.gridLayout_4.addWidget(self.save_qu_btn, 1, 2, 1, 1)
 
         self.qu_btn = QPushButton(self.qu_widget)
         self.qu_btn.setObjectName(u"qu_btn")
@@ -1670,6 +1671,7 @@ class Ui_MainWindow(object):
         self.qu_num_list.setCurrentText(QCoreApplication.translate("MainWindow", u"Select number of questions", u"Enter number of questions"))
         self.qu_num_list.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter number of questions", u"Enter number of questions"))
         self.qu_btn.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
+        self.save_qu_btn.setText(QCoreApplication.translate("MainWindow", u"Save Questions", None))
         self.qu_data_btn.setText("")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Questions_tap), QCoreApplication.translate("MainWindow", u"Questions", None))
         self.sum_btn.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))

@@ -178,6 +178,14 @@ class MainWindow(QMainWindow):
         summary = self.app_functions.db.get_report_summary(report_id)
         if summary:
             self.app_functions._update_summary_text(summary)
+        else: 
+            self.ui.summary_text.setText("")
+        questions = self.app_functions.db.get_report_questions(report_id)
+        if questions:
+            self.app_functions.g_questions = questions
+            self.app_functions._ques_add()
+        
+
 
 
     # You can add more logic here, such as loading the report data, etc.

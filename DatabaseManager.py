@@ -127,3 +127,6 @@ class DatabaseManager:
         summary = self.session.query(Summary.summary_content).filter(Summary.report_id == reportID).first()
         summary = summary[0] if summary else None
         return summary
+    def get_report_questions(self, reportID):
+        questions = self.session.query(Questions.question).filter(Questions.report_id == reportID).order_by(Questions.question_num).all()
+        return [qu[0] for qu in questions] if questions else None

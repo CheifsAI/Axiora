@@ -73,6 +73,7 @@ class GuiFunctions():
         self.main_window.ui.clean_data_btn.clicked.connect(self.handle_clean_data_btn)
         self.main_window.ui.qu_num_list.currentIndexChanged.connect(self.handle_qu_num)
         self.main_window.ui.qu_btn.clicked.connect(self.handle_qu_btn)
+        self.main_window.ui.save_qu_btn.clicked.connect(self.handle_save_qu_btn)
         self.main_window.ui.chat_data_btn.clicked.connect(self.handle_chat_data_btn)
         self.main_window.ui.send_btn.clicked.connect(self.send_message)
         self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
@@ -318,8 +319,9 @@ class GuiFunctions():
 
         # Clear the selected questions list when generating new questions
         self.selected_qu_list = []
+        self._ques_add()
 
-        # Get references to UI components
+    def _ques_add(self): # Get references to UI components
         scroll_area = self.main_window.ui.scrollArea
         scroll_contents = self.main_window.ui.scrollAreaWidgetContents
 
@@ -390,6 +392,14 @@ class GuiFunctions():
         else:
             if question in self.selected_qu_list:
                 self.selected_qu_list.remove(question)
+     
+    def handle_save_qu_btn(self):
+        self.saved_questions = set()
+        for qu in self.selected_qu_list:
+            if qu not in self.saved_questions:  
+                self.db.saveQuestion(reportID=self.reportID, question=qu)
+                self.saved_questions.add(qu) 
+        self.qu_saved = True
 
 #
     def handle_chat_data_btn(self):
@@ -426,8 +436,10 @@ class GuiFunctions():
 
     def process_selected_questions(self):
         for qu in self.selected_qu_list:
-            self.db.saveQuestion(reportID=self.reportID,
-                                 question=qu)
+            if qu not in self.saved_questions:
+                self.db.saveQuestion(reportID=self.reportID,
+                                     question=qu)
+                self.saved_questions.add(qu)
         self.dashboardID = self.db.addDashboard(reportID=self.reportID)
         """Process selected questions and generate charts"""
         if not self.selected_qu_list:
