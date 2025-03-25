@@ -1,7 +1,7 @@
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import create_engine
-from Axioradb import engine,Dataset,CleanDataset,Report,Summary,LLM, Questions, Dashboards, Charts, ReportMemory
+from Axioradb import engine,Dataset,CleanDataset,Report,Summary,LLM, Questions, Dashboards, Charts, ReportMemory,User
 from sqlalchemy import func
 
 class DatabaseManager:
@@ -152,4 +152,6 @@ class DatabaseManager:
             ReportMemory.chat == False
         ).order_by(ReportMemory.message_date).all()
         return memory if memory else None
-
+    def get_user_name(self,userID):
+        user_name = self.session.query(User.username).filter(User.user_id == userID).first()
+        return user_name if user_name else None

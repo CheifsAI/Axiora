@@ -133,8 +133,13 @@ class MainWindow(QMainWindow):
 
         # SET HOME PAGE AND SELECT MENU
         # ///////////////////////////////////////////////////////////////
-        widgets.stackedWidget.setCurrentWidget(widgets.home)
-        widgets.btn_chat.setStyleSheet(UIFunctions.selectMenu(widgets.btn_chat.styleSheet()))
+        widgets.stackedWidget.setCurrentWidget(widgets.home_2)
+        username = self.app_functions.db.get_user_name(self.user_id)
+        welcome_label = QLabel(f"Welcome, {username}!")
+        welcome_label.setAlignment(Qt.AlignCenter)
+        welcome_label.setStyleSheet("font-size: 20px; font-weight: bold;")
+        widgets.home_2.layout().addWidget(welcome_label)
+        widgets.btn_home.setStyleSheet(UIFunctions.selectMenu(widgets.btn_home.styleSheet()))
 
     def load_reports(self):
         #self.report_list.clear()
@@ -170,6 +175,7 @@ class MainWindow(QMainWindow):
     
     def load_report(self,report_id):
         self._clear_chat_display()
+        self._clear_questions()
         self.app_functions.reportID = report_id
         report_dataset = self.app_functions.db.get_report_dataset(report_id)
         self.app_functions.dname = os.path.basename(report_dataset)
@@ -209,6 +215,14 @@ class MainWindow(QMainWindow):
             # If it's a layout or spacer, remove it
             elif item.layout():
                 self.clear_layout(item.layout())
+
+    def _clear_questions(self):
+        scroll_contents = self.ui.scrollAreaWidgetContents
+        if layout := scroll_contents.layout():  # Python 3.8+ (walrus operator)
+            while layout.count():
+                item = layout.takeAt(0)
+                if item.widget():
+                    item.widget().deleteLater()
 
 
     # You can add more logic here, such as loading the report data, etc.
