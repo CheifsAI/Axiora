@@ -143,11 +143,13 @@ class DatabaseManager:
         return chat_history if chat_history else None
     
     def get_report_memory(self, reportID):
-        memory = self.session.query(ReportMemory.response)\
-            .filter(ReportMemory.report_id == reportID)\
-            .filter(ReportMemory.chat == False)\
-            .order_by(ReportMemory.message_date)\
-            .all()
-        return [response[0] for response in memory] if memory else None
-
+        memory = self.session.query(
+            ReportMemory.prompt,
+            ReportMemory.response,
+            ReportMemory.message_date
+        ).filter(
+            ReportMemory.report_id == reportID,
+            ReportMemory.chat == False
+        ).order_by(ReportMemory.message_date).all()
+        return memory if memory else None
 

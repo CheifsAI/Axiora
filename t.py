@@ -3,10 +3,10 @@ db = DatabaseManager()
 #print(db.get_report_dataset(1))
 #print(db.get_report_summary(2))
 #print(db.get_report_questions(2))
-chat_history = db.get_report_chat(1)
+chat_history = db.get_report_memory(1)
 for prompt, response, _ in chat_history:
-    if prompt:
-        print(prompt)
+    if response:
+        print(response)
 #print(db.get_report_memory(2))
 #if db.get_report_summary(2):
 #        print(db.get_report_summary(1))

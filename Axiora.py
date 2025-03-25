@@ -4,6 +4,7 @@ import platform
 import ctypes
 from Functions import GuiFunctions
 from uiEXT.login.LoginWindow import LoginWindow
+from langchain_core.messages import HumanMessage, AIMessage
 from PySide6.QtWidgets import QApplication, QMainWindow, QHeaderView, QLabel, QVBoxLayout
 from PySide6.QtGui import QIcon, QFont, QPixmap
 from OprFuncs import read_file
@@ -192,15 +193,22 @@ class MainWindow(QMainWindow):
                     self.app_functions._add_user_message(prompt)
                     if response:
                         self.app_functions._add_ai_message(response)
-
-
-        
+        report_memory = self.app_functions.db.get_report_memory(report_id)
+        if report_memory:
+            for prompt, response, _ in report_memory:
+                if prompt:
+                    self.app_functions.analyzer.memory.append(HumanMessage(content=prompt))
+                    if response:
+                        self.app_functions.analyzer.memory.append(AIMessage(content=response))        
 
     def _clear_chat_display(self):
-        if self.ui.chat_layout.count() > 0:
-            item = self.ui.chat_layout.takeAt(self.ui.chat_layout.count() - 1)
+        while self.ui.chat_layout.count() > 0:
+            item = self.ui.chat_layout.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
+            # If it's a layout or spacer, remove it
+            elif item.layout():
+                self.clear_layout(item.layout())
 
 
     # You can add more logic here, such as loading the report data, etc.
