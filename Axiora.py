@@ -4,6 +4,7 @@ import platform
 import ctypes
 from Functions import GuiFunctions
 from uiEXT.login.LoginWindow import LoginWindow
+from langchain_core.messages import HumanMessage, AIMessage
 from PySide6.QtWidgets import QApplication, QMainWindow, QHeaderView, QLabel, QVBoxLayout
 from PySide6.QtGui import QIcon, QFont, QPixmap
 from OprFuncs import read_file
@@ -60,7 +61,7 @@ class MainWindow(QMainWindow):
         UIFunctions.uiDefinitions(self)
 
         # Set icons for buttons
-        widgets.btn_home.setIcon(QIcon(r"images\icons\chat.png"))
+        #widgets.btn_chat.setIcon(QIcon(r"images\icons\chat.png"))
         
         # Set the logo
         logo_path = os.path.join(os.path.dirname(__file__), "images", "images", "IMG_20250226_011441_442.jpg")
@@ -89,18 +90,18 @@ class MainWindow(QMainWindow):
         # ///////////////////////////////////////////////////////////////
 
         # LEFT MENUS
-        widgets.btn_home.clicked.connect(self.buttonClick)
+        widgets.btn_chat.clicked.connect(self.buttonClick)
         widgets.btn_data.clicked.connect(self.buttonClick)
+        widgets.btn_anlysis.clicked.connect(self.buttonClick)
         widgets.btn_new.clicked.connect(self.buttonClick)
-        widgets.btn_save.clicked.connect(self.buttonClick)
-        widgets.pushButton.clicked.connect(self.buttonClick)
-        widgets.pushButton_2.clicked.connect(self.buttonClick)
+        widgets.btn_home.clicked.connect(self.buttonClick)
+        widgets.btn_dashboard.clicked.connect(self.buttonClick)
         
         
         # Set icons for buttons
-        widgets.btn_home.setIcon(QIcon(r"images\icons\chat.png"))
+        #widgets.btn_home.setIcon(QIcon(r"images\icons\chat.png"))
         widgets.btn_data.setIcon(QIcon("path/to/data_icon.png"))
-        widgets.btn_new.setIcon(QIcon("path/to/new_icon.png"))
+        widgets.btn_anlysis.setIcon(QIcon("path/to/new_icon.png"))
 
         # EXTRA LEFT BOX
         def openCloseLeftBox():
@@ -132,7 +133,12 @@ class MainWindow(QMainWindow):
 
         # SET HOME PAGE AND SELECT MENU
         # ///////////////////////////////////////////////////////////////
-        widgets.stackedWidget.setCurrentWidget(widgets.home)
+        widgets.stackedWidget.setCurrentWidget(widgets.home_2)
+        username = self.app_functions.db.get_user_name(self.user_id)
+        welcome_label = QLabel(f"Welcome, {username}!")
+        welcome_label.setAlignment(Qt.AlignCenter)
+        welcome_label.setStyleSheet("font-size: 20px; font-weight: bold;")
+        widgets.home_2.layout().addWidget(welcome_label)
         widgets.btn_home.setStyleSheet(UIFunctions.selectMenu(widgets.btn_home.styleSheet()))
 
     def load_reports(self):
@@ -168,6 +174,8 @@ class MainWindow(QMainWindow):
         self.load_report(report_id)
     
     def load_report(self,report_id):
+        self._clear_chat_display()
+        self._clear_questions()
         self.app_functions.reportID = report_id
         report_dataset = self.app_functions.db.get_report_dataset(report_id)
         self.app_functions.dname = os.path.basename(report_dataset)
@@ -178,6 +186,43 @@ class MainWindow(QMainWindow):
         summary = self.app_functions.db.get_report_summary(report_id)
         if summary:
             self.app_functions._update_summary_text(summary)
+        else: 
+            self.ui.summary_text.setText("")
+        questions = self.app_functions.db.get_report_questions(report_id)
+        if questions:
+            self.app_functions.g_questions = questions
+            self.app_functions._ques_add()
+        chat_history = self.app_functions.db.get_report_chat(report_id)
+        if chat_history:
+            for prompt, response, _ in chat_history:
+                if prompt:
+                    self.app_functions._add_user_message(prompt)
+                    if response:
+                        self.app_functions._add_ai_message(response)
+        report_memory = self.app_functions.db.get_report_memory(report_id)
+        if report_memory:
+            for prompt, response, _ in report_memory:
+                if prompt:
+                    self.app_functions.analyzer.memory.append(HumanMessage(content=prompt))
+                    if response:
+                        self.app_functions.analyzer.memory.append(AIMessage(content=response))        
+
+    def _clear_chat_display(self):
+        while self.ui.chat_layout.count() > 0:
+            item = self.ui.chat_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+            # If it's a layout or spacer, remove it
+            elif item.layout():
+                self.clear_layout(item.layout())
+
+    def _clear_questions(self):
+        scroll_contents = self.ui.scrollAreaWidgetContents
+        if layout := scroll_contents.layout():  # Python 3.8+ (walrus operator)
+            while layout.count():
+                item = layout.takeAt(0)
+                if item.widget():
+                    item.widget().deleteLater()
 
 
     # You can add more logic here, such as loading the report data, etc.
@@ -193,12 +238,12 @@ class MainWindow(QMainWindow):
         btn = self.sender()
         btnName = btn.objectName()
 
-        if btnName == "pushButton":
+        if btnName == "btn_home":
             widgets.stackedWidget.setCurrentWidget(widgets.home_2)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
-        if btnName == "pushButton_2":
+        if btnName == "btn_dashboard":
             widgets.stackedWidget.setCurrentWidget(widgets.page)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
@@ -206,7 +251,7 @@ class MainWindow(QMainWindow):
 
 
         # SHOW HOME PAGE
-        if btnName == "btn_home":
+        if btnName == "btn_chat":
             widgets.stackedWidget.setCurrentWidget(widgets.home)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
@@ -218,12 +263,12 @@ class MainWindow(QMainWindow):
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
         # SHOW NEW PAGE
-        if btnName == "btn_new":
-            widgets.stackedWidget.setCurrentWidget(widgets.new_page) # SET PAGE
-            UIFunctions.resetStyle(self, btnName) # RESET ANOTHERS BUTTONS SELECTED
-            btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet())) # SELECT MENU
+        if btnName == "btn_anlysis":
+            widgets.stackedWidget.setCurrentWidget(widgets.new_page)
+            UIFunctions.resetStyle(self, btnName)
+            btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
-        if btnName == "btn_save":
+        if btnName == "btn_new":
             print("Save BTN clicked!")
 
         # PRINT BTN NAME

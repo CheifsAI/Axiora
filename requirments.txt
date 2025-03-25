@@ -12,3 +12,4 @@ bcrypt
 passlib
 SQLAlchemy
 pygal
+openpyxl

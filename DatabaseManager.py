@@ -1,7 +1,7 @@
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import create_engine
-from Axioradb import engine,Dataset,CleanDataset,Report,Summary,LLM, Questions, Dashboards, Charts, ReportMemory
+from Axioradb import engine,Dataset,CleanDataset,Report,Summary,LLM, Questions, Dashboards, Charts, ReportMemory,User
 from sqlalchemy import func
 
 class DatabaseManager:
@@ -109,6 +109,14 @@ class DatabaseManager:
        return [{'id': report.report_id, 'name': report.report_name} for report in reports]
     
     def get_report_dataset(self, reportID):
+        clean_data_set = self.session.query(CleanDataset.raw_data)\
+        .join(Report, Report.clean_dataset_id == CleanDataset.clean_dataset_id)\
+        .filter(Report.report_id == reportID)\
+        .first()
+        
+        if clean_data_set:
+            return clean_data_set[0]
+        
         data_set = self.session.query(Dataset.raw_data)\
         .join(Report, Report.dataset_id == Dataset.dataset_id)\
         .filter(Report.report_id == reportID)\
@@ -119,3 +127,31 @@ class DatabaseManager:
         summary = self.session.query(Summary.summary_content).filter(Summary.report_id == reportID).first()
         summary = summary[0] if summary else None
         return summary
+    def get_report_questions(self, reportID):
+        questions = self.session.query(Questions.question).filter(Questions.report_id == reportID).order_by(Questions.question_num).all()
+        return [qu[0] for qu in questions] if questions else None
+    
+    def get_report_chat(self, reportID):
+        chat_history = self.session.query(
+            ReportMemory.prompt,
+            ReportMemory.response,
+            ReportMemory.message_date
+        ).filter(
+            ReportMemory.report_id == reportID,
+            ReportMemory.chat == True
+        ).order_by(ReportMemory.message_date).all()
+        return chat_history if chat_history else None
+    
+    def get_report_memory(self, reportID):
+        memory = self.session.query(
+            ReportMemory.prompt,
+            ReportMemory.response,
+            ReportMemory.message_date
+        ).filter(
+            ReportMemory.report_id == reportID,
+            ReportMemory.chat == False
+        ).order_by(ReportMemory.message_date).all()
+        return memory if memory else None
+    def get_user_name(self,userID):
+        user_name = self.session.query(User.username).filter(User.user_id == userID).first()
+        return user_name if user_name else None

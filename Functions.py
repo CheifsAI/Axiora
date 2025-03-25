@@ -73,11 +73,13 @@ class GuiFunctions():
         self.main_window.ui.clean_data_btn.clicked.connect(self.handle_clean_data_btn)
         self.main_window.ui.qu_num_list.currentIndexChanged.connect(self.handle_qu_num)
         self.main_window.ui.qu_btn.clicked.connect(self.handle_qu_btn)
+        self.main_window.ui.save_qu_btn.clicked.connect(self.handle_save_qu_btn)
         self.main_window.ui.chat_data_btn.clicked.connect(self.handle_chat_data_btn)
         self.main_window.ui.send_btn.clicked.connect(self.send_message)
+        self.lineEdit_chat = self.main_window.ui.lineEdit_message
         self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
         self.main_window.ui.qu_data_btn.clicked.connect(self.handle_word_btn)
-        self.main_window.ui.pushButton_2.clicked.connect(self.display_svg)
+        self.main_window.ui.btn_dashboard.clicked.connect(self.display_svg)
         # Add done button connection
         self.main_window.ui.done_btn.clicked.connect(self.process_selected_questions)
 
@@ -185,7 +187,6 @@ class GuiFunctions():
                                 llm=self.db.llm_id_by_name(self.llm.model),
                                 dataset=self.datasetID,
                                 rname = self.rname)
-            self.analyzer.report_id = self.reportID
             self._show_df()
             
     def _analyzer_attributes(self):
@@ -195,7 +196,9 @@ class GuiFunctions():
             self.data_sample = self.analyzer.data_sample
             self.data_cols = self.analyzer.data_cols
     def _show_df(self):
-            self.df.insert(0, "Index", self.df.index)
+            self.analyzer.report_id = self.reportID
+            if "Index" not in self.df.columns:
+                self.df.insert(0, "Index", self.df.index)
             self.table = self.main_window.ui.tableData
             self.table.setRowCount(self.df.shape[0])  
             self.table.setColumnCount(self.df.shape[1])  
@@ -261,12 +264,7 @@ class GuiFunctions():
         print(self.cleaned_df_path)
         self.cleaned_df.to_csv(self.cleaned_df_path, index=False)
         self.df = self.cleaned_df
-        self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
-        self.analyzer.session_id = self.reportID
-        self.data_info = self.analyzer.data_info
-        self.data_summary = self.analyzer.data_summary
-        self.data_sample = self.analyzer.data_sample
-        self.data_cols = self.analyzer.data_cols
+        self._analyzer_attributes()
         self.datasetID = self.db.saveCleanDataset(ogID=self.datasetID,
                                 path=self.cleaned_df_path,
                                 name=self.dname,
@@ -275,18 +273,7 @@ class GuiFunctions():
                                 sample=self.data_sample,
                                 cols=self.data_cols)
         self.db.saveCleanDatasetReport(reportId=self.reportID,cleandataset=self.datasetID)
-        self.table = self.main_window.ui.tableData
-        self.table.setRowCount(self.df.shape[0])  # Set number of rows
-        self.table.setColumnCount(self.df.shape[1])  # Set number of columns
-        self.table.setHorizontalHeaderLabels(self.df.columns)  # Set column headers
-        header = self.table.horizontalHeader()
-        # header.setStyleSheet("QHeaderView::section { background-color: lightgray; }")
-        # Populate the table with data
-        for i in range(self.df.shape[0]):
-            for j in range(self.df.shape[1]):
-                self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))
-
-    import re
+        self._show_df()
 
     def extract_questions(self, text):
         """Extracts questions from the text by splitting on newlines."""
@@ -333,8 +320,9 @@ class GuiFunctions():
 
         # Clear the selected questions list when generating new questions
         self.selected_qu_list = []
+        self._ques_add()
 
-        # Get references to UI components
+    def _ques_add(self): # Get references to UI components
         scroll_area = self.main_window.ui.scrollArea
         scroll_contents = self.main_window.ui.scrollAreaWidgetContents
 
@@ -405,15 +393,16 @@ class GuiFunctions():
         else:
             if question in self.selected_qu_list:
                 self.selected_qu_list.remove(question)
+     
+    def handle_save_qu_btn(self):
+        self.saved_questions = set()
+        for qu in self.selected_qu_list:
+            if qu not in self.saved_questions:  
+                self.db.saveQuestion(reportID=self.reportID, question=qu)
+                self.saved_questions.add(qu) 
+        self.qu_saved = True
 
-    def send_question_to_model(self, question, state):
-        if state == Qt.Checked:
-            response = self.analyzer.chat(question)
-            ai_msg = ChatBubble(str(response), False, "AI")
-            self.main_window.ui.chat_layout.addWidget(ai_msg)
-        else:
-            print(f"Question unchecked: {question}")
-
+#
     def handle_chat_data_btn(self):
         cfpath, _ = QFileDialog.getOpenFileName(
             self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)"
@@ -427,15 +416,20 @@ class GuiFunctions():
     def enter_return_release(self, event):
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
             self.send_message()
+    def _add_user_message(self,user_input):
+            user_msg = ChatBubble(user_input, True, "You")
+            self.main_window.ui.chat_layout.addWidget(user_msg)
+            self.lineEdit_chat.clear()
+    def _add_ai_message(self,ai_response):
+        ai_msg = ChatBubble(ai_response, False, "AI")
+        self.main_window.ui.chat_layout.addWidget(ai_msg)
+
 
     def send_message(self):
         print("send_message called")  # Debugging statement
-        lineEdit_chat = self.main_window.ui.lineEdit_message
-        user_input = lineEdit_chat.text()
+        user_input = self.lineEdit_chat.text()
         if user_input:
-            user_msg = ChatBubble(user_input, True, "You")
-            self.main_window.ui.chat_layout.addWidget(user_msg)
-            lineEdit_chat.clear()
+            self._add_user_message(user_input=user_input)
             if not hasattr(self, 'analyzer') or not self.analyzer:
                 print("Analyzer not initialized!")
                 ai_response = "Upload a dataset first."
@@ -443,13 +437,14 @@ class GuiFunctions():
                 self.main_window.ui.chat_layout.addWidget(ai_msg)
             else:
                 ai_response = self.analyzer.chat(user_input)
-                ai_msg = ChatBubble(ai_response, False, "AI")
-                self.main_window.ui.chat_layout.addWidget(ai_msg)
+                self._add_ai_message(ai_response)
 
     def process_selected_questions(self):
         for qu in self.selected_qu_list:
-            self.db.saveQuestion(reportID=self.reportID,
-                                 question=qu)
+            if qu not in self.saved_questions:
+                self.db.saveQuestion(reportID=self.reportID,
+                                     question=qu)
+                self.saved_questions.add(qu)
         self.dashboardID = self.db.addDashboard(reportID=self.reportID)
         """Process selected questions and generate charts"""
         if not self.selected_qu_list:
