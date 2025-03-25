@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QMainWindow, QLabel, QVBoxLayout, QWidget, QGraphi
 from PySide6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QRect, Signal
 from PySide6.QtGui import QColor, QPixmap
 from uiEXT.login.ui_login import Ui_Login 
-from uiEXT.login.circular_progress import CircularProgress
+#from uiEXT.login.circular_progress import CircularProgress
 from sqlalchemy.orm import sessionmaker  
 from Axioradb import engine, User
 import os
@@ -25,19 +25,19 @@ class LoginWindow(QMainWindow):
         self.setAttribute(Qt.WA_TranslucentBackground)
 
         # IMPORT AND CONFIGURE CIRCULAR PROGRESS
-        self.progress = CircularProgress()
-        self.progress.width = 240
-        self.progress.height = 240
-        self.progress.value = 0
-        self.progress.setFixedSize(self.progress.width, self.progress.height)
-        self.progress.font_size = 20
-        self.progress.add_shadow(True)
-        self.progress.progress_width = 4
-        self.progress.progress_color = QColor("#bdff00")
-        self.progress.text_color = QColor("#E6E6E6")
-        self.progress.bg_color = QColor("#222222")
-        self.progress.setParent(self.ui.preloader)
-        self.progress.show()
+        #self.progress = CircularProgress()
+        #self.progress.width = 240
+        #self.progress.height = 240
+        #self.progress.value = 0
+        #self.progress.setFixedSize(self.progress.width, self.progress.height)
+        #self.progress.font_size = 20
+        #self.progress.add_shadow(True)
+        #self.progress.progress_width = 4
+        #self.progress.progress_color = QColor("#bdff00")
+        #self.progress.text_color = QColor("#E6E6E6")
+        #self.progress.bg_color = QColor("#222222")
+        #self.progress.setParent(self.ui.preloader)
+        #self.progress.show()
 
         # ADD DROP SHADOW
         self.shadow = QGraphicsDropShadowEffect(self)
@@ -59,10 +59,10 @@ class LoginWindow(QMainWindow):
             print(f"Could not create pixmap from {logo_path}")
 
         # QTIMER TO UPDATE THE PROGRESS
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_progress)
-        self.timer.start(30)
-
+        #self.timer = QTimer()
+        #self.timer.timeout.connect(self.update_progress)
+        #self.timer.start(30)
+        self.animation_login()
         # OVERRIDE KEY RELEASE EVENT FOR THE QLineEdits
         self.ui.username.keyReleaseEvent = self.check_login
         self.ui.password.keyReleaseEvent = self.check_login
@@ -104,13 +104,13 @@ class LoginWindow(QMainWindow):
         QTimer.singleShot(250, lambda: self.move(actual_pos.x() - 2, actual_pos.y()))
         QTimer.singleShot(300, lambda: self.move(actual_pos.x(), actual_pos.y()))
 
-    def update_progress(self):
-        global counter
-        self.progress.set_value(counter)
-        if counter >= 100:
-            self.timer.stop()
-            self.animation_login()
-        counter += 1
+    #def update_progress(self):
+    #    global counter
+    #    self.progress.set_value(counter)
+    #    if counter >= 100:
+    #        self.timer.stop()
+    #        self.animation_login()
+    #    counter += 1
 
     def animation_login(self):
         self.animation = QPropertyAnimation(self.ui.frame_widgets, b"geometry")
