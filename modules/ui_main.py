@@ -663,24 +663,24 @@ class Ui_MainWindow(object):
         self.verticalLayout_8.setSpacing(0)
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
         self.verticalLayout_8.setContentsMargins(0, 0, 0, 0)
-        self.pushButton = QPushButton(self.topMenu)
-        self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setMinimumSize(QSize(0, 45))
-        self.pushButton.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-home.png);")
-
-        self.verticalLayout_8.addWidget(self.pushButton)
-
         self.btn_home = QPushButton(self.topMenu)
         self.btn_home.setObjectName(u"btn_home")
-        sizePolicy1.setHeightForWidth(self.btn_home.sizePolicy().hasHeightForWidth())
-        self.btn_home.setSizePolicy(sizePolicy1)
         self.btn_home.setMinimumSize(QSize(0, 45))
-        self.btn_home.setFont(font)
-        self.btn_home.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.btn_home.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.btn_home.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-chat-bubble.png);")
+        self.btn_home.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-home.png);")
 
         self.verticalLayout_8.addWidget(self.btn_home)
+
+        self.btn_chat = QPushButton(self.topMenu)
+        self.btn_chat.setObjectName(u"btn_chat")
+        sizePolicy1.setHeightForWidth(self.btn_chat.sizePolicy().hasHeightForWidth())
+        self.btn_chat.setSizePolicy(sizePolicy1)
+        self.btn_chat.setMinimumSize(QSize(0, 45))
+        self.btn_chat.setFont(font)
+        self.btn_chat.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.btn_chat.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.btn_chat.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-chat-bubble.png);")
+
+        self.verticalLayout_8.addWidget(self.btn_chat)
 
         self.btn_data = QPushButton(self.topMenu)
         self.btn_data.setObjectName(u"btn_data")
@@ -695,6 +695,25 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addWidget(self.btn_data)
 
+        self.btn_anlysis = QPushButton(self.topMenu)
+        self.btn_anlysis.setObjectName(u"btn_anlysis")
+        sizePolicy1.setHeightForWidth(self.btn_anlysis.sizePolicy().hasHeightForWidth())
+        self.btn_anlysis.setSizePolicy(sizePolicy1)
+        self.btn_anlysis.setMinimumSize(QSize(0, 45))
+        self.btn_anlysis.setFont(font)
+        self.btn_anlysis.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.btn_anlysis.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.btn_anlysis.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-file.png);")
+
+        self.verticalLayout_8.addWidget(self.btn_anlysis)
+
+        self.btn_dashboard = QPushButton(self.topMenu)
+        self.btn_dashboard.setObjectName(u"btn_dashboard")
+        self.btn_dashboard.setMinimumSize(QSize(0, 45))
+        self.btn_dashboard.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-chart.png);")
+
+        self.verticalLayout_8.addWidget(self.btn_dashboard)
+
         self.btn_new = QPushButton(self.topMenu)
         self.btn_new.setObjectName(u"btn_new")
         sizePolicy1.setHeightForWidth(self.btn_new.sizePolicy().hasHeightForWidth())
@@ -703,28 +722,9 @@ class Ui_MainWindow(object):
         self.btn_new.setFont(font)
         self.btn_new.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.btn_new.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.btn_new.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-file.png);")
+        self.btn_new.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-medical-cross.png)")
 
         self.verticalLayout_8.addWidget(self.btn_new)
-
-        self.pushButton_2 = QPushButton(self.topMenu)
-        self.pushButton_2.setObjectName(u"pushButton_2")
-        self.pushButton_2.setMinimumSize(QSize(0, 45))
-        self.pushButton_2.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-chart.png);")
-
-        self.verticalLayout_8.addWidget(self.pushButton_2)
-
-        self.btn_save = QPushButton(self.topMenu)
-        self.btn_save.setObjectName(u"btn_save")
-        sizePolicy1.setHeightForWidth(self.btn_save.sizePolicy().hasHeightForWidth())
-        self.btn_save.setSizePolicy(sizePolicy1)
-        self.btn_save.setMinimumSize(QSize(0, 45))
-        self.btn_save.setFont(font)
-        self.btn_save.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.btn_save.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.btn_save.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-save.png)")
-
-        self.verticalLayout_8.addWidget(self.btn_save)
 
 
         self.verticalMenuLayout.addWidget(self.topMenu)
@@ -1155,7 +1155,7 @@ class Ui_MainWindow(object):
         self.verticalLayout = QVBoxLayout(self.data_page)
         self.verticalLayout.setSpacing(10)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalLayout.setContentsMargins(10, 10, 10, 10)
+        self.verticalLayout.setContentsMargins(10, 0, 10, 10)
         self.import_data_row1 = QFrame(self.data_page)
         self.import_data_row1.setObjectName(u"import_data_row1")
         self.import_data_row1.setFrameShape(QFrame.Shape.StyledPanel)
@@ -1245,15 +1245,15 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.import_data_row1)
 
-        self.row_2 = QFrame(self.data_page)
-        self.row_2.setObjectName(u"row_2")
-        self.row_2.setMinimumSize(QSize(0, 150))
-        self.row_2.setFrameShape(QFrame.Shape.StyledPanel)
-        self.row_2.setFrameShadow(QFrame.Shadow.Raised)
-        self.verticalLayout_19 = QVBoxLayout(self.row_2)
-        self.verticalLayout_19.setObjectName(u"verticalLayout_19")
+        #self.row_2 = QFrame(self.data_page)
+        #self.row_2.setObjectName(u"row_2")
+        #self.row_2.setMinimumSize(QSize(0, 150))
+        #self.row_2.setFrameShape(QFrame.Shape.StyledPanel)
+        #self.row_2.setFrameShadow(QFrame.Shadow.Raised)
+        #self.verticalLayout_19 = QVBoxLayout(self.row_2)
+        #self.verticalLayout_19.setObjectName(u"verticalLayout_19")
 
-        self.verticalLayout.addWidget(self.row_2)
+        #self.verticalLayout.addWidget(self.row_2)
 
         self.row_3 = QFrame(self.data_page)
         self.row_3.setObjectName(u"row_3")
@@ -1597,12 +1597,12 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(accessibility)
         self.label.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><img src=\":/images/images/IMG_20250226_011441_442.jpg\" width=\"150\" height=\"150\"/></p></body></html>", None))
         self.toggleButton.setText(QCoreApplication.translate("MainWindow", u"Hide", None))
-        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
         self.btn_home.setText(QCoreApplication.translate("MainWindow", u"Home", None))
+        self.btn_chat.setText(QCoreApplication.translate("MainWindow", u"Chat", None))
         self.btn_data.setText(QCoreApplication.translate("MainWindow", u"Data", None))
-        self.btn_new.setText(QCoreApplication.translate("MainWindow", u"Questions", None))
-        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
-        self.btn_save.setText(QCoreApplication.translate("MainWindow", u"Save", None))
+        self.btn_anlysis.setText(QCoreApplication.translate("MainWindow", u"Analysis", None))
+        self.btn_dashboard.setText(QCoreApplication.translate("MainWindow", u"Dashboard", None))
+        self.btn_new.setText(QCoreApplication.translate("MainWindow", u"New Report", None))
         self.toggleLeftBox.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
         self.extraLabel.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
 #if QT_CONFIG(tooltip)

@@ -79,7 +79,7 @@ class GuiFunctions():
         self.lineEdit_chat = self.main_window.ui.lineEdit_message
         self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
         self.main_window.ui.qu_data_btn.clicked.connect(self.handle_word_btn)
-        self.main_window.ui.pushButton_2.clicked.connect(self.display_svg)
+        self.main_window.ui.btn_dashboard.clicked.connect(self.display_svg)
         # Add done button connection
         self.main_window.ui.done_btn.clicked.connect(self.process_selected_questions)
 

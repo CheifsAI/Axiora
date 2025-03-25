@@ -61,7 +61,7 @@ class MainWindow(QMainWindow):
         UIFunctions.uiDefinitions(self)
 
         # Set icons for buttons
-        widgets.btn_home.setIcon(QIcon(r"images\icons\chat.png"))
+        #widgets.btn_chat.setIcon(QIcon(r"images\icons\chat.png"))
         
         # Set the logo
         logo_path = os.path.join(os.path.dirname(__file__), "images", "images", "IMG_20250226_011441_442.jpg")
@@ -90,18 +90,18 @@ class MainWindow(QMainWindow):
         # ///////////////////////////////////////////////////////////////
 
         # LEFT MENUS
-        widgets.btn_home.clicked.connect(self.buttonClick)
+        widgets.btn_chat.clicked.connect(self.buttonClick)
         widgets.btn_data.clicked.connect(self.buttonClick)
+        widgets.btn_anlysis.clicked.connect(self.buttonClick)
         widgets.btn_new.clicked.connect(self.buttonClick)
-        widgets.btn_save.clicked.connect(self.buttonClick)
-        widgets.pushButton.clicked.connect(self.buttonClick)
-        widgets.pushButton_2.clicked.connect(self.buttonClick)
+        widgets.btn_home.clicked.connect(self.buttonClick)
+        widgets.btn_dashboard.clicked.connect(self.buttonClick)
         
         
         # Set icons for buttons
-        widgets.btn_home.setIcon(QIcon(r"images\icons\chat.png"))
+        #widgets.btn_home.setIcon(QIcon(r"images\icons\chat.png"))
         widgets.btn_data.setIcon(QIcon("path/to/data_icon.png"))
-        widgets.btn_new.setIcon(QIcon("path/to/new_icon.png"))
+        widgets.btn_anlysis.setIcon(QIcon("path/to/new_icon.png"))
 
         # EXTRA LEFT BOX
         def openCloseLeftBox():
@@ -134,7 +134,7 @@ class MainWindow(QMainWindow):
         # SET HOME PAGE AND SELECT MENU
         # ///////////////////////////////////////////////////////////////
         widgets.stackedWidget.setCurrentWidget(widgets.home)
-        widgets.btn_home.setStyleSheet(UIFunctions.selectMenu(widgets.btn_home.styleSheet()))
+        widgets.btn_chat.setStyleSheet(UIFunctions.selectMenu(widgets.btn_chat.styleSheet()))
 
     def load_reports(self):
         #self.report_list.clear()
@@ -224,12 +224,12 @@ class MainWindow(QMainWindow):
         btn = self.sender()
         btnName = btn.objectName()
 
-        if btnName == "pushButton":
+        if btnName == "btn_home":
             widgets.stackedWidget.setCurrentWidget(widgets.home_2)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
-        if btnName == "pushButton_2":
+        if btnName == "btn_dashboard":
             widgets.stackedWidget.setCurrentWidget(widgets.page)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
@@ -237,7 +237,7 @@ class MainWindow(QMainWindow):
 
 
         # SHOW HOME PAGE
-        if btnName == "btn_home":
+        if btnName == "btn_chat":
             widgets.stackedWidget.setCurrentWidget(widgets.home)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
@@ -249,12 +249,12 @@ class MainWindow(QMainWindow):
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
         # SHOW NEW PAGE
-        if btnName == "btn_new":
-            widgets.stackedWidget.setCurrentWidget(widgets.new_page) # SET PAGE
-            UIFunctions.resetStyle(self, btnName) # RESET ANOTHERS BUTTONS SELECTED
-            btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet())) # SELECT MENU
+        if btnName == "btn_anlysis":
+            widgets.stackedWidget.setCurrentWidget(widgets.new_page)
+            UIFunctions.resetStyle(self, btnName)
+            btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
-        if btnName == "btn_save":
+        if btnName == "btn_new":
             print("Save BTN clicked!")
 
         # PRINT BTN NAME
