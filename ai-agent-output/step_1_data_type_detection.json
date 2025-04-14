@@ -1,0 +1,28 @@
+{
+  "data_type": [
+    "structured",
+    "tabular"
+  ],
+  "structure": {
+    "columns": [
+      "Order ID",
+      "Product",
+      "Sales",
+      "Date"
+    ],
+    "data_types": {
+      "Order ID": "integer",
+      "Product": "string",
+      "Sales": "float",
+      "Date": "datetime"
+    },
+    "row_count": 1000,
+    "column_count": 4
+  },
+  "suggested_analysis": [
+    "Line chart for Sales over time",
+    "Bar chart for Sales by Product",
+    "Scatter plot for Sales vs. Date",
+    "Pie chart for Sales distribution by Product"
+  ]
+}
