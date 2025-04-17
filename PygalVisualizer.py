@@ -36,18 +36,18 @@ class PygalVisualizer:
         self,
         question: str,
         output_path: str,
-        columns: Optional[List[str]] = None,
-        chart_type: Optional[str] = None,
+        columns: List[str],
+        chart_type: str,
         **chart_args
     ) -> Dict[str, Union[str, bool]]:
         """
         Generate and execute Pygal visualization
         
         Args:
-            question: Analysis question/objective
+            question: Chart title/description
             output_path: Where to save SVG (e.g., 'output/chart.svg')
-            columns: Specific columns to visualize (auto-detected if None)
-            chart_type: Force specific chart type (auto-detected if None)
+            columns: List of columns to visualize
+            chart_type: Type of chart to generate
             chart_args: Additional chart configuration
             
         Returns:
@@ -97,22 +97,16 @@ class PygalVisualizer:
         self,
         question: str,
         output_path: str,
-        columns: Optional[List[str]] = None,
-        chart_type: Optional[str] = None,
+        columns: List[str],
+        chart_type: str,
         **chart_args
     ) -> str:
         """
         Core code generation logic
         """
-        # Auto-detect columns if not specified
-        if not columns:
-            columns = self._auto_detect_columns(question)
-        columns = self._validate_columns(columns)
-        
-        # Determine chart type
-        if not chart_type:
-            chart_type = self._determine_chart_type(question, columns)
-        chart_type = self._validate_chart_type(chart_type)
+        # Validate inputs
+        self._validate_columns(columns)
+        self._validate_chart_type(chart_type)
         
         # Generate code components
         data_code, x_labels = self._generate_data_code(chart_type, columns)
@@ -143,44 +137,16 @@ chart.title = {repr(self._clean_title(question))}
 chart.render_to_file({repr(output_path)})
 """
 
-    def _auto_detect_columns(self, question: str) -> List[str]:
-        """Heuristics to select relevant columns based on question"""
-        # Simple implementation - can be enhanced with NLP
-        numeric_cols = [col for col in self.df.columns 
-                       if pd.api.types.is_numeric_dtype(self.df[col])]
-        
-        if "distribution" in question.lower() and numeric_cols:
-            return [numeric_cols[0]]  # Default to first numeric column
-        return [self.df.columns[0]]  # Fallback to first column
-
-    def _validate_columns(self, columns: List[str]) -> List[str]:
+    def _validate_columns(self, columns: List[str]) -> None:
         """Ensure columns exist in DataFrame"""
         invalid = [col for col in columns if col not in self.df.columns]
         if invalid:
             raise ValueError(f"Columns not found: {invalid}")
-        return columns
 
-    def _validate_chart_type(self, chart_type: str) -> str:
+    def _validate_chart_type(self, chart_type: str) -> None:
         """Ensure requested chart type is supported"""
         if chart_type not in self._valid_charts:
             raise ValueError(f"Invalid chart type. Choose from: {self._valid_charts}")
-        return chart_type
-
-    def _determine_chart_type(self, question: str, columns: List[str]) -> str:
-        """Smart chart type selection based on data and question"""
-        col_types = [pd.api.types.is_numeric_dtype(self.df[col]) for col in columns]
-        
-        # Question keywords
-        q = question.lower()
-        if "distribution" in q:
-            return "Histogram" if all(col_types) else "Bar"
-        elif "relationship" in q and len(columns) >= 2:
-            return "Scatter" if all(col_types) else "StackedBar"
-        elif "trend" in q and len(columns) >= 2:
-            return "Line"
-        elif "composition" in q:
-            return "Pie"
-        return "Bar"  # Default
 
     def _generate_data_code(self, chart_type: str, columns: List[str]) -> tuple:
         """Generate data preparation code based on chart type"""
@@ -189,14 +155,9 @@ chart.render_to_file({repr(output_path)})
                 f"data = pd.cut(df['{columns[0]}'], bins=10).value_counts().sort_index()",
                 "x_labels = [str(interval) for interval in data.index]"
             )
-        elif chart_type == "Bar":
+        elif chart_type in ["Bar", "Pie"]:
             return (
                 f"data = df['{columns[0]}'].value_counts().sort_values(ascending=False)",
-                "x_labels = data.index.astype(str).tolist()"
-            )
-        elif chart_type == "Pie":
-            return (
-                f"data = df['{columns[0]}'].value_counts()",
                 "x_labels = data.index.astype(str).tolist()"
             )
         else:
@@ -208,7 +169,7 @@ chart.render_to_file({repr(output_path)})
     def _generate_config_code(self, chart_args: dict) -> str:
         """Generate chart configuration code"""
         defaults = {
-            'style': self._style.__name__,  # Use the style class name
+            'style': self._style.__name__,
             'x_label_rotation': 45,
             'truncate_label': 15,
             'show_legend': True,
@@ -219,13 +180,14 @@ chart.render_to_file({repr(output_path)})
         config_items = []
         for k, v in defaults.items():
             if k == 'style':
-                config_items.append(f"style=pygal.style.{v}")  # Reference style properly
+                config_items.append(f"style=pygal.style.{v}")
             elif isinstance(v, bool):
                 config_items.append(f"{k}={v}")
             else:
                 config_items.append(f"{k}={repr(v)}")
         
         return f"config = pygal.Config(\n    {',\n    '.join(config_items)}\n)"
+
     def _generate_series_code(self, chart_type: str, columns: List[str]) -> str:
         """Generate data series addition code"""
         if chart_type in ["Scatter", "Line"]:
