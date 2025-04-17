@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QGraphicsDropShadowEffect, QApplication, QMainWindow, 
     QFileDialog, QPushButton, QLabel, QDialog, QVBoxLayout, 
     QTableWidget, QTableWidgetItem, QSizePolicy, QHBoxLayout,
-    QFrame, QCheckBox, QWidget, QLineEdit
+    QFrame, QCheckBox, QWidget, QLineEdit, QGridLayout
 )
 from PySide6.QtSvg import QSvgRenderer
 import shutil
@@ -453,7 +453,7 @@ class GuiFunctions():
                 self._add_ai_message(ai_response)
 
     def process_selected_questions(self):
-        """Process selected questions and generate charts"""
+        """Process selected questions and generate charts in a grid layout"""
         if not self.selected_qu_list:
             print("No questions selected!")
             print("Debug: Current selections:", self.selected_qu_list)
@@ -475,6 +475,9 @@ class GuiFunctions():
             self.dashboardID = self.db.addDashboard(reportID=self.reportID)
             print(f"Created dashboard with ID: {self.dashboardID}")
             
+            # Store chart paths for all questions
+            self.chart_paths = []
+            
             # Process each question and generate charts
             for question in self.selected_qu_list:
                 # Get chart type and column from the question
@@ -490,6 +493,7 @@ class GuiFunctions():
                 if chart_path and os.path.exists(chart_path):
                     print(f"Successfully generated chart at: {chart_path}")
                     self.db.saveCharts(dashID=self.dashboardID, path=chart_path)
+                    self.chart_paths.append(chart_path)
             
             # Configure the page widget
             page_widget = self.main_window.ui.page
@@ -508,7 +512,7 @@ class GuiFunctions():
             # Switch to the visualization page
             self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
             
-            # Display the chart
+            # Display all charts
             self.display_current_chart()
             
         except Exception as e:
@@ -517,7 +521,7 @@ class GuiFunctions():
             traceback.print_exc()
 
     def display_current_chart(self):
-        """Display the current chart in widget_3"""
+        """Display all charts in a grid layout"""
         try:
             # Switch to the visualization page first
             self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
@@ -544,138 +548,117 @@ class GuiFunctions():
             self.main_window.ui.widget_3.setMinimumSize(800, 600)
             self.main_window.ui.widget_3.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
             
-            # Create layout for widget_3
-            widget_3_layout = QVBoxLayout(self.main_window.ui.widget_3)
-            widget_3_layout.setContentsMargins(0, 0, 0, 0)
-            widget_3_layout.setSpacing(0)
+            # Create grid layout for widget_3
+            grid_layout = QGridLayout(self.main_window.ui.widget_3)
+            grid_layout.setContentsMargins(10, 10, 10, 10)
+            grid_layout.setSpacing(10)
             
-            # Get a list of all HTML files in the output directory
-            if os.path.exists(self.output_dir):
-                html_files = sorted(
-                    [f for f in os.listdir(self.output_dir) if f.endswith('.html')],
-                    key=lambda x: os.path.getmtime(os.path.join(self.output_dir, x)),
-                    reverse=True
-                )
-                print(f"Found {len(html_files)} HTML files in {self.output_dir}:")
-                for file in html_files:
-                    print(f"- {file}")
-            else:
-                print(f"Directory {self.output_dir} does not exist")
+            # Calculate grid dimensions
+            num_charts = len(self.chart_paths)
+            if num_charts == 0:
                 return
-            
-            # Check if there are any HTML files
-            if not html_files:
-                print("No chart files found in the directory")
-                return
-            
-            # Get the most recent chart file
-            current_chart_file = html_files[0]
-            current_chart_path = os.path.join(self.output_dir, current_chart_file)
-            
-            print(f"Looking for chart at: {current_chart_path}")
-            
-            if os.path.exists(current_chart_path):
-                print(f"Found chart file: {current_chart_path}")
                 
-                # Clean up old web view if it exists
-                if self.web_view is not None:
-                    self.web_view.setParent(None)
-                    self.web_view.deleteLater()
-                
-                # Create new web view widget
-                self.web_view = QWebEngineView(self.main_window.ui.widget_3)
-                
-                # Enable JavaScript and other settings
-                settings = self.web_view.settings()
-                settings.setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
-                settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls, True)
-                settings.setAttribute(QWebEngineSettings.WebAttribute.AllowRunningInsecureContent, True)
-                settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessFileUrls, True)
-                settings.setAttribute(QWebEngineSettings.WebAttribute.WebGLEnabled, True)
-                settings.setAttribute(QWebEngineSettings.WebAttribute.ScrollAnimatorEnabled, True)
-                settings.setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
-                settings.setAttribute(QWebEngineSettings.WebAttribute.ShowScrollBars, True)
-                
-                # Configure web view
-                self.web_view.setMinimumSize(800, 600)
-                self.web_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                
-                # Add interaction settings
-                self.web_view.page().setBackgroundColor(Qt.transparent)
-                self.web_view.setAttribute(Qt.WA_TranslucentBackground)
-                self.web_view.setContextMenuPolicy(Qt.NoContextMenu)
-                
-                # Convert to absolute file URL
-                abs_path = os.path.abspath(current_chart_path)
-                file_url = QUrl.fromLocalFile(abs_path)
-                print(f"Loading URL: {file_url.toString()}")
-                
-                # Connect signals
-                self.web_view.loadFinished.connect(self._on_load_finished)
-                self.web_view.page().loadFinished.connect(lambda ok: self._inject_interaction_js() if ok else None)
-                
-                # Load the HTML file
-                self.web_view.load(file_url)
-                
-                # Add web view to widget_3 layout
-                widget_3_layout.addWidget(self.web_view)
-                
-                # Add widget_3 to page layout
-                page_layout.addWidget(self.main_window.ui.widget_3)
-                
-                # Show everything
-                self.web_view.show()
-                self.main_window.ui.widget_3.show()
-                page_widget.show()
-                
-                print(f"Successfully displayed chart from: {current_chart_path}")
+            # Calculate number of rows and columns for the grid
+            if num_charts <= 2:
+                cols = num_charts
+                rows = 1
             else:
-                print(f"Chart file not found: {current_chart_path}")
-                
+                cols = 2  # Maximum 2 columns
+                rows = (num_charts + 1) // 2  # Ceiling division
+            
+            # Create and add web views for each chart
+            for i, chart_path in enumerate(self.chart_paths):
+                if os.path.exists(chart_path):
+                    # Create container widget for each chart
+                    chart_container = QWidget()
+                    chart_layout = QVBoxLayout(chart_container)
+                    chart_layout.setContentsMargins(0, 0, 0, 0)
+                    
+                    # Create web view for the chart
+                    web_view = QWebEngineView()
+                    
+                    # Enable JavaScript and other settings
+                    settings = web_view.settings()
+                    settings.setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
+                    settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls, True)
+                    settings.setAttribute(QWebEngineSettings.WebAttribute.AllowRunningInsecureContent, True)
+                    settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessFileUrls, True)
+                    settings.setAttribute(QWebEngineSettings.WebAttribute.WebGLEnabled, True)
+                    settings.setAttribute(QWebEngineSettings.WebAttribute.ScrollAnimatorEnabled, True)
+                    settings.setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
+                    settings.setAttribute(QWebEngineSettings.WebAttribute.ShowScrollBars, True)
+                    
+                    # Configure web view
+                    web_view.setMinimumSize(400, 300)
+                    web_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                    
+                    # Add interaction settings
+                    web_view.page().setBackgroundColor(Qt.transparent)
+                    web_view.setAttribute(Qt.WA_TranslucentBackground)
+                    web_view.setContextMenuPolicy(Qt.NoContextMenu)
+                    
+                    # Convert to absolute file URL
+                    abs_path = os.path.abspath(chart_path)
+                    file_url = QUrl.fromLocalFile(abs_path)
+                    
+                    # Connect signals
+                    web_view.loadFinished.connect(lambda ok, view=web_view: self._on_chart_load_finished(ok, view))
+                    
+                    # Load the HTML file
+                    web_view.load(file_url)
+                    
+                    # Add web view to container
+                    chart_layout.addWidget(web_view)
+                    
+                    # Add container to grid
+                    row = i // cols
+                    col = i % cols
+                    grid_layout.addWidget(chart_container, row, col)
+            
+            # Add widget_3 to page layout
+            page_layout.addWidget(self.main_window.ui.widget_3)
+            
+            # Show everything
+            self.main_window.ui.widget_3.show()
+            page_widget.show()
+            
         except Exception as e:
-            print(f"Error displaying chart: {str(e)}")
+            print(f"Error displaying charts: {str(e)}")
             import traceback
             traceback.print_exc()
 
-    def _inject_interaction_js(self):
-        """Inject JavaScript to enhance chart interactivity"""
-        js = """
-        if (window.Plotly) {
-            var gd = document.querySelector('.plotly-graph-div');
-            if (gd) {
-                Plotly.relayout(gd, {
-                    'showlink': false,
-                    'modeBarButtonsToRemove': ['sendDataToCloud'],
-                    'responsive': true,
-                    'displayModeBar': true,
-                    'scrollZoom': true,
-                    'editable': true,
-                    'dragmode': 'zoom'
-                });
-                
-                // Enable single-click interactions
-                gd.on('plotly_click', function(data) {
-                    var point = data.points[0];
-                    // Handle click event
-                    console.log('Clicked point:', point);
-                });
-                
-                // Make chart responsive
-                window.addEventListener('resize', function() {
-                    Plotly.Plots.resize(gd);
-                });
-            }
-        }
-        """
-        self.web_view.page().runJavaScript(js)
-
-    def _on_load_finished(self, ok):
-        """Handle web view load finished event"""
+    def _on_chart_load_finished(self, ok, web_view):
+        """Handle chart load finished event"""
         if ok:
-            print("Chart loaded successfully")
-            self._inject_interaction_js()
-        else:
-            print("Failed to load chart")
+            # Inject JavaScript to enhance chart interactivity
+            js = """
+            if (window.Plotly) {
+                var gd = document.querySelector('.plotly-graph-div');
+                if (gd) {
+                    Plotly.relayout(gd, {
+                        'showlink': false,
+                        'modeBarButtonsToRemove': ['sendDataToCloud'],
+                        'responsive': true,
+                        'displayModeBar': true,
+                        'scrollZoom': true,
+                        'editable': true,
+                        'dragmode': 'zoom'
+                    });
+                    
+                    // Enable single-click interactions
+                    gd.on('plotly_click', function(data) {
+                        var point = data.points[0];
+                        console.log('Clicked point:', point);
+                    });
+                    
+                    // Make chart responsive
+                    window.addEventListener('resize', function() {
+                        Plotly.Plots.resize(gd);
+                    });
+                }
+            }
+            """
+            web_view.page().runJavaScript(js)
 
     def show_previous_chart(self):
         """Show the previous chart"""
