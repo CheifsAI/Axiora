@@ -1,16 +1,19 @@
+import os
+import numpy as np
 import pandas as pd
+import plotly.graph_objects as go
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain, SequentialChain
 from OprFuncs import *
-from langchain.schema.runnable import RunnableSequence
+from langchain_core.runnables import RunnableSequence
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.agents import AgentExecutor, Tool, create_react_agent
 from langchain import hub
 import re
-from modelEXT.PygalCodeComponents import PygalCodeComponents
-from langchain.output_parsers import PydanticOutputParser
 from DatabaseManager import DatabaseManager
+from datetime import datetime
+
 class DataAnalyzer:
     def __init__(self,dataframe,llm):
         self.dataframe = dataframe
@@ -22,6 +25,8 @@ class DataAnalyzer:
         self.db = DatabaseManager()
         self.report_id = None
         self.memory = []
+        self.rname = "output"
+        os.makedirs(self.rname, exist_ok=True)
 
     def analysis_data(self):
         data_info = self.data_info
@@ -188,46 +193,7 @@ class DataAnalyzer:
         return response
     
 
-    def visual(self,report, questions_list: list):
-        code_template = """import pygal
-        from pygal.style import RedBlueStyle
-
-        data = df["{column}"].value_counts()
-        chart = pygal.{chart_type}(style=RedBlueStyle, x_label_rotation=45)
-        chart.title = '{chart_title}'
-        chart.x_labels = [str(x) for x in data.index.tolist()]  # Convert all labels to strings
-        chart.add('{column}', data.values)  # Use original column name for legend
-        chart.render_to_file('{report}/{chart_title}.svg')
-        """
-        viscodes = []
-        for question in questions_list:
-            vis_resp = self._chart_select_chain(question)
-            print(vis_resp)
-            
-            chart_type = vis_resp['chart_type']
-            chart_title = vis_resp['chart_title']
-            column = vis_resp['columns']
-            
-            # Clean up column name and chart title
-            if column in self.dataframe.columns:  # Verify column exists
-                chart_title = f"{column} Distribution"  # Use simple distribution title
-            
-            viscode = code_template.format(
-                chart_type=chart_type,
-                chart_title=chart_title,
-                column=column,
-                report=report
-            )
-            viscode = viscode.strip()
-            viscodes.append(viscode)
-        
-        return viscodes
-    
-    
     def _chart_select_chain(self, question):
-       # data_info = self.data_info
-       # data_sample = self.data_sample
-       # data_summary = self.data_summary
         data_cols = self.data_cols
         llm = self.llm
 
@@ -236,7 +202,7 @@ class DataAnalyzer:
             "bar": "Bar",
             "line chart": "Line",
             "line": "Line",
-            "pie chart": "Pie",
+            "pie chart": "Pie", 
             "pie": "Pie",
             "histogram": "Histogram",
             "stackedbar": "StackedBar",
@@ -248,74 +214,259 @@ class DataAnalyzer:
         guidelines = """▼ Chart Selection Matrix
     | Scenario                           | Chart Type      | When to Use                             |
     |------------------------------------|-----------------|-----------------------------------------|
+    | Comparing two related metrics      | Bar (grouped)   | Compare pairs of values side by side    |
     | Time series analysis               | Line            | Track trends over time (years, months)  |
     | Comparing >3 categories            | Bar             | Compare discrete values across groups   |
     | Distribution of data               | Histogram       | Show frequency distribution of data     |
     | Comparing 2-5 categories           | Pie             | Show proportions (limit to 5 categories)|
-    | Part-to-whole relationships        | StackedBar      | Show cumulative totals and components   |
+    | Part-to-whole relationships        | StackedBar      | Show cumulative totals and components  |
     | Multivariate comparison            | Radar           | Compare multiple quantitative variables |
-    | Statistical distribution analysis  | Box             | Show quartiles and outliers             |
+    | Statistical distribution analysis  | Box             | Show quartiles and outliers            |"""
 
-    ▲ Special Cases:
-    - Use box plots for statistical distributions
-    - Use stacked bars for cumulative totals 
-    - Use Progress Rings/Charts for progress/completion
-    - Use Proportional Symbol Map for proportions/rates 
-    - Use area charts to avoid misleading representations
-    - Avoid pie charts when >5 categories"""
+        # Special handling for comparison questions
+        if "compare" in question.lower() or "vs" in question.lower() or "versus" in question.lower():
+            if "goal" in question.lower() and "Home Team Goals" in self.dataframe.columns:
+                return {
+                    "chart_type": "Bar",
+                    "chart_title": "Goals_Comparison",
+                    "columns": "Home Team Goals"  # This will trigger the special comparison logic
+                }
 
-        chart_selection_prompt = PromptTemplate(
-            input_variables=["data_cols", "question"],
-            template="""Based on the available columns: {data_cols}
-            Select the most appropriate visualization for this question: {question}
-            based on {guidelines} 
+        prompt = PromptTemplate(
+            input_variables=["data_cols", "guidelines", "question"],
+            template="""You are a data visualization expert. Based on the available columns and guidelines, select the most appropriate visualization type and column for the given question.
             
-            Respond in this exact format:
-            chart_type: [type]
-            column: [single column name]
-            
-            The column MUST be one of the available columns listed above.
-            The chart_type should be one of: bar, line, pie, histogram, stackedbar, radar, box"""
+Available columns: {data_cols}
+
+Chart selection guidelines:
+{guidelines}
+
+Question: {question}
+
+Respond in this exact format (no other text):
+chart_type: [type]
+column: [single column name]
+
+The column MUST be one of the available columns listed above.
+The chart_type should be one of: bar, line, pie, histogram, stackedbar, radar, box
+
+For questions about frequencies, distributions, or "most common" values, use Bar or Pie charts.
+For comparison questions between two metrics, use Bar with the primary metric."""
         )
 
-        chart_selection_chain = LLMChain(
-            llm=llm,
-            prompt=chart_selection_prompt,
-            output_key="chart_selection_result" 
-        )
-        
-        response = chart_selection_chain({
+        chain = prompt | llm
+
+        result = chain.invoke({
             "data_cols": data_cols,
-            "question": question,
-            "guidelines":guidelines
+            "guidelines": guidelines,
+            "question": question
         })
-        
-        result = response["chart_selection_result"].strip()
-        
+
         # Parse the response
         chart_type = None
         column = None
         
-        for line in result.split('\n'):
-            if 'chart_type:' in line.lower():
-                chart_type = line.split(':')[1].strip().lower()
-            elif 'column:' in line.lower():
-                column = line.split(':')[1].strip()
+        # Handle both string and AIMessage responses
+        response_text = result if isinstance(result, str) else result.content
+        print("Raw LLM response:", response_text)
+        
+        for line in response_text.split('\n'):
+            line = line.strip().lower()
+            if line.startswith('chart_type:'):
+                chart_type = line.split(':')[1].strip()
+            elif line.startswith('column:'):
+                # Get the column name and find the exact match in dataframe columns
+                col_name = line.split(':')[1].strip()
+                # Try to find an exact match first
+                for df_col in self.dataframe.columns:
+                    if df_col.lower() == col_name.lower():
+                        column = df_col
+                        break
+                # If no exact match, try partial match
+                if not column:
+                    for df_col in self.dataframe.columns:
+                        if col_name.lower() in df_col.lower():
+                            column = df_col
+                            break
         
         # Validate and clean up
         if not chart_type or not column:
-            chart_type = "Bar"  # default
-            column = self.dataframe.columns[0]  # fallback to first column
+            print("Warning: Could not parse chart type or column from response. Using defaults.")
+            print("Response was:", response_text)
+            print("Available columns:", self.data_cols)
+            
+            # Try to find a relevant column based on the question
+            question_lower = question.lower()
+            if "goal" in question_lower:
+                column = "Home Team Goals"  # This will trigger the special comparison logic
+                chart_type = "Bar"
+            else:
+                column = self.dataframe.columns[0]
+                chart_type = "Bar"
             
         chart_type = chart_type_mapping.get(chart_type, "Bar")
         
         # Verify column exists in dataframe
         if column not in self.dataframe.columns:
             print(f"Warning: Column '{column}' not found. Available columns: {self.data_cols}")
-            column = self.dataframe.columns[0]  # fallback to first column
+            column = self.dataframe.columns[0]
+        
+        # Create descriptive title
+        if "goal" in question.lower():
+            title = "Goals_Analysis"
+        else:
+            title = f"{column}_Analysis"
             
         return {
             "chart_type": chart_type,
-            "chart_title": column,  # Use column name as chart title
+            "chart_title": title,
             "columns": column
         }
+
+    def visual(self, chart_type, column_name, data):
+        """Generate a visualization based on the specified chart type and data."""
+        try:
+            # Convert data to DataFrame if it's not already
+            df = pd.DataFrame(data) if not isinstance(data, pd.DataFrame) else data
+            
+            # Create a unique filename for the chart
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            safe_column_name = "".join(c if c.isalnum() else "_" for c in column_name)
+            filename = f"{chart_type}_{safe_column_name}_{timestamp}.html"
+            
+            # Ensure output directory exists
+            os.makedirs(self.rname, exist_ok=True)
+            output_path = os.path.join(self.rname, filename)
+            print(f"Generating chart at: {output_path}")
+            
+            # Special handling for goal comparison
+            if "goal" in column_name.lower():
+                home_goals = df["Home Team Goals"] if "Home Team Goals" in df.columns else None
+                away_goals = df["Away Team Goals"] if "Away Team Goals" in df.columns else None
+                
+                if home_goals is not None and away_goals is not None:
+                    # Create comparison bar chart
+                    fig = go.Figure()
+                    
+                    # Add home goals
+                    fig.add_trace(go.Bar(
+                        name='Home Team Goals',
+                        x=df.index,
+                        y=home_goals,
+                        text=[f"{v:,}" if pd.notna(v) else "N/A" for v in home_goals],
+                        textposition='auto',
+                    ))
+                    
+                    # Add away goals
+                    fig.add_trace(go.Bar(
+                        name='Away Team Goals',
+                        x=df.index,
+                        y=away_goals,
+                        text=[f"{v:,}" if pd.notna(v) else "N/A" for v in away_goals],
+                        textposition='auto',
+                    ))
+                    
+                    # Update layout
+                    fig.update_layout(
+                        title='Comparison of Home vs Away Team Goals',
+                        xaxis_title='Match Index',
+                        yaxis_title='Goals Scored',
+                        barmode='group',
+                        template='plotly_white'
+                    )
+                    
+                    fig.write_html(output_path)
+                    print(f"Successfully generated comparison chart at {output_path}")
+                    return output_path
+            
+            # If not a goal comparison or missing columns, fall back to regular chart
+            values = df[column_name].replace({np.nan: None})
+            
+            # Define chart templates
+            chart_templates = {
+                'Bar': f"""
+fig = go.Figure(data=[
+    go.Bar(
+        x=[str(x) for x in df.index],
+        y=[v if v is not None else 0 for v in values],
+        text=[str(v) if v is not None else "N/A" for v in values],
+        textposition='auto',
+    )
+])
+fig.update_layout(
+    title=f'Bar Chart of {column_name}',
+    xaxis_title='Index',
+    yaxis_title=f'{column_name}',
+    template='plotly_white'
+)
+""",
+                'Pie': f"""
+fig = go.Figure(data=[
+    go.Pie(
+        labels=[str(x) for x in df.index],
+        values=[v if v is not None else 0 for v in values],
+        textinfo='label+percent',
+        hovertemplate="%{{label}}<br>Value: %{{value}}<extra></extra>"
+    )
+])
+fig.update_layout(
+    title=f'Pie Chart of {column_name}',
+    template='plotly_white'
+)
+""",
+                'Histogram': f"""
+fig = go.Figure(data=[
+    go.Histogram(
+        x=[v for v in values if v is not None],
+        nbinsx=30,
+        name='{column_name}'
+    )
+])
+fig.update_layout(
+    title=f'Histogram of {column_name}',
+    xaxis_title=f'{column_name}',
+    yaxis_title='Count',
+    template='plotly_white'
+)
+""",
+                'Box': f"""
+fig = go.Figure(data=[
+    go.Box(
+        y=[v for v in values if v is not None],
+        name='{column_name}',
+        boxpoints='all',
+        jitter=0.3,
+        pointpos=-1.8
+    )
+])
+fig.update_layout(
+    title=f'Box Plot of {column_name}',
+    yaxis_title=f'{column_name}',
+    template='plotly_white'
+)
+"""
+            }
+            
+            # Get the appropriate template or default to Bar
+            code = chart_templates.get(chart_type, chart_templates['Bar'])
+            
+            # Create a clean environment for executing the code
+            exec_env = {
+                'go': go,
+                'df': df,
+                'values': values,
+                'np': np
+            }
+            
+            # Execute the chart generation code
+            try:
+                exec(code, exec_env)
+                fig = exec_env['fig']
+                fig.write_html(output_path)
+                print(f"Successfully generated chart at {output_path}")
+                return output_path
+            except Exception as e:
+                raise Exception(f"Error generating chart: {str(e)}")
+                
+        except Exception as e:
+            raise Exception(f"❌ Error generating chart: {str(e)}")

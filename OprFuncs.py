@@ -7,8 +7,13 @@ def data_infer(dataframe):
     buffer = io.StringIO()
     dataframe.info(buf=buffer)
     data_info = buffer.getvalue()
-    with open("df_info.txt", "w",
-            encoding="utf-8") as f:  
+    
+    # Ensure output directory exists
+    output_dir = "output"
+    os.makedirs(output_dir, exist_ok=True)  
+    
+    output_path = os.path.join(output_dir, "df_info.txt")
+    with open(output_path, "w", encoding="utf-8") as f:  
         f.write(data_info)
     return data_info
 
@@ -22,11 +27,17 @@ def data_describer(dataframe):
         description_str += f"\nColumn: {col}\n"
         description_str += description[col].to_string() + "\n"
     
-    # Write the description to a file
-    with open("df_description.txt", "w", encoding="utf-8") as f:
+    # Ensure output directory exists
+    output_dir = "output"
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Use os.path.join for path handling
+    output_path = os.path.join(output_dir, "df_description.txt")
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write(description_str)
     
     return description_str
+
 def extract_code(input_text):
     result = re.search(r'```.*?\n(.*?)\n```', input_text, re.DOTALL)
     code = result.group(1) if result else input_text
@@ -34,10 +45,9 @@ def extract_code(input_text):
     cleaned_code = "\n".join(line.strip() for line in code_lines)
     return cleaned_code.strip()
 
-
 def read_file(path):
     _, extension = os.path.splitext(path)    
-    if extension == ".csv":
+    if extension.lower() == ".csv":
         encodings_to_try = ['utf-8', 'latin1', 'cp1252', 'utf-16']
         for encoding in encodings_to_try:
             try:
@@ -47,18 +57,9 @@ def read_file(path):
             except UnicodeDecodeError:
                 continue
             except Exception as e:
-                raise ValueError(f"Failed to read CSV with encoding {encoding}: {e}")
-    
-    elif extension in [".xls", ".xlsx"]:
-        try:
-            df = pd.read_excel(path)
-            return df
-        except Exception as e:
-            raise ValueError(f"Failed to read Excel file: {e}")
-    
-    else:
-        raise ValueError(f"Unsupported file format: '{extension}'. Expected '.csv', '.xls', or '.xlsx'.")
-
+                print(f"Error reading file: {e}")
+                continue
+    raise ValueError(f"Unsupported file extension: {extension}")
 
 def extract_questions(generated_text):
     # Split the text by lines and filter out empty lines

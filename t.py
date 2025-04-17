@@ -12,6 +12,6 @@ for prompt, response, _ in chat_history:
 #        print(db.get_report_summary(1))
 #from OprFuncs import read_file
 #import pandas as pd
-#df = read_file("Test_Datasets\laptop_price.csv")
-#df = pd.read_csv("Test_Datasets\laptop_price.csv", encoding='latin1')
+#df = read_file("Test_Datasets/laptop_price.csv")
+#df = pd.read_csv("Test_Datasets/laptop_price.csv", encoding='latin1')
 #print(df.head(3))

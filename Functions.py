@@ -1,20 +1,21 @@
 #from Custom_Widgets import *
 #from Custom_Widgets.QAppSettings import QAppSettings
 #from Custom_Widgets.QCustomTipOverlay import QCustomTipOverlay
-from PySide6.QtCore import QSettings, QTimer, QThread, Signal
-from PySide6.QtGui import QColor, QFont, QFontDatabase
-from PySide6.QtWidgets import (QGraphicsDropShadowEffect, QApplication, QMainWindow, 
-                             QFileDialog, QPushButton, QLabel, QDialog, QVBoxLayout, 
-                             QTableWidget, QTableWidgetItem, QSizePolicy)
+from PySide6.QtCore import (QSettings, QTimer, QThread, Signal, Qt, QUrl)
+from PySide6.QtGui import (QColor, QFont, QFontDatabase, QCursor, QIcon, QPixmap)
+from PySide6.QtWidgets import (
+    QGraphicsDropShadowEffect, QApplication, QMainWindow, 
+    QFileDialog, QPushButton, QLabel, QDialog, QVBoxLayout, 
+    QTableWidget, QTableWidgetItem, QSizePolicy, QHBoxLayout,
+    QFrame, QCheckBox, QWidget, QLineEdit
+)
 from PySide6.QtSvg import QSvgRenderer
 import shutil
-from PySide6.QtGui import QCursor
 from PySide6.QtCore import QFile
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWebEngineCore import QWebEngineSettings
 from PySide6 import QtCore
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt,QUrl,QSize
 from PySide6.QtWidgets import (QApplication, QMainWindow, QLineEdit,
                                QPushButton, QVBoxLayout, QWidget, QLabel,
                                QScrollArea, QSizePolicy, QHBoxLayout,
@@ -32,6 +33,14 @@ from uiEXT.ChatBubble import ChatBubble
 #from Axioradb import *
 from docx import Document
 from DatabaseManager import DatabaseManager
+import sys
+import platform
+from datetime import datetime
+
+# Add Shiboken path to sys.path if needed
+shiboken_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'Lib', 'site-packages', 'shiboken6')
+if os.path.exists(shiboken_path) and shiboken_path not in sys.path:
+    sys.path.append(shiboken_path)
 
 class SummaryWorker(QThread):
     finished = Signal(str)
@@ -49,7 +58,7 @@ class SummaryWorker(QThread):
             self.error.emit(str(e))
 
 class GuiFunctions():
-    def __init__(self, MainWindow,user_id):
+    def __init__(self, MainWindow, user_id):
         self.main_window = MainWindow
         self.ui = MainWindow.ui
         self.user_id = user_id
@@ -61,7 +70,11 @@ class GuiFunctions():
         self.loading_timer = QTimer()
         self.loading_timer.timeout.connect(self.update_loading_animation)
         self.loading_dots = 0
-        #self.reportID = None
+        self.web_view = None  # Track web view instance
+        
+        # Create output directory with forward slashes
+        self.output_dir = "output"
+        os.makedirs(self.output_dir, exist_ok=True)
         
         # Connect LLM selection change
         self.ui.llm_combo.currentTextChanged.connect(self.handle_llm_change)
@@ -79,7 +92,7 @@ class GuiFunctions():
         self.lineEdit_chat = self.main_window.ui.lineEdit_message
         self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
         self.main_window.ui.qu_data_btn.clicked.connect(self.handle_word_btn)
-        self.main_window.ui.btn_dashboard.clicked.connect(self.display_svg)
+        self.main_window.ui.btn_dashboard.clicked.connect(self.handle_dashboard_click)
         # Add done button connection
         self.main_window.ui.done_btn.clicked.connect(self.process_selected_questions)
 
@@ -440,12 +453,6 @@ class GuiFunctions():
                 self._add_ai_message(ai_response)
 
     def process_selected_questions(self):
-        for qu in self.selected_qu_list:
-            if qu not in self.saved_questions:
-                self.db.saveQuestion(reportID=self.reportID,
-                                     question=qu)
-                self.saved_questions.add(qu)
-        self.dashboardID = self.db.addDashboard(reportID=self.reportID)
         """Process selected questions and generate charts"""
         if not self.selected_qu_list:
             print("No questions selected!")
@@ -456,141 +463,206 @@ class GuiFunctions():
         print(f"Selected questions: {self.selected_qu_list}")
         
         try:
-            # Get visualization code for all selected questions
-            self.vis_codes = self.analyzer.visual(
-                questions_list=self.selected_qu_list,
-                report=self.rname  # Use the dataset directory
-            )
+            # Save questions and create dashboard first
+            for qu in self.selected_qu_list:
+                if not hasattr(self, 'saved_questions'):
+                    self.saved_questions = set()
+                if qu not in self.saved_questions:
+                    self.db.saveQuestion(reportID=self.reportID, question=qu)
+                    self.saved_questions.add(qu)
             
-            # Execute each visualization code
-            for i, code in enumerate(self.vis_codes):
-                #try:
-                    # Import required modules in the execution environment
-                    exec_env = {
-                        'df': self.analyzer.dataframe,
-                        #'pygal': __import__('pygal'),
-                        #'RedBlueStyle': getattr(__import__('pygal.style'), 'RedBlueStyle')
-                    }
-                    
-                    # Clean up the code and ensure proper file path
-                    code = "\n".join(line.strip() for line in code.splitlines() if line.strip())
-                    
-                    # Replace the chart rendering path to use numbered filenames
-                    #chart_path = os.path.join(self.rname, f"chart_{i+1}.svg")
-                    #code = code.replace(
-                      #  "chart.render_to_file('{report}/{chart_title}.svg')",
-                     #   f"chart.render_to_file(r'{chart_path}')"
-                    #)
-                    
-                    print(f"Executing visualization code for question {i+1}:")
-                    print(code)
-                    
-                    # Execute the visualization code
-                    exec(code, exec_env)
-                    
-                    # Verify the file was created
-                    #if os.path.exists(chart_path):
-                     #   print(f"Successfully created chart: {chart_path}")
-                    #else:
-                     #   print(f"Failed to create chart: {chart_path}")
-                      #  self.create_error_svg(chart_path, f"Error generating chart for question {i+1}")
-                    
-                #except Exception as e:
-                 #   print(f"Error executing visualization code for question {i+1}: {str(e)}")
-                  #  error_file = os.path.join(self.rname, f"chart_{i+1}.svg")
-                   # self.create_error_svg(error_file, f"Error: {str(e)}")
+            # Create dashboard
+            self.dashboardID = self.db.addDashboard(reportID=self.reportID)
+            print(f"Created dashboard with ID: {self.dashboardID}")
             
-            # Set up for chart display
-            self.current_chart_index = 0
-            self.total_charts = len(self.selected_qu_list)
+            # Process each question and generate charts
+            for question in self.selected_qu_list:
+                # Get chart type and column from the question
+                chart_info = self.analyzer._chart_select_chain(question)
+                
+                # Generate visualization
+                chart_path = self.analyzer.visual(
+                    chart_type=chart_info['chart_type'],
+                    column_name=chart_info['columns'],
+                    data=self.analyzer.dataframe
+                )
+                
+                if chart_path and os.path.exists(chart_path):
+                    print(f"Successfully generated chart at: {chart_path}")
+                    self.db.saveCharts(dashID=self.dashboardID, path=chart_path)
             
-            # Display the first chart
-            self.display_current_chart()
+            # Configure the page widget
+            page_widget = self.main_window.ui.page
+            if page_widget.layout():
+                QWidget().setLayout(page_widget.layout())
+            page_layout = QVBoxLayout(page_widget)
+            page_layout.setContentsMargins(0, 0, 0, 0)
+            page_layout.setSpacing(0)
+            
+            # Configure widget_3
+            widget_3 = self.main_window.ui.widget_3
+            widget_3.setMinimumSize(800, 600)
+            widget_3.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            page_layout.addWidget(widget_3)
             
             # Switch to the visualization page
             self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
+            
+            # Display the chart
+            self.display_current_chart()
             
         except Exception as e:
             print(f"Error processing questions: {str(e)}")
             import traceback
             traceback.print_exc()
 
-    def create_error_svg(self, chart_path, error_message):
-        """Create a simple SVG with an error message"""
-        try:
-            svg_content = f'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-            <svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
-                <rect width="100%" height="100%" fill="#2b2b2b"/>
-                <text x="50%" y="50%" text-anchor="middle" fill="white" font-family="Arial">
-                    {error_message}
-                </text>
-            </svg>'''
-            
-            with open(chart_path, 'w', encoding='utf-8') as f:
-                f.write(svg_content)
-            print(f"Error SVG created at {chart_path}")
-        except Exception as e:
-            print(f"Error creating error SVG: {str(e)}")
-            import traceback
-            traceback.print_exc()
-
     def display_current_chart(self):
         """Display the current chart in widget_3"""
         try:
-            # Ensure we have a valid chart index
-            if not hasattr(self, 'current_chart_index'):
-                print("No current chart index set")
+            # Switch to the visualization page first
+            self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
+            
+            # Get or create the page layout
+            page_widget = self.main_window.ui.page
+            if not page_widget.layout():
+                page_layout = QVBoxLayout(page_widget)
+                page_layout.setContentsMargins(0, 0, 0, 0)
+                page_layout.setSpacing(0)
+            else:
+                page_layout = page_widget.layout()
+            
+            # Clear any existing widgets from the page layout
+            while page_layout.count():
+                item = page_layout.takeAt(0)
+                if item.widget():
+                    item.widget().setParent(None)
+                    item.widget().deleteLater()
+            
+            # Create new widget_3
+            self.main_window.ui.widget_3 = QWidget(page_widget)
+            self.main_window.ui.widget_3.setObjectName("widget_3")
+            self.main_window.ui.widget_3.setMinimumSize(800, 600)
+            self.main_window.ui.widget_3.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            
+            # Create layout for widget_3
+            widget_3_layout = QVBoxLayout(self.main_window.ui.widget_3)
+            widget_3_layout.setContentsMargins(0, 0, 0, 0)
+            widget_3_layout.setSpacing(0)
+            
+            # Get a list of all HTML files in the output directory
+            if os.path.exists(self.output_dir):
+                html_files = sorted(
+                    [f for f in os.listdir(self.output_dir) if f.endswith('.html')],
+                    key=lambda x: os.path.getmtime(os.path.join(self.output_dir, x)),
+                    reverse=True
+                )
+                print(f"Found {len(html_files)} HTML files in {self.output_dir}:")
+                for file in html_files:
+                    print(f"- {file}")
+            else:
+                print(f"Directory {self.output_dir} does not exist")
                 return
             
-            # Get a list of all .svg files in the directory
-            svg_files = [f for f in os.listdir(self.rname) if f.endswith('.svg')]
-            for chart in svg_files:
-                self.db.saveCharts(dashID=self.dashboardID,path=chart)
-
-            # Check if there are any .svg files
-            if not svg_files:
-                print("No SVG files found in the directory")
+            # Check if there are any HTML files
+            if not html_files:
+                print("No chart files found in the directory")
                 return
             
-            # Ensure the current_chart_index is within bounds
-            if self.current_chart_index < 0 or self.current_chart_index >= len(svg_files):
-                print("Invalid chart index")
-                return
-            
-            # Get the current chart file
-            current_chart_file = svg_files[self.current_chart_index]
-            current_chart_path = os.path.join(self.rname, current_chart_file)
+            # Get the most recent chart file
+            current_chart_file = html_files[0]
+            current_chart_path = os.path.join(self.output_dir, current_chart_file)
             
             print(f"Looking for chart at: {current_chart_path}")
             
             if os.path.exists(current_chart_path):
                 print(f"Found chart file: {current_chart_path}")
                 
-                # Create navigation buttons if they don't exist
-                if not hasattr(self, 'nav_widget'):
-                    self.create_navigation_controls()
+                # Clean up old web view if it exists
+                if self.web_view is not None:
+                    self.web_view.setParent(None)
+                    self.web_view.deleteLater()
                 
-                # Display the SVG
-                if self.display_svg(current_chart_path):
-                    # Update navigation button states
-                    if hasattr(self, 'prev_btn') and hasattr(self, 'next_btn'):
-                        self.prev_btn.setEnabled(self.current_chart_index > 0)
-                        self.next_btn.setEnabled(self.current_chart_index < len(svg_files) - 1)
-                    
-                    # Update chart counter label
-                    if hasattr(self, 'chart_counter'):
-                        self.chart_counter.setText(f"Chart {self.current_chart_index + 1} of {len(svg_files)}")
-                else:
-                    print("Failed to display SVG widget")
+                # Create new web view widget
+                self.web_view = QWebEngineView(self.main_window.ui.widget_3)
+                
+                # Enable JavaScript and other settings
+                settings = self.web_view.settings()
+                settings.setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
+                settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls, True)
+                settings.setAttribute(QWebEngineSettings.WebAttribute.AllowRunningInsecureContent, True)
+                settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessFileUrls, True)
+                settings.setAttribute(QWebEngineSettings.WebAttribute.WebGLEnabled, True)
+                settings.setAttribute(QWebEngineSettings.WebAttribute.ScrollAnimatorEnabled, True)
+                settings.setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
+                
+                # Configure web view
+                self.web_view.setMinimumSize(800, 600)
+                self.web_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                
+                # Convert to absolute file URL
+                abs_path = os.path.abspath(current_chart_path)
+                file_url = QUrl.fromLocalFile(abs_path)
+                print(f"Loading URL: {file_url.toString()}")
+                
+                # Connect loadFinished signal
+                self.web_view.loadFinished.connect(self._on_load_finished)
+                
+                # Load the HTML file
+                self.web_view.load(file_url)
+                
+                # Add web view to widget_3 layout
+                widget_3_layout.addWidget(self.web_view)
+                
+                # Add widget_3 to page layout
+                page_layout.addWidget(self.main_window.ui.widget_3)
+                
+                # Show everything
+                self.web_view.show()
+                self.main_window.ui.widget_3.show()
+                page_widget.show()
+                
+                print(f"Successfully displayed chart from: {current_chart_path}")
             else:
                 print(f"Chart file not found: {current_chart_path}")
-                # Create error SVG if chart is missing
-                self.create_error_svg(current_chart_path, "Chart file not found")
                 
         except Exception as e:
             print(f"Error displaying chart: {str(e)}")
             import traceback
             traceback.print_exc()
+
+    def _on_load_finished(self, ok):
+        """Handle web view load finished event"""
+        if ok:
+            print("Chart loaded successfully")
+            # Inject JavaScript to ensure Plotly is properly initialized
+            js = """
+            if (window.Plotly) {
+                var gd = document.querySelector('.plotly-graph-div');
+                if (gd) {
+                    Plotly.relayout(gd, {
+                        'showlink': false,
+                        'modeBarButtonsToRemove': ['sendDataToCloud'],
+                        'responsive': true
+                    });
+                }
+            }
+            """
+            self.web_view.page().runJavaScript(js)
+        else:
+            print("Failed to load chart")
+
+    def show_previous_chart(self):
+        """Show the previous chart"""
+        if hasattr(self, 'current_chart_index') and self.current_chart_index > 0:
+            self.current_chart_index -= 1
+            self.display_current_chart()
+
+    def show_next_chart(self):
+        """Show the next chart"""
+        if hasattr(self, 'current_chart_index') and hasattr(self, 'total_charts'):
+            if self.current_chart_index < self.total_charts - 1:
+                self.current_chart_index += 1
+                self.display_current_chart()
 
     def create_navigation_controls(self):
         """Create navigation controls for multiple charts"""
@@ -618,22 +690,30 @@ class GuiFunctions():
             widget_3.setLayout(QVBoxLayout())
         widget_3.layout().addWidget(self.nav_widget)
 
-    def show_previous_chart(self):
-        """Show the previous chart"""
-        if self.current_chart_index > 0:
-            self.current_chart_index -= 1
-            self.display_current_chart()
-
-    def show_next_chart(self):
-        """Show the next chart"""
-        if self.current_chart_index < self.total_charts - 1:
-            self.current_chart_index += 1
-            self.display_current_chart()
-
-    def display_svg(self, svg_path):
+    def display_svg(self, svg_path=None):
         """Display an SVG file in widget_3"""
         try:
-            # Verify the file exists and is a valid path
+            # If no specific SVG path is provided, look for charts in the output directory
+            if svg_path is None:
+                output_dir = "output"
+                if os.path.exists(output_dir):
+                    html_files = sorted(
+                        [f for f in os.listdir(output_dir) if f.endswith('.html')],
+                        key=lambda x: os.path.getmtime(os.path.join(output_dir, x)),
+                        reverse=True
+                    )
+                    if html_files:
+                        # Display the most recent chart
+                        self.display_current_chart()
+                        return
+                    else:
+                        print("No charts found in output directory")
+                        return
+                else:
+                    print(f"Output directory {output_dir} does not exist")
+                    return
+            
+            # If a specific SVG path is provided, verify it exists
             if not isinstance(svg_path, str):
                 raise ValueError("SVG path must be a string")
             
@@ -654,10 +734,10 @@ class GuiFunctions():
             if not widget_3.layout():
                 widget_3.setLayout(QVBoxLayout())
             
-            # Clear existing content except navigation controls
+            # Clear existing content
             layout = widget_3.layout()
-            while layout.count() > 1:  # Keep navigation controls
-                item = layout.takeAt(1)
+            while layout.count():
+                item = layout.takeAt(0)
                 if item.widget():
                     item.widget().deleteLater()
             
@@ -711,3 +791,11 @@ class GuiFunctions():
         process = subprocess.run(install_code, shell=True, capture_output=True, text=True)
         if process.returncode != 0:
             raise RuntimeError(f"Failed to install model: {process.stderr}")
+
+    def handle_dashboard_click(self):
+        """Handle dashboard button click by displaying the most recent chart"""
+        print("Opening dashboard view...")
+        # Switch to the visualization page
+        self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
+        # Display the most recent chart
+        self.display_current_chart()

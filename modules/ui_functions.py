@@ -101,9 +101,12 @@ class CustomGrip(QWidget):
             qp.drawRect(self.rect())
             qp.end()
 
-class UIFunctions(QMainWindow):
-    # MAXIMIZE/RESTORE
-    # ///////////////////////////////////////////////////////////////
+class UIFunctions:
+    def __init__(self, ui):
+        self.ui = ui
+        self.settings = Settings()
+
+    @staticmethod
     def maximize_restore(self):
         global GLOBAL_STATE
         status = GLOBAL_STATE
@@ -131,19 +134,16 @@ class UIFunctions(QMainWindow):
             self.top_grip.show()
             self.bottom_grip.show()
 
-    # RETURN STATUS
-    # ///////////////////////////////////////////////////////////////
-    def returStatus(self):
+    @staticmethod
+    def returStatus():
         return GLOBAL_STATE
 
-    # SET STATUS
-    # ///////////////////////////////////////////////////////////////
-    def setStatus(self, status):
+    @staticmethod
+    def setStatus(status):
         global GLOBAL_STATE
         GLOBAL_STATE = status
 
-    # TOGGLE MENU
-    # ///////////////////////////////////////////////////////////////
+    @staticmethod
     def toggleMenu(self, enable):
         if enable:
             # GET WIDTH
@@ -164,6 +164,22 @@ class UIFunctions(QMainWindow):
             self.animation.setEndValue(widthExtended)
             self.animation.setEasingCurve(QEasingCurve.InOutQuart)
             self.animation.start()
+
+    @staticmethod
+    def selectMenu(getStyle):
+        select = getStyle + Settings.MENU_SELECTED_STYLESHEET
+        return select
+
+    @staticmethod
+    def deselectMenu(getStyle):
+        deselect = getStyle.replace(Settings.MENU_SELECTED_STYLESHEET, "")
+        return deselect
+
+    @staticmethod
+    def selectStandardMenu(self, widget):
+        for w in self.ui.topMenu.findChildren(QPushButton):
+            if w.objectName() == widget:
+                w.setStyleSheet(UIFunctions.selectMenu(w.styleSheet()))
 
     # TOGGLE LEFT BOX
     # ///////////////////////////////////////////////////////////////
@@ -257,24 +273,6 @@ class UIFunctions(QMainWindow):
         self.group.addAnimation(self.left_box)
         self.group.addAnimation(self.right_box)
         self.group.start()
-
-    # SELECT/DESELECT MENU
-    # ///////////////////////////////////////////////////////////////
-    # SELECT
-    def selectMenu(getStyle):
-        select = getStyle + Settings.MENU_SELECTED_STYLESHEET
-        return select
-
-    # DESELECT
-    def deselectMenu(getStyle):
-        deselect = getStyle.replace(Settings.MENU_SELECTED_STYLESHEET, "")
-        return deselect
-
-    # START SELECTION
-    def selectStandardMenu(self, widget):
-        for w in self.ui.topMenu.findChildren(QPushButton):
-            if w.objectName() == widget:
-                w.setStyleSheet(UIFunctions.selectMenu(w.styleSheet()))
 
     # RESET SELECTION
     def resetStyle(self, widget):
