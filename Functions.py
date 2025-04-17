@@ -594,18 +594,25 @@ class GuiFunctions():
                 settings.setAttribute(QWebEngineSettings.WebAttribute.WebGLEnabled, True)
                 settings.setAttribute(QWebEngineSettings.WebAttribute.ScrollAnimatorEnabled, True)
                 settings.setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
+                settings.setAttribute(QWebEngineSettings.WebAttribute.ShowScrollBars, True)
                 
                 # Configure web view
                 self.web_view.setMinimumSize(800, 600)
                 self.web_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                
+                # Add interaction settings
+                self.web_view.page().setBackgroundColor(Qt.transparent)
+                self.web_view.setAttribute(Qt.WA_TranslucentBackground)
+                self.web_view.setContextMenuPolicy(Qt.NoContextMenu)
                 
                 # Convert to absolute file URL
                 abs_path = os.path.abspath(current_chart_path)
                 file_url = QUrl.fromLocalFile(abs_path)
                 print(f"Loading URL: {file_url.toString()}")
                 
-                # Connect loadFinished signal
+                # Connect signals
                 self.web_view.loadFinished.connect(self._on_load_finished)
+                self.web_view.page().loadFinished.connect(lambda ok: self._inject_interaction_js() if ok else None)
                 
                 # Load the HTML file
                 self.web_view.load(file_url)
@@ -630,24 +637,43 @@ class GuiFunctions():
             import traceback
             traceback.print_exc()
 
+    def _inject_interaction_js(self):
+        """Inject JavaScript to enhance chart interactivity"""
+        js = """
+        if (window.Plotly) {
+            var gd = document.querySelector('.plotly-graph-div');
+            if (gd) {
+                Plotly.relayout(gd, {
+                    'showlink': false,
+                    'modeBarButtonsToRemove': ['sendDataToCloud'],
+                    'responsive': true,
+                    'displayModeBar': true,
+                    'scrollZoom': true,
+                    'editable': true,
+                    'dragmode': 'zoom'
+                });
+                
+                // Enable single-click interactions
+                gd.on('plotly_click', function(data) {
+                    var point = data.points[0];
+                    // Handle click event
+                    console.log('Clicked point:', point);
+                });
+                
+                // Make chart responsive
+                window.addEventListener('resize', function() {
+                    Plotly.Plots.resize(gd);
+                });
+            }
+        }
+        """
+        self.web_view.page().runJavaScript(js)
+
     def _on_load_finished(self, ok):
         """Handle web view load finished event"""
         if ok:
             print("Chart loaded successfully")
-            # Inject JavaScript to ensure Plotly is properly initialized
-            js = """
-            if (window.Plotly) {
-                var gd = document.querySelector('.plotly-graph-div');
-                if (gd) {
-                    Plotly.relayout(gd, {
-                        'showlink': false,
-                        'modeBarButtonsToRemove': ['sendDataToCloud'],
-                        'responsive': true
-                    });
-                }
-            }
-            """
-            self.web_view.page().runJavaScript(js)
+            self._inject_interaction_js()
         else:
             print("Failed to load chart")
 
