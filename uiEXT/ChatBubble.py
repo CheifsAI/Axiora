@@ -30,9 +30,9 @@ class ChatBubble(QWidget):
             label.setObjectName("user-bubble")
             label.setStyleSheet("""
                 QLabel#user-bubble {
-                    background-color: white;
-                    color: #333333;
-                    border: 1px solid #FFFFFF;
+                    background-color: #ADD8E6;  /* Light blue */
+                    color: #00008B;  /* Dark blue */
+                    border: 1px solid #ADD8E6;
                     border-radius: 15px;
                     padding: 10px;
                 }
@@ -42,9 +42,9 @@ class ChatBubble(QWidget):
             label.setObjectName("bot-bubble")
             label.setStyleSheet("""
                 QLabel#bot-bubble {
-                    background-color: #E8D8FF;
-                    color: #5E2D91;
-                    border: 1px solid #E8D8FF;
+                    background-color: #98FB98;  /* Light green */
+                    color: #006400;  /* Dark green */
+                    border: 1px solid #98FB98;
                     border-radius: 15px;
                     padding: 10px;
                 }

@@ -618,10 +618,16 @@ Button */
           </property>
           <item>
            <widget class="QFrame" name="topLogoInfo">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>10</horstretch>
+              <verstretch>10</verstretch>
+             </sizepolicy>
+            </property>
             <property name="minimumSize">
              <size>
-              <width>0</width>
-              <height>50</height>
+              <width>10</width>
+              <height>10</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -630,6 +636,24 @@ Button */
               <height>50</height>
              </size>
             </property>
+            <property name="sizeIncrement">
+             <size>
+              <width>50</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="baseSize">
+             <size>
+              <width>50</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/icons/images/images/logo axuira.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
             <property name="frameShape">
              <enum>QFrame::Shape::NoFrame</enum>
             </property>
@@ -637,44 +661,76 @@ Button */
              <enum>QFrame::Shadow::Raised</enum>
             </property>
             <layout class="QGridLayout" name="gridLayout_8">
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_2">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>100</horstretch>
-                 <verstretch>100</verstretch>
-                </sizepolicy>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <property name="horizontalSpacing">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QWidget" name="widget" native="true">
+               <property name="font">
+                <font>
+                 <family>Segoe UI</family>
+                 <pointsize>10</pointsize>
+                 <italic>false</italic>
+                 <bold>false</bold>
+                </font>
                </property>
-               <property name="minimumSize">
-                <size>
-                 <width>50</width>
-                 <height>40</height>
-                </size>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Shadow::Raised</enum>
-               </property>
-               <property name="lineWidth">
-                <number>0</number>
-               </property>
-               <property name="text">
+               <property name="accessibleName">
                 <string/>
                </property>
-               <property name="pixmap">
-                <pixmap resource="resources.qrc">:/icons/images/images/logo axuira.png</pixmap>
+               <property name="styleSheet">
+                <string notr="true"/>
                </property>
-               <property name="scaledContents">
-                <bool>true</bool>
+               <property name="locale">
+                <locale language="English" country="CookIslands"/>
                </property>
-               <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignCenter</set>
-               </property>
-               <property name="wordWrap">
-                <bool>false</bool>
-               </property>
-               <property name="margin">
-                <number>3</number>
-               </property>
+               <layout class="QGridLayout" name="gridLayout_11" rowstretch="0" columnstretch="0" rowminimumheight="0">
+                <property name="leftMargin">
+                 <number>7</number>
+                </property>
+                <property name="topMargin">
+                 <number>7</number>
+                </property>
+                <property name="rightMargin">
+                 <number>7</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>7</number>
+                </property>
+                <property name="horizontalSpacing">
+                 <number>6</number>
+                </property>
+                <property name="verticalSpacing">
+                 <number>5</number>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label">
+                  <property name="minimumSize">
+                   <size>
+                    <width>10</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">border-image: url(:/icons/images/images/logo axuira.png);</string>
+                  </property>
+                  <property name="text">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/icons/images/images/logo axuira.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
             </layout>
@@ -773,7 +829,7 @@ Button */
                </layout>
               </widget>
              </item>
-             <item alignment="Qt::AlignmentFlag::AlignTop">
+             <item>
               <widget class="QFrame" name="topMenu">
                <property name="frameShape">
                 <enum>QFrame::Shape::NoFrame</enum>
@@ -797,6 +853,58 @@ Button */
                 <property name="bottomMargin">
                  <number>0</number>
                 </property>
+                <item>
+                 <widget class="QPushButton" name="pushButton">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>45</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">background-image: url(:/icons/images/icons/cil-home.png);</string>
+                  </property>
+                  <property name="text">
+                   <string>PushButton</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btn_home">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>45</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <family>Segoe UI</family>
+                    <pointsize>10</pointsize>
+                    <italic>false</italic>
+                    <bold>false</bold>
+                   </font>
+                  </property>
+                  <property name="cursor">
+                   <cursorShape>PointingHandCursor</cursorShape>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LayoutDirection::LeftToRight</enum>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">background-image: url(:/icons/images/icons/cil-chat-bubble.png);</string>
+                  </property>
+                  <property name="text">
+                   <string>Home</string>
+                  </property>
+                 </widget>
+                </item>
                 <item>
                  <widget class="QPushButton" name="btn_data">
                   <property name="sizePolicy">
@@ -826,7 +934,7 @@ Button */
                    <enum>Qt::LayoutDirection::LeftToRight</enum>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">background-image: url(:/icons/images/icons/cil-gamepad.png);</string>
+                   <string notr="true">background-image: url(:/icons/images/icons/cil-data-transfer-up.png);</string>
                   </property>
                   <property name="text">
                    <string>Data</string>
@@ -876,38 +984,18 @@ Button */
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="btn_home">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
+                 <widget class="QPushButton" name="pushButton_2">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
                     <height>45</height>
                    </size>
                   </property>
-                  <property name="font">
-                   <font>
-                    <family>Segoe UI</family>
-                    <pointsize>10</pointsize>
-                    <italic>false</italic>
-                    <bold>false</bold>
-                   </font>
-                  </property>
-                  <property name="cursor">
-                   <cursorShape>PointingHandCursor</cursorShape>
-                  </property>
-                  <property name="layoutDirection">
-                   <enum>Qt::LayoutDirection::LeftToRight</enum>
-                  </property>
                   <property name="styleSheet">
-                   <string notr="true">background-image: url(:/icons/images/icons/cil-home.png);</string>
+                   <string notr="true">background-image: url(:/icons/images/icons/cil-chart.png);</string>
                   </property>
                   <property name="text">
-                   <string>Home</string>
+                   <string>PushButton</string>
                   </property>
                  </widget>
                 </item>
@@ -944,42 +1032,6 @@ Button */
                   </property>
                   <property name="text">
                    <string>Save</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="btn_exit">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>45</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <family>Segoe UI</family>
-                    <pointsize>10</pointsize>
-                    <italic>false</italic>
-                    <bold>false</bold>
-                   </font>
-                  </property>
-                  <property name="cursor">
-                   <cursorShape>PointingHandCursor</cursorShape>
-                  </property>
-                  <property name="layoutDirection">
-                   <enum>Qt::LayoutDirection::LeftToRight</enum>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">background-image: url(:/icons/images/icons/cil-x.png);</string>
-                  </property>
-                  <property name="text">
-                   <string>Close</string>
                   </property>
                  </widget>
                 </item>
@@ -1039,7 +1091,7 @@ Button */
                    <enum>Qt::LayoutDirection::LeftToRight</enum>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">background-image: url(:/icons/images/icons/icon_settings.png);</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Left Box</string>
@@ -1828,7 +1880,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                       <string notr="true">background: transparent;</string>
                      </property>
                      <property name="currentIndex">
-                      <number>0</number>
+                      <number>1</number>
                      </property>
                      <widget class="QWidget" name="home">
                       <property name="styleSheet">
@@ -1928,7 +1980,18 @@ li.checked::marker { content: &quot;\2612&quot;; }
                       </layout>
                      </widget>
                      <widget class="QWidget" name="home_2">
-                      <layout class="QGridLayout" name="gridLayout_2"/>
+                      <layout class="QGridLayout" name="gridLayout_2">
+                       <item row="0" column="0">
+                        <widget class="QWidget" name="widget_2" native="true"/>
+                       </item>
+                      </layout>
+                     </widget>
+                     <widget class="QWidget" name="page">
+                      <layout class="QGridLayout" name="gridLayout_12">
+                       <item row="0" column="0">
+                        <widget class="QWidget" name="widget_3" native="true"/>
+                       </item>
+                      </layout>
                      </widget>
                      <widget class="QWidget" name="data_page">
                       <property name="styleSheet">
@@ -2489,17 +2552,10 @@ li.checked::marker { content: &quot;\2612&quot;; }
                            <string>Questions</string>
                           </attribute>
                           <layout class="QGridLayout" name="gridLayout_3">
-                           <item row="2" column="0">
+                           <item row="1" column="0">
                             <widget class="QWidget" name="qu_widget" native="true">
                              <layout class="QGridLayout" name="gridLayout_4">
-                              <item row="4" column="0" colspan="3">
-                               <widget class="QPushButton" name="done_btn">
-                                <property name="text">
-                                 <string>Done</string>
-                                </property>
-                               </widget>
-                              </item>
-                              <item row="3" column="0" colspan="3">
+                              <item row="3" column="0" rowspan="3" colspan="5">
                                <widget class="QScrollArea" name="scrollArea">
                                 <property name="widgetResizable">
                                  <bool>true</bool>
@@ -2509,15 +2565,19 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>54</width>
-                                   <height>24</height>
+                                   <width>770</width>
+                                   <height>491</height>
                                   </rect>
                                  </property>
                                  <layout class="QGridLayout" name="gridLayout_9">
                                   <item row="0" column="0">
                                    <layout class="QVBoxLayout" name="qu_layout">
-                                    <item>
-                                     <widget class="QWidget" name="widget" native="true"/>
+                                    <item alignment="Qt::AlignmentFlag::AlignBottom">
+                                     <widget class="QPushButton" name="done_btn">
+                                      <property name="text">
+                                       <string>Done</string>
+                                      </property>
+                                     </widget>
                                     </item>
                                    </layout>
                                   </item>
@@ -2525,8 +2585,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                 </widget>
                                </widget>
                               </item>
-                              <item row="1" column="0">
+                              <item row="1" column="0" colspan="2">
                                <widget class="QComboBox" name="qu_num_list">
+                                <property name="accessibleName">
+                                 <string extracomment="enter number of questions"/>
+                                </property>
                                 <property name="autoFillBackground">
                                  <bool>false</bool>
                                 </property>
@@ -2534,11 +2597,19 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                  <bool>true</bool>
                                 </property>
                                 <property name="currentText">
-                                 <string>1</string>
+                                 <string comment="Enter number of questions" extracomment="Enter number of questions">Select number of questions</string>
+                                </property>
+                                <property name="placeholderText">
+                                 <string comment="Enter number of questions" extracomment="Enter number of questions">Enter number of questions</string>
                                 </property>
                                 <property name="duplicatesEnabled">
                                  <bool>true</bool>
                                 </property>
+                                <item>
+                                 <property name="text">
+                                  <string comment="select number of questions" extracomment="select number of questions">Select number of questions</string>
+                                 </property>
+                                </item>
                                 <item>
                                  <property name="text">
                                   <string comment="1">1</string>
@@ -2591,15 +2662,15 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                 </item>
                                </widget>
                               </item>
-                              <item row="1" column="2">
+                              <item row="1" column="4">
                                <widget class="QPushButton" name="qu_btn">
                                 <property name="text">
                                  <string>Questions</string>
                                 </property>
                                </widget>
                               </item>
-                              <item row="1" column="1">
-                               <widget class="QPushButton" name="pushButton">
+                              <item row="1" column="3">
+                               <widget class="QPushButton" name="qu_data_btn">
                                 <property name="text">
                                  <string/>
                                 </property>
@@ -2906,7 +2977,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                 <property name="bottomMargin">
                  <number>0</number>
                 </property>
-                <item>
+                <item alignment="Qt::AlignmentFlag::AlignLeft">
                  <widget class="QLabel" name="creditsLabel">
                   <property name="maximumSize">
                    <size>

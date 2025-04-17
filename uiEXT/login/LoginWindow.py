@@ -1,18 +1,19 @@
 # LoginWindow.py
-from PySide6.QtWidgets import QMainWindow, QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QMainWindow, QLabel, QVBoxLayout, QWidget, QGraphicsDropShadowEffect
 from PySide6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, QRect, Signal
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QPixmap
 from uiEXT.login.ui_login import Ui_Login 
-from uiEXT.login.circular_progress import CircularProgress
+#from uiEXT.login.circular_progress import CircularProgress
 from sqlalchemy.orm import sessionmaker  
-from Axioradb import engine, users
+from Axioradb import engine, User
+import os
 
 counter = 0
 SessionLocal = sessionmaker(bind=engine)
 
 class LoginWindow(QMainWindow):
     # Add a custom signal that will be emitted when login is accepted
-    login_accepted = Signal()
+    login_accepted = Signal(int)
     
     def __init__(self):
         super().__init__()
@@ -24,19 +25,19 @@ class LoginWindow(QMainWindow):
         self.setAttribute(Qt.WA_TranslucentBackground)
 
         # IMPORT AND CONFIGURE CIRCULAR PROGRESS
-        self.progress = CircularProgress()
-        self.progress.width = 240
-        self.progress.height = 240
-        self.progress.value = 0
-        self.progress.setFixedSize(self.progress.width, self.progress.height)
-        self.progress.font_size = 20
-        self.progress.add_shadow(True)
-        self.progress.progress_width = 4
-        self.progress.progress_color = QColor("#bdff00")
-        self.progress.text_color = QColor("#E6E6E6")
-        self.progress.bg_color = QColor("#222222")
-        self.progress.setParent(self.ui.preloader)
-        self.progress.show()
+        #self.progress = CircularProgress()
+        #self.progress.width = 240
+        #self.progress.height = 240
+        #self.progress.value = 0
+        #self.progress.setFixedSize(self.progress.width, self.progress.height)
+        #self.progress.font_size = 20
+        #self.progress.add_shadow(True)
+        #self.progress.progress_width = 4
+        #self.progress.progress_color = QColor("#bdff00")
+        #self.progress.text_color = QColor("#E6E6E6")
+        #self.progress.bg_color = QColor("#222222")
+        #self.progress.setParent(self.ui.preloader)
+        #self.progress.show()
 
         # ADD DROP SHADOW
         self.shadow = QGraphicsDropShadowEffect(self)
@@ -46,11 +47,22 @@ class LoginWindow(QMainWindow):
         self.shadow.setColor(QColor(0, 0, 0, 80))
         self.ui.bg.setGraphicsEffect(self.shadow)
 
-        # QTIMER TO UPDATE THE PROGRESS
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_progress)
-        self.timer.start(30)
+        # ADD LOGO IMAGE
+        logo_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 
+                                "images", "images", "IMG_20250226_011441_442.jpg")
+        pixmap = QPixmap(logo_path)
+        if not pixmap.isNull():
+            scaled_pixmap = pixmap.scaled(100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.ui.logo.setPixmap(scaled_pixmap)
+            self.ui.logo.setAlignment(Qt.AlignCenter)
+        else:
+            print(f"Could not create pixmap from {logo_path}")
 
+        # QTIMER TO UPDATE THE PROGRESS
+        #self.timer = QTimer()
+        #self.timer.timeout.connect(self.update_progress)
+        #self.timer.start(30)
+        self.animation_login()
         # OVERRIDE KEY RELEASE EVENT FOR THE QLineEdits
         self.ui.username.keyReleaseEvent = self.check_login
         self.ui.password.keyReleaseEvent = self.check_login
@@ -64,14 +76,14 @@ class LoginWindow(QMainWindow):
 
             db = SessionLocal()
             try:
-                user = db.query(users).filter(users.username == username).first()
+                user = db.query(User).filter(User.username == username).first()
                 if user and user.check_password(password):
                     self.ui.user_description.setText(f"Welcome {username}!")
                     self.ui.user_description.setStyleSheet("#user_description { color: #bdff00 }")
                     self.ui.username.setStyleSheet("#username:focus { border: 3px solid #bdff00; }")
                     self.ui.password.setStyleSheet("#password:focus { border: 3px solid #bdff00; }")
                     # Emit the login_accepted signal after a short delay (allowing the progress/animation)
-                    QTimer.singleShot(1200, lambda: self.login_accepted.emit())
+                    QTimer.singleShot(1200, lambda: self.login_accepted.emit(user.user_id))
                 else:
                     self.ui.username.setStyleSheet("#username:focus { border: 3px solid rgb(255, 0, 127); }")
                     self.ui.password.setStyleSheet("#password:focus { border: 3px solid rgb(255, 0, 127); }")
@@ -92,13 +104,13 @@ class LoginWindow(QMainWindow):
         QTimer.singleShot(250, lambda: self.move(actual_pos.x() - 2, actual_pos.y()))
         QTimer.singleShot(300, lambda: self.move(actual_pos.x(), actual_pos.y()))
 
-    def update_progress(self):
-        global counter
-        self.progress.set_value(counter)
-        if counter >= 100:
-            self.timer.stop()
-            self.animation_login()
-        counter += 1
+    #def update_progress(self):
+    #    global counter
+    #    self.progress.set_value(counter)
+    #    if counter >= 100:
+    #        self.timer.stop()
+    #        self.animation_login()
+    #    counter += 1
 
     def animation_login(self):
         self.animation = QPropertyAnimation(self.ui.frame_widgets, b"geometry")
