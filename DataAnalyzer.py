@@ -334,6 +334,82 @@ For comparison questions between two metrics, use Bar with the primary metric.""
             safe_column_name = "".join(c if c.isalnum() else "_" for c in column_name)
             filename = f"{chart_type}_{safe_column_name}_{timestamp}.html"
             
+            # Font configurations
+            font_config = {
+                'family': 'Segoe UI',
+                'title_size': 20,      # Slightly smaller title
+                'axis_title_size': 14, # Smaller axis titles
+                'tick_size': 12,       # Smaller tick labels
+                'legend_size': 12,     # Smaller legend
+                'label_size': 10       # Smaller data labels
+            }
+            
+            # Define theme colors with blue and green data colors but dark background
+            theme_colors = {
+                'primary': '#2196F3',      # Bright blue
+                'secondary': '#4CAF50',    # Green
+                'accent': '#1976D2',       # Darker blue
+                'accent2': '#388E3C',      # Darker green
+                'accent3': '#64B5F6',      # Light blue
+                'accent4': '#81C784',      # Light green
+                'accent5': '#0D47A1',      # Navy blue
+                'background': '#708090 ',   # Dark background
+                'text': '#E0E0E0',         # Light gray text
+                'grid': '#1F2937'          # Dark grid lines
+            }
+            
+            # Custom theme for plotly
+            custom_theme = {
+                'layout': {
+                    'plot_bgcolor': theme_colors['background'],
+                    'paper_bgcolor': theme_colors['background'],
+                    'width': 1200,
+                    'height': 800,
+                    'font': {
+                        'family': font_config['family'],
+                        'color': theme_colors['text'],
+                        'size': font_config['label_size']
+                    },
+                    'title': {
+                        'font': {
+                            'color': theme_colors['text'],
+                            'size': font_config['title_size'],
+                            'family': font_config['family']
+                        }
+                    },
+                    'showlegend': True,
+                    'legend': {
+                        'bgcolor': 'rgba(17, 24, 39, 0.8)',  # Semi-transparent dark background
+                        'font': {'color': theme_colors['text']},
+                        'bordercolor': theme_colors['grid'],
+                        'borderwidth': 1
+                    },
+                    'colorway': [
+                        theme_colors['primary'],    # Bright blue
+                        theme_colors['secondary'],  # Green
+                        theme_colors['accent3'],    # Light blue
+                        theme_colors['accent4'],    # Light green
+                        theme_colors['accent'],     # Darker blue
+                        theme_colors['accent2'],    # Darker green
+                        theme_colors['accent5'],    # Navy blue
+                    ],
+                    'xaxis': {
+                        'gridcolor': theme_colors['grid'],
+                        'linecolor': theme_colors['grid'],
+                        'tickcolor': theme_colors['text'],
+                        'tickfont': {'color': theme_colors['text']},
+                        'title': {'font': {'color': theme_colors['text']}}
+                    },
+                    'yaxis': {
+                        'gridcolor': theme_colors['grid'],
+                        'linecolor': theme_colors['grid'],
+                        'tickcolor': theme_colors['text'],
+                        'tickfont': {'color': theme_colors['text']},
+                        'title': {'font': {'color': theme_colors['text']}}
+                    }
+                }
+            }
+            
             # Ensure output directory exists
             os.makedirs(self.rname, exist_ok=True)
             output_path = os.path.join(self.rname, filename)
@@ -345,34 +421,101 @@ For comparison questions between two metrics, use Bar with the primary metric.""
                 away_goals = df["Away Team Goals"] if "Away Team Goals" in df.columns else None
                 
                 if home_goals is not None and away_goals is not None:
-                    # Create comparison bar chart
+                    # Create comparison bar chart with blue and green colors
                     fig = go.Figure()
                     
-                    # Add home goals
+                    # Add home goals with blue theme
                     fig.add_trace(go.Bar(
                         name='Home Team Goals',
                         x=df.index,
                         y=home_goals,
                         text=[f"{v:,}" if pd.notna(v) else "N/A" for v in home_goals],
                         textposition='auto',
+                        marker=dict(
+                            color='#2196F3',  # Bright blue
+                            line=dict(
+                                color='#1976D2',  # Darker blue
+                                width=1.5
+                            )
+                        ),
+                        opacity=0.9
                     ))
                     
-                    # Add away goals
+                    # Add away goals with green theme
                     fig.add_trace(go.Bar(
                         name='Away Team Goals',
                         x=df.index,
                         y=away_goals,
                         text=[f"{v:,}" if pd.notna(v) else "N/A" for v in away_goals],
                         textposition='auto',
+                        marker=dict(
+                            color='#4CAF50',  # Green
+                            line=dict(
+                                color='#388E3C',  # Darker green
+                                width=1.5
+                            )
+                        ),
+                        opacity=0.9
                     ))
                     
+                    # Create layout configuration with enhanced styling
+                    layout = {
+                        **custom_theme['layout'],
+                        'title': {
+                            'text': 'Comparison of Home vs Away Team Goals',
+                            'font': {
+                                'size': font_config['title_size'],
+                                'color': theme_colors['text'],
+                                'family': font_config['family']
+                            },
+                            'x': 0.5,
+                            'xanchor': 'center',
+                            'y': 0.95,
+                            'yanchor': 'top'
+                        },
+                        'xaxis_title': 'Match Index',
+                        'yaxis_title': 'Goals Scored',
+                        'barmode': 'group',
+                        'bargap': 0.15,        # Gap between bars
+                        'bargroupgap': 0.1,    # Gap between bar groups
+                        'showlegend': True,
+                        'legend': {
+                            'bgcolor': 'rgba(26, 35, 126, 0.8)',
+                            'bordercolor': theme_colors['grid'],
+                            'borderwidth': 1,
+                            'font': {
+                                'family': font_config['family'],
+                                'size': font_config['legend_size'],
+                                'color': theme_colors['text']
+                            }
+                        },
+                        'hoverlabel': {
+                            'bgcolor': theme_colors['background'],
+                            'bordercolor': theme_colors['grid'],
+                            'font': {
+                                'family': font_config['family'],
+                                'size': font_config['label_size'],
+                                'color': theme_colors['text']
+                            }
+                        }
+                    }
+                    
                     # Update layout
-                    fig.update_layout(
-                        title='Comparison of Home vs Away Team Goals',
-                        xaxis_title='Match Index',
-                        yaxis_title='Goals Scored',
-                        barmode='group',
-                        template='plotly_white'
+                    fig.update_layout(**layout)
+                    
+                    # Update axes for better readability
+                    fig.update_xaxes(
+                        showgrid=True,
+                        gridwidth=1,
+                        gridcolor=theme_colors['grid'],
+                        zeroline=False
+                    )
+                    
+                    fig.update_yaxes(
+                        showgrid=True,
+                        gridwidth=1,
+                        gridcolor=theme_colors['grid'],
+                        zeroline=False
                     )
                     
                     fig.write_html(output_path)
@@ -382,7 +525,7 @@ For comparison questions between two metrics, use Bar with the primary metric.""
             # If not a goal comparison or missing columns, fall back to regular chart
             values = df[column_name].replace({np.nan: None})
             
-            # Define chart templates
+            # Update the chart templates with new colors and sizing
             chart_templates = {
                 'Bar': f"""
 fig = go.Figure(data=[
@@ -391,59 +534,183 @@ fig = go.Figure(data=[
         y=[v if v is not None else 0 for v in values],
         text=[str(v) if v is not None else "N/A" for v in values],
         textposition='auto',
+        marker_color='{theme_colors["primary"]}',
+        marker_line_color='{theme_colors["grid"]}',
+        marker_line_width=1,
+        textfont={{
+            'color': '{theme_colors["text"]}',
+            'size': {font_config['label_size']},
+            'family': '{font_config["family"]}'
+        }},
+        hoverinfo='y+text',
+        hoverlabel={{
+            'bgcolor': '{theme_colors["background"]}',
+            'bordercolor': '{theme_colors["grid"]}',
+            'font': {{
+                'size': {font_config['label_size']},
+                'family': '{font_config["family"]}'
+            }}
+        }}
     )
 ])
-fig.update_layout(
-    title=f'Bar Chart of {column_name}',
-    xaxis_title='Index',
-    yaxis_title=f'{column_name}',
-    template='plotly_white'
-)
+
+layout = {{
+    **custom_theme['layout'],
+    'title': {{
+        'text': f'Analysis of {column_name}',
+        'font': {{
+            'size': {font_config['title_size']},
+            'color': '{theme_colors["text"]}',
+            'family': '{font_config["family"]}'
+        }},
+        'x': 0.5,
+        'xanchor': 'center',
+        'y': 0.95,
+        'yanchor': 'top'
+    }},
+    'xaxis_title': 'Index',
+    'yaxis_title': f'{column_name}'
+}}
+
+fig.update_layout(**layout)
 """,
                 'Pie': f"""
 fig = go.Figure(data=[
     go.Pie(
         labels=[str(x) for x in df.index],
         values=[v if v is not None else 0 for v in values],
-        textinfo='label+percent',
-        hovertemplate="%{{label}}<br>Value: %{{value}}<extra></extra>"
+        textinfo='percent+label',
+        textposition='auto',
+        hoverinfo='label+value+percent',
+        marker=dict(
+            colors=['{theme_colors["primary"]}', '{theme_colors["secondary"]}', '{theme_colors["accent"]}'],
+            line=dict(color='{theme_colors["grid"]}', width=2)
+        ),
+        textfont={{
+            'color': '{theme_colors["text"]}',
+            'size': {font_config['label_size']},
+            'family': '{font_config["family"]}'
+        }},
+        hoverlabel={{
+            'bgcolor': '{theme_colors["background"]}',
+            'bordercolor': '{theme_colors["grid"]}',
+            'font': {{
+                'size': {font_config['label_size']},
+                'family': '{font_config["family"]}'
+            }}
+        }}
     )
 ])
-fig.update_layout(
-    title=f'Pie Chart of {column_name}',
-    template='plotly_white'
-)
+
+layout = {{
+    **custom_theme['layout'],
+    'title': {{
+        'text': f'Distribution of {column_name}',
+        'font': {{
+            'size': {font_config['title_size']},
+            'color': '{theme_colors["text"]}',
+            'family': '{font_config["family"]}'
+        }},
+        'x': 0.5,
+        'xanchor': 'center',
+        'y': 0.95,
+        'yanchor': 'top'
+    }}
+}}
+
+fig.update_layout(**layout)
 """,
                 'Histogram': f"""
 fig = go.Figure(data=[
     go.Histogram(
         x=[v for v in values if v is not None],
         nbinsx=30,
-        name='{column_name}'
+        name='{column_name}',
+        marker_color='{theme_colors["primary"]}',
+        marker_line_color='{theme_colors["grid"]}',
+        marker_line_width=1,
+        opacity=0.8,
+        textfont={{
+            'color': '{theme_colors["text"]}',
+            'size': {font_config['label_size']},
+            'family': '{font_config["family"]}'
+        }},
+        hoverlabel={{
+            'bgcolor': '{theme_colors["background"]}',
+            'bordercolor': '{theme_colors["grid"]}',
+            'font': {{
+                'size': {font_config['label_size']},
+                'family': '{font_config["family"]}'
+            }}
+        }}
     )
 ])
-fig.update_layout(
-    title=f'Histogram of {column_name}',
-    xaxis_title=f'{column_name}',
-    yaxis_title='Count',
-    template='plotly_white'
-)
+
+layout = {{
+    **custom_theme['layout'],
+    'title': {{
+        'text': f'Frequency Distribution of {column_name}',
+        'font': {{
+            'size': {font_config['title_size']},
+            'color': '{theme_colors["text"]}',
+            'family': '{font_config["family"]}'
+        }},
+        'x': 0.5,
+        'xanchor': 'center',
+        'y': 0.95,
+        'yanchor': 'top'
+    }},
+    'xaxis_title': f'{column_name}',
+    'yaxis_title': 'Count'
+}}
+
+fig.update_layout(**layout)
 """,
                 'Box': f"""
 fig = go.Figure(data=[
     go.Box(
         y=[v for v in values if v is not None],
         name='{column_name}',
-        boxpoints='all',
+        boxpoints='outliers',
         jitter=0.3,
-        pointpos=-1.8
+        pointpos=-1.8,
+        marker_color='{theme_colors["primary"]}',
+        line_color='{theme_colors["secondary"]}',
+        fillcolor='{theme_colors["primary"]}',
+        marker=dict(
+            color='{theme_colors["accent"]}',
+            size=6,
+            line=dict(color='{theme_colors["grid"]}', width=1)
+        ),
+        hoverlabel=dict(
+            font=dict(
+                size={font_config['label_size']},
+                family='{font_config["family"]}'
+            ),
+            bgcolor='{theme_colors["background"]}',
+            bordercolor='{theme_colors["grid"]}'
+        )
     )
 ])
-fig.update_layout(
-    title=f'Box Plot of {column_name}',
-    yaxis_title=f'{column_name}',
-    template='plotly_white'
-)
+
+layout = {{
+    **custom_theme['layout'],
+    'title': {{
+        'text': f'Distribution Analysis of {column_name}',
+        'font': {{
+            'size': {font_config['title_size']},
+            'color': '{theme_colors["text"]}',
+            'family': '{font_config["family"]}'
+        }},
+        'x': 0.5,
+        'xanchor': 'center',
+        'y': 0.95,
+        'yanchor': 'top'
+    }},
+    'yaxis_title': f'{column_name}'
+}}
+
+fig.update_layout(**layout)
 """
             }
             
@@ -455,15 +722,67 @@ fig.update_layout(
                 'go': go,
                 'df': df,
                 'values': values,
-                'np': np
+                'np': np,
+                'custom_theme': custom_theme
             }
             
             # Execute the chart generation code
             try:
                 exec(code, exec_env)
                 fig = exec_env['fig']
+                
+                # Add common layout updates for interactivity
+                fig.update_layout(
+                    hovermode='x unified',
+                    hoverlabel=dict(
+                        bgcolor=theme_colors['secondary'],
+                        font_size=14,
+                        font_family="Segoe UI"
+                    ),
+                    modebar=dict(
+                        bgcolor='rgba(0,0,0,0)',
+                        color=theme_colors['primary'],
+                        activecolor=theme_colors['secondary']
+                    )
+                )
+                
                 fig.write_html(output_path)
                 print(f"Successfully generated chart at {output_path}")
+
+                # Update the chart load finished handler
+                js = """
+                if (window.Plotly) {
+                    var gd = document.querySelector('.plotly-graph-div');
+                    if (gd) {
+                        Plotly.relayout(gd, {
+                            'showlink': false,
+                            'modeBarButtonsToRemove': ['sendDataToCloud'],
+                            'responsive': true,
+                            'displayModeBar': true,
+                            'scrollZoom': true,
+                            'editable': true,
+                            'dragmode': 'zoom',
+                            'hoverlabel': {
+                                'font': {
+                                    'size': 14,
+                                    'family': 'Segoe UI'
+                                }
+                            }
+                        });
+                        
+                        // Enable single-click interactions
+                        gd.on('plotly_click', function(data) {
+                            var point = data.points[0];
+                            console.log('Clicked point:', point);
+                        });
+                        
+                        // Make chart responsive
+                        window.addEventListener('resize', function() {
+                            Plotly.Plots.resize(gd);
+                        });
+                    }
+                }
+                """
                 return output_path
             except Exception as e:
                 raise Exception(f"Error generating chart: {str(e)}")

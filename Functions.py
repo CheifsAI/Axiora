@@ -5,9 +5,10 @@ from PySide6.QtCore import (QSettings, QTimer, QThread, Signal, Qt, QUrl)
 from PySide6.QtGui import (QColor, QFont, QFontDatabase, QCursor, QIcon, QPixmap)
 from PySide6.QtWidgets import (
     QGraphicsDropShadowEffect, QApplication, QMainWindow, 
-    QFileDialog, QPushButton, QLabel, QDialog, QVBoxLayout, 
+                             QFileDialog, QPushButton, QLabel, QDialog, QVBoxLayout, 
     QTableWidget, QTableWidgetItem, QSizePolicy, QHBoxLayout,
-    QFrame, QCheckBox, QWidget, QLineEdit, QGridLayout
+    QFrame, QCheckBox, QWidget, QLineEdit, QGridLayout, QScrollArea,
+    QProgressBar
 )
 from PySide6.QtSvg import QSvgRenderer
 import shutil
@@ -57,6 +58,85 @@ class SummaryWorker(QThread):
         except Exception as e:
             self.error.emit(str(e))
 
+class LoadingOverlay(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setObjectName("loadingOverlay")
+        
+        # Set up the overlay
+        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        
+        # Create layout
+        layout = QVBoxLayout(self)
+        layout.setAlignment(Qt.AlignCenter)
+        
+        # Create loading spinner
+        self.spinner = QProgressBar()
+        self.spinner.setRange(0, 0)  # Makes it an "infinite" progress bar
+        self.spinner.setFixedSize(60, 60)
+        self.spinner.setTextVisible(False)
+        self.spinner.setStyleSheet("""
+            QProgressBar {
+                border: 2px solid #3498DB;
+                border-radius: 30px;
+                background-color: transparent;
+            }
+            QProgressBar::chunk {
+                background-color: transparent;
+            }
+        """)
+        
+        # Create loading text
+        self.label = QLabel("Loading...")
+        self.label.setObjectName("loadingLabel")
+        self.label.setAlignment(Qt.AlignCenter)
+        
+        # Add widgets to layout
+        layout.addWidget(self.spinner, alignment=Qt.AlignCenter)
+        layout.addWidget(self.label, alignment=Qt.AlignCenter)
+        
+        # Set up rotation animation
+        self.angle = 0
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self._rotate)
+        self.timer.start(80)
+        
+    def _rotate(self):
+        self.angle = (self.angle + 30) % 360
+        self.spinner.setStyleSheet(f"""
+            QProgressBar {{
+                border: 2px solid #3498DB;
+                border-radius: 30px;
+                background-color: transparent;
+            }}
+            QProgressBar::chunk {{
+                background-color: transparent;
+            }}
+        """)
+        
+    def showEvent(self, event):
+        self.resize(self.parent().size())
+        
+    def resizeEvent(self, event):
+        self.resize(self.parent().size())
+
+class QuestionWorker(QThread):
+    finished = Signal(list)
+    error = Signal(str)
+
+    def __init__(self, analyzer, num_questions):
+        super().__init__()
+        self.analyzer = analyzer
+        self.num_questions = num_questions
+
+    def run(self):
+        try:
+            questions = self.analyzer.questions_gen(self.num_questions)
+            self.finished.emit(questions)
+        except Exception as e:
+            self.error.emit(str(e))
+
 class GuiFunctions():
     def __init__(self, MainWindow, user_id):
         self.main_window = MainWindow
@@ -78,6 +158,13 @@ class GuiFunctions():
         
         # Connect LLM selection change
         self.ui.llm_combo.currentTextChanged.connect(self.handle_llm_change)
+        
+        # Initialize loading overlay
+        self.loading_overlay = LoadingOverlay(MainWindow)
+        self.loading_overlay.hide()
+        
+        # Update icons with modern versions
+        self.setup_modern_icons()
 
     def setup_connections(self):
         self.main_window.ui.openfile_btn.clicked.connect(self.handle_data_button)
@@ -223,26 +310,24 @@ class GuiFunctions():
                     self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))
 
     def handle_sum_btn(self):
-        # Disable the summary button and start loading animation
+        # Show loading overlay
+        self.show_loading("Generating Summary...")
+        
+        # Disable the summary button
         self.main_window.ui.sum_btn.setEnabled(False)
-        self.main_window.ui.sum_btn.setText("Generating")
-        self.loading_timer.start(500)  # Update every 500ms
         
         # Create and configure the worker
         self.summary_worker = SummaryWorker(self.analyzer)
         self.summary_worker.finished.connect(self.handle_summary_complete)
         self.summary_worker.error.connect(self.handle_summary_error)
         self.summary_worker.start()
+
     def _update_summary_text(self,summary):
             summary_md = markdown(summary)
             self.main_window.ui.summary_text.setMarkdown(summary_md)
 
     def handle_summary_complete(self, summary):
         try:
-            # Stop loading animation
-            self.loading_timer.stop()
-            self.main_window.ui.sum_btn.setText("Generate Summary")
-            
             # Save to database and update UI
             self.db.saveSummary(reportID=self.reportID, summary_content=summary)
             self._update_summary_text(summary)
@@ -251,17 +336,18 @@ class GuiFunctions():
         finally:
             # Reset UI state
             self.main_window.ui.sum_btn.setEnabled(True)
-            self.main_window.ui.sum_btn.setText("Generate Summary")
+            self.hide_loading()
             if self.summary_worker:
                 self.summary_worker.deleteLater()
                 self.summary_worker = None
 
     def handle_summary_error(self, error_message):
-        # Stop loading animation
-        self.loading_timer.stop()
-        self.main_window.ui.sum_btn.setText("Generate Summary")
-        print(f"Error generating summary: {error_message}")
+        # Hide loading overlay
+        self.hide_loading()
+        
+        # Reset button state
         self.main_window.ui.sum_btn.setEnabled(True)
+        print(f"Error generating summary: {error_message}")
         
         if self.summary_worker:
             self.summary_worker.deleteLater()
@@ -312,28 +398,47 @@ class GuiFunctions():
             print("Analyzer not initialized. Load data first.")
             return
 
-        # Generate questions with error handling and retry mechanism
-        max_retries = 3
-        retries = 0
-        while retries < max_retries:
-            try:
-                self.g_questions = self.analyzer.questions_gen(self.num_qu)
-                if not isinstance(self.g_questions, list):
-                    self.g_questions = []  # Ensure it's a list
-            except Exception as e:
-                print(f"Question generation failed: {str(e)}")
-                self.g_questions = []
+        # Show loading overlay
+        self.show_loading("Generating Questions...")
+        
+        # Disable the questions button
+        self.main_window.ui.qu_btn.setEnabled(False)
+        
+        # Create and configure the worker
+        self.question_worker = QuestionWorker(self.analyzer, self.num_qu)
+        self.question_worker.finished.connect(self.handle_questions_complete)
+        self.question_worker.error.connect(self.handle_questions_error)
+        self.question_worker.start()
 
-            # Validate the number of generated questions
-            if len(self.g_questions) == self.num_qu:
-                break
-            else:
-                print(f"Warning: Expected {self.num_qu} questions, but got {len(self.g_questions)}")
-                retries += 1
+    def handle_questions_complete(self, questions):
+        try:
+            # Store the generated questions
+            self.g_questions = questions
+            # Clear the selected questions list
+            self.selected_qu_list = []
+            # Update the UI with new questions
+            self._ques_add()
+        except Exception as e:
+            print(f"Error handling questions completion: {str(e)}")
+        finally:
+            # Reset UI state
+            self.main_window.ui.qu_btn.setEnabled(True)
+            self.hide_loading()
+            if hasattr(self, 'question_worker'):
+                self.question_worker.deleteLater()
+                self.question_worker = None
 
-        # Clear the selected questions list when generating new questions
-        self.selected_qu_list = []
-        self._ques_add()
+    def handle_questions_error(self, error_message):
+        # Hide loading overlay
+        self.hide_loading()
+        
+        # Reset button state
+        self.main_window.ui.qu_btn.setEnabled(True)
+        print(f"Error generating questions: {error_message}")
+        
+        if hasattr(self, 'question_worker'):
+            self.question_worker.deleteLater()
+            self.question_worker = None
 
     def _ques_add(self): # Get references to UI components
         scroll_area = self.main_window.ui.scrollArea
@@ -521,7 +626,7 @@ class GuiFunctions():
             traceback.print_exc()
 
     def display_current_chart(self):
-        """Display all charts in a grid layout"""
+        """Display all charts in a scrollable layout"""
         try:
             # Switch to the visualization page first
             self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
@@ -542,22 +647,23 @@ class GuiFunctions():
                     item.widget().setParent(None)
                     item.widget().deleteLater()
             
-            # Create new widget_3
-            self.main_window.ui.widget_3 = QWidget(page_widget)
-            self.main_window.ui.widget_3.setObjectName("widget_3")
-            self.main_window.ui.widget_3.setMinimumSize(800, 600)
-            self.main_window.ui.widget_3.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            # Create a scroll area for the main layout
+            main_scroll = QScrollArea()
+            main_scroll.setWidgetResizable(True)
+            main_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+            main_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
             
-            # Create grid layout for widget_3
-            grid_layout = QGridLayout(self.main_window.ui.widget_3)
-            grid_layout.setContentsMargins(10, 10, 10, 10)
-            grid_layout.setSpacing(10)
+            # Create main container widget
+            main_container = QWidget()
+            main_layout = QVBoxLayout(main_container)
+            main_layout.setSpacing(20)
+            main_layout.setContentsMargins(20, 20, 20, 20)
             
             # Calculate grid dimensions
             num_charts = len(self.chart_paths)
             if num_charts == 0:
                 return
-                
+            
             # Calculate number of rows and columns for the grid
             if num_charts <= 2:
                 cols = num_charts
@@ -566,13 +672,18 @@ class GuiFunctions():
                 cols = 2  # Maximum 2 columns
                 rows = (num_charts + 1) // 2  # Ceiling division
             
+            # Create grid layout for charts
+            grid_layout = QGridLayout()
+            grid_layout.setSpacing(20)
+            
             # Create and add web views for each chart
             for i, chart_path in enumerate(self.chart_paths):
                 if os.path.exists(chart_path):
                     # Create container widget for each chart
                     chart_container = QWidget()
+                    chart_container.setFixedSize(1200, 800)  # Fixed size for charts
                     chart_layout = QVBoxLayout(chart_container)
-                    chart_layout.setContentsMargins(0, 0, 0, 0)
+                    chart_layout.setContentsMargins(10, 10, 10, 10)
                     
                     # Create web view for the chart
                     web_view = QWebEngineView()
@@ -586,11 +697,9 @@ class GuiFunctions():
                     settings.setAttribute(QWebEngineSettings.WebAttribute.WebGLEnabled, True)
                     settings.setAttribute(QWebEngineSettings.WebAttribute.ScrollAnimatorEnabled, True)
                     settings.setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
-                    settings.setAttribute(QWebEngineSettings.WebAttribute.ShowScrollBars, True)
                     
                     # Configure web view
-                    web_view.setMinimumSize(400, 300)
-                    web_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                    web_view.setFixedSize(1180, 780)  # Fixed size slightly smaller than container
                     
                     # Add interaction settings
                     web_view.page().setBackgroundColor(Qt.transparent)
@@ -615,13 +724,23 @@ class GuiFunctions():
                     col = i % cols
                     grid_layout.addWidget(chart_container, row, col)
             
-            # Add widget_3 to page layout
-            page_layout.addWidget(self.main_window.ui.widget_3)
+            # Add grid layout to main layout
+            main_layout.addLayout(grid_layout)
+            
+            # Add stretch to push charts to the top
+            main_layout.addStretch()
+            
+            # Set the container widget as the scroll area's widget
+            main_scroll.setWidget(main_container)
+            
+            # Add scroll area to page layout
+            page_layout.addWidget(main_scroll)
             
             # Show everything
-            self.main_window.ui.widget_3.show()
+            main_container.show()
+            main_scroll.show()
             page_widget.show()
-            
+                
         except Exception as e:
             print(f"Error displaying charts: {str(e)}")
             import traceback
@@ -808,3 +927,25 @@ class GuiFunctions():
         self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
         # Display the most recent chart
         self.display_current_chart()
+
+    def setup_modern_icons(self):
+        # Update main icons
+        self.main_window.ui.btn_home.setIcon(QIcon("images/icons/home.png"))
+        self.main_window.ui.btn_dashboard.setIcon(QIcon("images/icons/dashboard.png"))
+        self.main_window.ui.btn_data.setIcon(QIcon("images/icons/database.png"))
+        self.main_window.ui.btn_anlysis.setIcon(QIcon("images/icons/analytics.png"))
+        self.main_window.ui.btn_chat.setIcon(QIcon("images/icons/chat.png"))
+        
+        # Update action icons
+        self.main_window.ui.openfile_btn.setIcon(QIcon("images/icons/upload.png"))
+        self.main_window.ui.clean_data_btn.setIcon(QIcon("images/icons/clean.png"))
+        self.main_window.ui.send_btn.setIcon(QIcon("images/icons/send.png"))
+        
+    def show_loading(self, message="Loading..."):
+        """Show loading overlay with custom message"""
+        self.loading_overlay.label.setText(message)
+        self.loading_overlay.show()
+        
+    def hide_loading(self):
+        """Hide loading overlay"""
+        self.loading_overlay.hide()
