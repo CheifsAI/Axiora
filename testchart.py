@@ -12,7 +12,7 @@ data_cols = ", ".join(sales_data.columns)
 #analyzer = DataAnalyzer(sales_data,llama3b)
 data_info = {
     "description": description,
-    "data_cols": ["orderid","Customer" "Name","shipmode","sales","quantity","discount","profit","segment","region",
+    "data_cols": ["orderid","Customer", "Name","shipmode","sales","quantity","discount","profit","segment","region",
                   "state","subcategory","category","orderdate_day","orderdate_weekday","orderdate_month",
                   "orderdate_year","shipdate_day","shipdate_month","shipdate_year","preparationtime"],
     "head": data_sample

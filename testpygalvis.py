@@ -11,7 +11,7 @@ visualizer.set_style('DarkSolarizedStyle')
 result = visualizer.generate_visualization(
     question="sales by product across all months",
     output_path="visualizations/sales_months.svg",
-    columns=['sales', 'segment'],  # Optional override
+    columns=['sales', 'orderdate_month'],  # Optional override
     chart_type='Line',  # Optional override
     width=1200,
     height=800
