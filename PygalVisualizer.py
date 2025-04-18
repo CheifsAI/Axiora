@@ -152,7 +152,7 @@ chart.render_to_file({repr(output_path)})
         """Generate data preparation code based on chart type"""
         if chart_type == "Histogram":
             return (
-                f"data = pd.cut(df['{columns[0]}'], bins=10).value_counts().sort_index()",
+                f"data = df['{columns[0]}'].value_counts().sort_index()",
                 "x_labels = [str(interval) for interval in data.index]"
             )
         elif chart_type in ["Bar", "Pie"]:

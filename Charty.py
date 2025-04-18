@@ -1,11 +1,11 @@
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_community.llms import Ollama
+from langchain_ollama import OllamaLLM
 from typing import Dict, List, Tuple
 import re
 
 class Charty:
     def __init__(self, model_name="llama3.2:3b"):
-        self.llm = Ollama(model=model_name)
+        self.llm = OllamaLLM(model=model_name)
         
         # Chart type selection template
         self.chart_type_prompt = ChatPromptTemplate.from_messages([
@@ -18,18 +18,16 @@ class Charty:
             - Pie: Parts of a whole (2-5 categories only)
             - Scatter: Relationships between two numerical variables
             - StackedBar: Composition of categories
-            - Histogram: Distribution of a numerical variable
             - Dot: Many categories with precise values
             
             2. SPECIAL CASES:
             - "trend"/"over time": Line chart
-            - "distribution": Histogram
             - "compare": Bar/HorizontalBar
             - "composition": StackedBar/Pie
             - "relationship": Scatter
             
             3. OUTPUT FORMAT (EXACTLY):
-            chart_type: [Bar|HorizontalBar|Line|Pie|Scatter|StackedBar|Histogram|Dot]
+            chart_type: [Bar|HorizontalBar|Line|Pie|Scatter|StackedBar|Dot]
             
             Data Description: {data_description}
             Available Columns: {columns}
@@ -79,7 +77,7 @@ class Charty:
         
         # Validate
         allowed_charts = {'Bar', 'HorizontalBar', 'Line', 'Pie', 'Scatter', 
-                        'StackedBar', 'Histogram', 'Dot'}
+                        'StackedBar', 'Dot'}
         return chart_type if chart_type in allowed_charts else 'Bar'
     
     def select_columns(self, data_info: Dict, question: str) -> List[str]:
