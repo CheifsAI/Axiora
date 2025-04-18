@@ -1,7 +1,6 @@
-from DataAnalyzer import DataAnalyzer 
-from ChartSelector import ChartSelector
+from Charty import Charty
 import pandas as pd
-from LLM import llama3b
+charty = Charty()
 from OprFuncs import data_describer
 
 sales_data = pd.read_csv("sales.csv")
@@ -19,9 +18,10 @@ data_info = {
 }
 
 question = "What are the total sales across all months?"
-
-selector = ChartSelector()
-chart_type, columns = selector.get_chart_recommendation(data_info, question)
-
-print(f"Recommended chart type: {chart_type}")
-print(f"Columns to use: {columns}")
+# Use separately
+#chart_type = charty.select_chart_type(data_info, question)
+#print(chart_type)
+columns = charty.select_columns(data_info, question)
+print(columns)
+# Or use combined (like original)
+#chart_type, columns = charty.get_chart_recommendation(data_info, "Show product sales distribution")
