@@ -1,28 +1,54 @@
 {
   "data_type": [
-    "structured",
-    "tabular"
+    "structured"
   ],
   "structure": {
-    "columns": [
-      "Order ID",
-      "Product",
-      "Sales",
-      "Date"
+    "column_names": [
+      "rows",
+      "columns_count",
+      "note",
+      "Column1",
+      "Column2",
+      "...",
+      "Column20"
     ],
-    "data_types": {
-      "Order ID": "integer",
-      "Product": "string",
-      "Sales": "float",
-      "Date": "datetime"
-    },
-    "row_count": 1000,
-    "column_count": 4
+    "data_types": [
+      "int",
+      "int",
+      "str",
+      "str",
+      "str",
+      "...",
+      "str"
+    ],
+    "sample_values": {
+      "Column1": [
+        "value1",
+        "value2",
+        "..."
+      ],
+      "Column2": [
+        "value1",
+        "value2",
+        "..."
+      ],
+      "...": [
+        "value1",
+        "value2",
+        "..."
+      ],
+      "Column20": [
+        "value1",
+        "value2",
+        "..."
+      ]
+    }
   },
   "suggested_analysis": [
-    "Line chart for Sales over time",
-    "Bar chart for Sales by Product",
-    "Scatter plot for Sales vs. Date",
-    "Pie chart for Sales distribution by Product"
+    "Exploratory Data Analysis (EDA) to understand the distribution and relationships between variables.",
+    "Correlation analysis to identify relationships between columns.",
+    "Descriptive statistics for each column.",
+    "Visualizations such as bar charts, scatter plots, heatmaps, etc., to better understand the data.",
+    "Inferential statistics if applicable (e.g., hypothesis testing, regression analysis)."
   ]
 }

@@ -1,0 +1,85 @@
+{
+  "data_type": "structured",
+  "columns": [
+    {
+      "column_name": "orderid",
+      "data_type": "int64"
+    },
+    {
+      "column_name": "Customer Name",
+      "data_type": "object"
+    },
+    {
+      "column_name": "shipmode",
+      "data_type": "object"
+    },
+    {
+      "column_name": "sales",
+      "data_type": "float64"
+    },
+    {
+      "column_name": "quantity",
+      "data_type": "int64"
+    },
+    {
+      "column_name": "discount",
+      "data_type": "float64"
+    },
+    {
+      "column_name": "profit",
+      "data_type": "float64"
+    },
+    {
+      "column_name": "segment",
+      "data_type": "object"
+    },
+    {
+      "column_name": "region",
+      "data_type": "object"
+    },
+    {
+      "column_name": "state",
+      "data_type": "object"
+    },
+    {
+      "column_name": "subcategory",
+      "data_type": "object"
+    },
+    {
+      "column_name": "category",
+      "data_type": "object"
+    },
+    {
+      "column_name": "orderdate_day",
+      "data_type": "int64"
+    },
+    {
+      "column_name": "orderdate_weekday",
+      "data_type": "object"
+    },
+    {
+      "column_name": "orderdate_month",
+      "data_type": "int64"
+    },
+    {
+      "column_name": "orderdate_year",
+      "data_type": "int64"
+    },
+    {
+      "column_name": "shipdate_day",
+      "data_type": "int64"
+    },
+    {
+      "column_name": "shipdate_month",
+      "data_type": "int64"
+    },
+    {
+      "column_name": "shipdate_year",
+      "data_type": "int64"
+    },
+    {
+      "column_name": "preparationtime",
+      "data_type": "int64"
+    }
+  ]
+}

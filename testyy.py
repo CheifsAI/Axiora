@@ -4,7 +4,7 @@ charty = Charty()
 from OprFuncs import data_describer
 
 #sales_data = pd.read_csv("sales.csv")
-supply_chain_data = pd.read_csv("Test_Datasets\supply_chain_data.csv")
+supply_chain_data = pd.read_csv("sales.csv")
 description = data_describer(supply_chain_data)
 data_sample = supply_chain_data.head().to_string()
 data_cols = ", ".join(supply_chain_data.columns)
