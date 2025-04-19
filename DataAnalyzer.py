@@ -1,4 +1,5 @@
 import pandas as pd
+from typing import Dict, List, Tuple
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain, SequentialChain
 from OprFuncs import *
@@ -16,7 +17,7 @@ class DataAnalyzer:
         self.dataframe = dataframe
         self.llm = llm
         self.data_info = data_infer(dataframe)
-        self.data_summary = data_describer(dataframe)
+        self.data_description = data_describer(dataframe)
         self.data_sample = dataframe.head().to_string()
         self.data_cols = ", ".join(dataframe.columns)
         self.db = DatabaseManager()
@@ -26,13 +27,13 @@ class DataAnalyzer:
     def analysis_data(self):
         data_info = self.data_info
         data_sample = self.data_sample
-        data_summary = self.data_sample
+        data_description = self.data_description
 
         analysis_prompt = '''
         You are a data analyst. You are provided with:
         1. Dataset metadata: {data_info}
         2. Dataset sample: {data_sample}
-        3. Dataset summary: {data_summary} 
+        3. Dataset summary: {data_description} 
 
         Please analyze the data and provide insights about:
         1. Key trends and patterns.
@@ -46,9 +47,9 @@ class DataAnalyzer:
         analysis_chain = LLMChain(llm=self.llm, prompt=analysis_template)
 
         
-        analysis = analysis_chain.run(data_info=data_info,data_sample=data_sample,data_summary=data_summary)
+        analysis = analysis_chain.run(data_info=data_info,data_sample=data_sample,data_description=data_description)
 
-        formatted_analysis_prompt = analysis_prompt.format(data_info=data_info,data_sample=data_sample,data_summary=data_summary)
+        formatted_analysis_prompt = analysis_prompt.format(data_info=data_info,data_sample=data_sample,data_description=data_description)
         self.memory.append(HumanMessage(content=formatted_analysis_prompt))
         self.memory.append(AIMessage(content=analysis))
         self.db.saveMemory(reportID=self.report_id,
@@ -95,13 +96,13 @@ class DataAnalyzer:
     def questions_gen(self, num):
         data_info = self.data_info
         data_sample = self.data_sample
-        data_summary = self.data_sample
+        data_description = self.data_description
 
         question_prompt = f"""
         You are a data analyst. You are provided with:
         1. Dataset metadata: {data_info}
         2. Dataset sample: {data_sample}
-        3. Dataset summary: {data_summary} 
+        3. Dataset summary: {data_description} 
         Create {num} analysis questions about the dataset.
 
         Please format each question on a new line, starting with a number, as in this example:
@@ -110,7 +111,7 @@ class DataAnalyzer:
         """
 
         question_template = PromptTemplate(
-            input_variables=["num", "data_info", "data_sample", "data_summary"],
+            input_variables=["num", "data_info", "data_sample", "data_description"],
             template=question_prompt
         )
 
@@ -121,7 +122,7 @@ class DataAnalyzer:
                 "num": num,
                 "data_info": data_info,
                 "data_sample": data_sample,
-                "data_summary": data_summary
+                "data_description": data_description
             })
 
             print("🔹 Raw LLM Output:", repr(generated_questions))
@@ -146,7 +147,7 @@ class DataAnalyzer:
                 num=num,
                 data_info=data_info,
                 data_sample=data_sample,
-                data_summary=data_summary
+                data_description=data_description
             )
             self.memory.append(HumanMessage(content=formatted_question_prompt))
             self.memory.append(AIMessage(content="\n".join(questions_list)))
@@ -188,134 +189,96 @@ class DataAnalyzer:
         return response
     
 
-    def visual(self,report, questions_list: list):
-        code_template = """import pygal
-        from pygal.style import RedBlueStyle
-
-        data = df["{column}"].value_counts()
-        chart = pygal.{chart_type}(style=RedBlueStyle, x_label_rotation=45)
-        chart.title = '{chart_title}'
-        chart.x_labels = [str(x) for x in data.index.tolist()]  # Convert all labels to strings
-        chart.add('{column}', data.values)  # Use original column name for legend
-        chart.render_to_file('{report}/{chart_title}.svg')
-        """
-        viscodes = []
-        for question in questions_list:
-            vis_resp = self._chart_select_chain(question)
-            print(vis_resp)
+    def select_chart_type(self, question: str) -> str:
+        self.chart_type_prompt = ChatPromptTemplate.from_messages([
+            ("system", """You are an expert at selecting chart types for data visualization. Strictly follow these rules:
             
-            chart_type = vis_resp['chart_type']
-            chart_title = vis_resp['chart_title']
-            column = vis_resp['columns']
+            1. CHART SELECTION GUIDE:
+            - For comparing categories: Bar or HorizontalBar
+            - For trends over time: Line
+            - For parts of a whole: Pie (few categories)
+            - For relationships: Scatter
+            - For precise values across many categories: Dot
             
-            # Clean up column name and chart title
-            if column in self.dataframe.columns:  # Verify column exists
-                chart_title = f"{column} Distribution"  # Use simple distribution title
+            3. OUTPUT FORMAT (EXACTLY):
+            chart_type: [Bar|HorizontalBar|Line|Pie|Scatter|StackedBar|Dot]
             
-            viscode = code_template.format(
-                chart_type=chart_type,
-                chart_title=chart_title,
-                column=column,
-                report=report
-            )
-            viscode = viscode.strip()
-            viscodes.append(viscode)
-        
-        return viscodes
-    
-    
-    def _chart_select_chain(self, question):
-       # data_info = self.data_info
-       # data_sample = self.data_sample
-       # data_summary = self.data_summary
-        data_cols = self.data_cols
-        llm = self.llm
-
-        chart_type_mapping = {
-            "bar chart": "Bar",
-            "bar": "Bar",
-            "line chart": "Line",
-            "line": "Line",
-            "pie chart": "Pie",
-            "pie": "Pie",
-            "histogram": "Histogram",
-            "stackedbar": "StackedBar",
-            "stacked bar": "StackedBar",
-            "radar": "Radar",
-            "box": "Box",
-        }
-
-        guidelines = """▼ Chart Selection Matrix
-    | Scenario                           | Chart Type      | When to Use                             |
-    |------------------------------------|-----------------|-----------------------------------------|
-    | Time series analysis               | Line            | Track trends over time (years, months)  |
-    | Comparing >3 categories            | Bar             | Compare discrete values across groups   |
-    | Distribution of data               | Histogram       | Show frequency distribution of data     |
-    | Comparing 2-5 categories           | Pie             | Show proportions (limit to 5 categories)|
-    | Part-to-whole relationships        | StackedBar      | Show cumulative totals and components   |
-    | Multivariate comparison            | Radar           | Compare multiple quantitative variables |
-    | Statistical distribution analysis  | Box             | Show quartiles and outliers             |
-
-    ▲ Special Cases:
-    - Use box plots for statistical distributions
-    - Use stacked bars for cumulative totals 
-    - Use Progress Rings/Charts for progress/completion
-    - Use Proportional Symbol Map for proportions/rates 
-    - Use area charts to avoid misleading representations
-    - Avoid pie charts when >5 categories"""
-
-        chart_selection_prompt = PromptTemplate(
-            input_variables=["data_cols", "question"],
-            template="""Based on the available columns: {data_cols}
-            Select the most appropriate visualization for this question: {question}
-            based on {guidelines} 
+            Data Description: {data_description}
+            Available Columns: {columns}
+            Sample Data: {sample_data}
+            Question: {question}
             
-            Respond in this exact format:
-            chart_type: [type]
-            column: [single column name]
-            
-            The column MUST be one of the available columns listed above.
-            The chart_type should be one of: bar, line, pie, histogram, stackedbar, radar, box"""
-        )
+            Respond ONLY with:
+            chart_type: [chart_type]""")
+        ])
 
-        chart_selection_chain = LLMChain(
-            llm=llm,
-            prompt=chart_selection_prompt,
-            output_key="chart_selection_result" 
-        )
-        
-        response = chart_selection_chain({
-            "data_cols": data_cols,
-            "question": question,
-            "guidelines":guidelines
+        """Select only the chart type based on the question and data."""
+        an_llm = self.llm.temperature = 0.3
+        chain = self.chart_type_prompt | an_llm
+        response = chain.invoke({
+            "data_description": self.data_description,
+            "columns": self.data_cols,
+            "sample_data": self.data_sample,
+            "question": question
         })
         
-        result = response["chart_selection_result"].strip()
+        # Parse response
+        chart_match = re.search(r'chart_type:\s*([a-zA-Z]+)', response, re.IGNORECASE)
+        chart_type = chart_match.group(1) if chart_match else None
         
-        # Parse the response
-        chart_type = None
-        column = None
-        
-        for line in result.split('\n'):
-            if 'chart_type:' in line.lower():
-                chart_type = line.split(':')[1].strip().lower()
-            elif 'column:' in line.lower():
-                column = line.split(':')[1].strip()
-        
-        # Validate and clean up
-        if not chart_type or not column:
-            chart_type = "Bar"  # default
-            column = self.dataframe.columns[0]  # fallback to first column
+        # Validate
+        allowed_charts = {'Bar', 'HorizontalBar', 'Line', 'Pie', 'Scatter', 
+                        'StackedBar', 'Dot'}
+        return chart_type if chart_type in allowed_charts else 'Bar'
+    
+    def select_columns(self, question: str) -> List[str]:
+        self.columns_prompt = ChatPromptTemplate.from_messages([
+            ("system", """You are an expert at selecting relevant columns for data visualization. Strictly follow:
             
-        chart_type = chart_type_mapping.get(chart_type, "Bar")
-        
-        # Verify column exists in dataframe
-        if column not in self.dataframe.columns:
-            print(f"Warning: Column '{column}' not found. Available columns: {self.data_cols}")
-            column = self.dataframe.columns[0]  # fallback to first column
+            1. COLUMN SELECTION RULES:
+            - Focus on columns mentioned in the question
+            - What is being measured (numerical columns)
+            - What is being compared/grouped by (categorical columns)
+            - Any time dimensions for trends
+            - Never suggest columns not in Available Columns
             
-        return {
-            "chart_type": chart_type,
-            "chart_title": column,  # Use column name as chart title
-            "columns": column
-        }
+            2. OUTPUT FORMAT (EXACTLY):
+            columns: [exact_column_name1, exact_column_name2]
+            
+            Data Description: {data_description}
+            Available Columns: {columns}
+            Sample Data: {sample_data}
+            Question: {question}
+            
+            Respond ONLY with:
+            columns: [column1, column2]""")
+        ])
+
+        """Select only the relevant columns based on the question and data."""
+        an_llm = self.llm.temperature = 0.3
+        chain = self.columns_prompt | an_llm
+        response = chain.invoke({
+            "data_description": self.data_description,
+            "columns":self.data_cols,
+            "sample_data": self.data_sample,
+            "question": question
+        })
+        
+        # Parse response
+        cols_match = re.search(r'columns:\s*\[([^\]]+)\]', response)
+        if cols_match:
+            columns = [col.strip() for col in cols_match.group(1).split(',')]
+        else:
+            # Fallback parsing
+            cols_line = next((line for line in response.split('\n') if line.startswith('columns:')), '')
+            columns = [col.strip() for col in cols_line.replace('columns:', '').split(',') if col.strip()]
+        
+        # Validate columns exist in data
+        available_cols = self.dataframe.columns.tolist()
+        return [col for col in columns if col in available_cols]
+    
+    def get_chart_recommendation(self, question: str) -> Tuple[str, List[str]]:
+        """Combined recommendation (maintaining original interface)"""
+        chart_type = self.select_chart_type(question)
+        columns = self.select_columns(question)
+        return chart_type, columns

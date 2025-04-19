@@ -6,8 +6,8 @@ import re
 class Charty:
     def __init__(self, model_name="llama3.2:3b"):
         self.llm = OllamaLLM(model=model_name, temperature=0.4)
-        
-        # Chart type selection template
+            
+    def select_chart_type(self, data_info: Dict, question: str) -> str:
         self.chart_type_prompt = ChatPromptTemplate.from_messages([
             ("system", """You are an expert at selecting chart types for data visualization. Strictly follow these rules:
             
@@ -29,8 +29,26 @@ class Charty:
             Respond ONLY with:
             chart_type: [chart_type]""")
         ])
+
+        """Select only the chart type based on the question and data."""
+        chain = self.chart_type_prompt | self.llm
+        response = chain.invoke({
+            "data_description": data_info.get("description", ""),
+            "columns": ", ".join(data_info.get("data_cols", [])),
+            "sample_data": str(data_info.get("head", "")),
+            "question": question
+        })
         
-        # Column selection template
+        # Parse response
+        chart_match = re.search(r'chart_type:\s*([a-zA-Z]+)', response, re.IGNORECASE)
+        chart_type = chart_match.group(1) if chart_match else None
+        
+        # Validate
+        allowed_charts = {'Bar', 'HorizontalBar', 'Line', 'Pie', 'Scatter', 
+                        'StackedBar', 'Dot'}
+        return chart_type if chart_type in allowed_charts else 'Bar'
+    
+    def select_columns(self, data_info: Dict, question: str) -> List[str]:
         self.columns_prompt = ChatPromptTemplate.from_messages([
             ("system", """You are an expert at selecting relevant columns for data visualization. Strictly follow:
             
@@ -52,27 +70,7 @@ class Charty:
             Respond ONLY with:
             columns: [column1, column2]""")
         ])
-    
-    def select_chart_type(self, data_info: Dict, question: str) -> str:
-        """Select only the chart type based on the question and data."""
-        chain = self.chart_type_prompt | self.llm
-        response = chain.invoke({
-            "data_description": data_info.get("description", ""),
-            "columns": ", ".join(data_info.get("data_cols", [])),
-            "sample_data": str(data_info.get("head", "")),
-            "question": question
-        })
-        
-        # Parse response
-        chart_match = re.search(r'chart_type:\s*([a-zA-Z]+)', response, re.IGNORECASE)
-        chart_type = chart_match.group(1) if chart_match else None
-        
-        # Validate
-        allowed_charts = {'Bar', 'HorizontalBar', 'Line', 'Pie', 'Scatter', 
-                        'StackedBar', 'Dot'}
-        return chart_type if chart_type in allowed_charts else 'Bar'
-    
-    def select_columns(self, data_info: Dict, question: str) -> List[str]:
+
         """Select only the relevant columns based on the question and data."""
         chain = self.columns_prompt | self.llm
         response = chain.invoke({
