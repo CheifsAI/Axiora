@@ -5,7 +5,7 @@ import re
 
 class Charty:
     def __init__(self, model_name="llama3.2:3b"):
-        self.llm = OllamaLLM(model=model_name)
+        self.llm = OllamaLLM(model=model_name, temperature=0.4)
         
         # Chart type selection template
         self.chart_type_prompt = ChatPromptTemplate.from_messages([
@@ -108,3 +108,15 @@ class Charty:
         chart_type = self.select_chart_type(data_info, question)
         columns = self.select_columns(data_info, question)
         return chart_type, columns
+"""
+from langchain_ollama import OllamaLLM
+
+llm = OllamaLLM(
+    model="llama3",
+    temperature=0.3,  # Less randomness
+    top_p=0.9,        # Exclude unlikely tokens
+    repeat_penalty=1.2  # Avoid repetition
+)
+
+
+"""

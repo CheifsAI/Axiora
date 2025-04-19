@@ -1,17 +1,40 @@
-from DatabaseManager import DatabaseManager
-db = DatabaseManager()
-#print(db.get_report_dataset(1))
-#print(db.get_report_summary(2))
-#print(db.get_report_questions(2))
-chat_history = db.get_report_memory(1)
-for prompt, response, _ in chat_history:
-    if response:
-        print(response)
-#print(db.get_report_memory(2))
-#if db.get_report_summary(2):
-#        print(db.get_report_summary(1))
-#from OprFuncs import read_file
-#import pandas as pd
-#df = read_file("Test_Datasets\laptop_price.csv")
-#df = pd.read_csv("Test_Datasets\laptop_price.csv", encoding='latin1')
-#print(df.head(3))
+""" import pandas as pd
+from langchain_ollama import OllamaLLM
+from langchain_experimental.agents import create_csv_agent
+
+df = pd.read_csv('sales.csv')
+print(df)
+
+llm = OllamaLLM(model="llama3.2:3b")
+
+agent = create_csv_agent(
+    llm,
+    'sales.csv',
+    verbose=True,
+    allow_dangerous_code=True
+)
+
+response = agent.invoke("What are the most profitable subcategories over the years?")
+print(response)"""
+import pandas as pd
+from langchain.document_loaders.csv_loader import CSVLoader
+from langchain_ollama import OllamaLLM
+from langchain_experimental.agents import create_csv_agent
+
+loader = CSVLoader(file_path='sales.csv') 
+data = loader.load()
+
+df = pd.DataFrame([doc.page_content for doc in data])  
+print(df)
+
+llm = OllamaLLM(model="llama3.2:3b")
+
+agent = create_csv_agent(
+    llm,
+    'sales.csv',
+    verbose=True,
+    allow_dangerous_code=True  
+)
+
+response = agent.invoke("What are the most profitable subcategories over the years?")
+print(response)
