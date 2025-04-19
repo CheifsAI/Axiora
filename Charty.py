@@ -12,19 +12,11 @@ class Charty:
             ("system", """You are an expert at selecting chart types for data visualization. Strictly follow these rules:
             
             1. CHART SELECTION GUIDE:
-            - Bar: Comparing categories/groups (vertical)
-            - HorizontalBar: Many categories (horizontal)
-            - Line: Trends over time (requires time dimension)
-            - Pie: Parts of a whole (2-5 categories only)
-            - Scatter: Relationships between two numerical variables
-            - StackedBar: Composition of categories
-            - Dot: Many categories with precise values
-            
-            2. SPECIAL CASES:
-            - "trend"/"over time": Line chart
-            - "compare": Bar/HorizontalBar
-            - "composition": StackedBar/Pie
-            - "relationship": Scatter
+            - For comparing categories: Bar or HorizontalBar
+            - For trends over time: Line
+            - For parts of a whole: Pie (few categories)
+            - For relationships: Scatter
+            - For precise values across many categories: Dot
             
             3. OUTPUT FORMAT (EXACTLY):
             chart_type: [Bar|HorizontalBar|Line|Pie|Scatter|StackedBar|Dot]
@@ -44,9 +36,9 @@ class Charty:
             
             1. COLUMN SELECTION RULES:
             - Focus on columns mentioned in the question
-            - "by [category]": Use categorical columns
-            - Metrics: Use numerical columns
-            - Time trends: Use date columns
+            - What is being measured (numerical columns)
+            - What is being compared/grouped by (categorical columns)
+            - Any time dimensions for trends
             - Never suggest columns not in Available Columns
             
             2. OUTPUT FORMAT (EXACTLY):
