@@ -5,7 +5,7 @@ from typing import List, Dict, Optional, Union
 import re
 import os
 
-class PygalVisualizer:
+class Visualizer:
     def __init__(self, dataframe: pd.DataFrame):
         """
         Initialize with a pandas DataFrame

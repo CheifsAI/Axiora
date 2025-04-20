@@ -197,11 +197,11 @@ class DataAnalyzer:
             - For comparing categories: Bar or HorizontalBar
             - For trends over time: Line
             - For parts of a whole: Pie (few categories)
-            - For relationships: Scatter
+            - For relationships: Histogram
             - For precise values across many categories: Dot
             
             3. OUTPUT FORMAT (EXACTLY):
-            chart_type: [Bar|HorizontalBar|Line|Pie|Scatter|StackedBar|Dot]
+            chart_type: [Bar|HorizontalBar|Line|Pie|Histogram|Dot]
             
             Data Description: {data_description}
             Available Columns: {columns}
@@ -213,22 +213,22 @@ class DataAnalyzer:
         ])
 
         """Select only the chart type based on the question and data."""
-        an_llm = self.llm.temperature = 0.3
-        chain = self.chart_type_prompt | an_llm
+        self.llm.temperature = 0.3
+        chain = self.chart_type_prompt | self.llm
         response = chain.invoke({
             "data_description": self.data_description,
             "columns": self.data_cols,
             "sample_data": self.data_sample,
             "question": question
         })
-        
+        self.llm.temperature = 0.7
         # Parse response
         chart_match = re.search(r'chart_type:\s*([a-zA-Z]+)', response, re.IGNORECASE)
         chart_type = chart_match.group(1) if chart_match else None
         
         # Validate
-        allowed_charts = {'Bar', 'HorizontalBar', 'Line', 'Pie', 'Scatter', 
-                        'StackedBar', 'Dot'}
+        allowed_charts = {'Bar', 'HorizontalBar', 'Line', 'Pie', 'Histogram', 
+                        'Dot'}
         return chart_type if chart_type in allowed_charts else 'Bar'
     
     def select_columns(self, question: str) -> List[str]:
@@ -255,15 +255,15 @@ class DataAnalyzer:
         ])
 
         """Select only the relevant columns based on the question and data."""
-        an_llm = self.llm.temperature = 0.3
-        chain = self.columns_prompt | an_llm
+        self.llm.temperature = 0.3
+        chain = self.columns_prompt | self.llm
         response = chain.invoke({
             "data_description": self.data_description,
             "columns":self.data_cols,
             "sample_data": self.data_sample,
             "question": question
         })
-        
+        self.llm.temperature = 0.7
         # Parse response
         cols_match = re.search(r'columns:\s*\[([^\]]+)\]', response)
         if cols_match:

@@ -1,9 +1,9 @@
-from PygalVisualizer import PygalVisualizer
+from Visualizer import Visualizer
 import pandas as pd
 sales_data = pd.read_csv("sales.csv")
 #supply_chain_data = pd.read_csv("Test_Datasets\supply_chain_data.csv")
 # Initialize with your DataFrame
-visualizer = PygalVisualizer(sales_data)
+visualizer = Visualizer(sales_data)
 
 # Set a custom style
 visualizer.set_style('DarkSolarizedStyle')
