@@ -1,43 +1,39 @@
-import os
-import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
+from typing import Dict, List, Tuple
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain, SequentialChain
 from OprFuncs import *
-from langchain_core.runnables import RunnableSequence
+#from langchain.schema.runnable import RunnableSequence
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.agents import AgentExecutor, Tool, create_react_agent
-from langchain import hub
+#from langchain.agents import AgentExecutor, Tool, create_react_agent
+#from langchain import hub
 import re
+#from modelEXT.PygalCodeComponents import PygalCodeComponents
+#from langchain.output_parsers import PydanticOutputParser
 from DatabaseManager import DatabaseManager
-from datetime import datetime
-
 class DataAnalyzer:
     def __init__(self,dataframe,llm):
         self.dataframe = dataframe
         self.llm = llm
         self.data_info = data_infer(dataframe)
-        self.data_summary = data_describer(dataframe)
+        self.data_description = data_describer(dataframe)
         self.data_sample = dataframe.head().to_string()
         self.data_cols = ", ".join(dataframe.columns)
         self.db = DatabaseManager()
         self.report_id = None
         self.memory = []
-        self.rname = "output"
-        os.makedirs(self.rname, exist_ok=True)
 
     def analysis_data(self):
         data_info = self.data_info
         data_sample = self.data_sample
-        data_summary = self.data_sample
+        data_description = self.data_description
 
         analysis_prompt = '''
         You are a data analyst. You are provided with:
         1. Dataset metadata: {data_info}
         2. Dataset sample: {data_sample}
-        3. Dataset summary: {data_summary} 
+        3. Dataset summary: {data_description} 
 
         Please analyze the data and provide insights about:
         1. Key trends and patterns.
@@ -51,9 +47,9 @@ class DataAnalyzer:
         analysis_chain = LLMChain(llm=self.llm, prompt=analysis_template)
 
         
-        analysis = analysis_chain.run(data_info=data_info,data_sample=data_sample,data_summary=data_summary)
+        analysis = analysis_chain.run(data_info=data_info,data_sample=data_sample,data_description=data_description)
 
-        formatted_analysis_prompt = analysis_prompt.format(data_info=data_info,data_sample=data_sample,data_summary=data_summary)
+        formatted_analysis_prompt = analysis_prompt.format(data_info=data_info,data_sample=data_sample,data_description=data_description)
         self.memory.append(HumanMessage(content=formatted_analysis_prompt))
         self.memory.append(AIMessage(content=analysis))
         self.db.saveMemory(reportID=self.report_id,
@@ -100,13 +96,13 @@ class DataAnalyzer:
     def questions_gen(self, num):
         data_info = self.data_info
         data_sample = self.data_sample
-        data_summary = self.data_sample
+        data_description = self.data_description
 
         question_prompt = f"""
         You are a data analyst. You are provided with:
         1. Dataset metadata: {data_info}
         2. Dataset sample: {data_sample}
-        3. Dataset summary: {data_summary} 
+        3. Dataset summary: {data_description} 
         Create {num} analysis questions about the dataset.
 
         Please format each question on a new line, starting with a number, as in this example:
@@ -115,7 +111,7 @@ class DataAnalyzer:
         """
 
         question_template = PromptTemplate(
-            input_variables=["num", "data_info", "data_sample", "data_summary"],
+            input_variables=["num", "data_info", "data_sample", "data_description"],
             template=question_prompt
         )
 
@@ -126,7 +122,7 @@ class DataAnalyzer:
                 "num": num,
                 "data_info": data_info,
                 "data_sample": data_sample,
-                "data_summary": data_summary
+                "data_description": data_description
             })
 
             print("🔹 Raw LLM Output:", repr(generated_questions))
@@ -151,7 +147,7 @@ class DataAnalyzer:
                 num=num,
                 data_info=data_info,
                 data_sample=data_sample,
-                data_summary=data_summary
+                data_description=data_description
             )
             self.memory.append(HumanMessage(content=formatted_question_prompt))
             self.memory.append(AIMessage(content="\n".join(questions_list)))
@@ -193,599 +189,96 @@ class DataAnalyzer:
         return response
     
 
-    def _chart_select_chain(self, question):
-        data_cols = self.data_cols
-        llm = self.llm
-
-        chart_type_mapping = {
-            "bar chart": "Bar",
-            "bar": "Bar",
-            "line chart": "Line",
-            "line": "Line",
-            "pie chart": "Pie", 
-            "pie": "Pie",
-            "histogram": "Histogram",
-            "stackedbar": "StackedBar",
-            "stacked bar": "StackedBar",
-            "radar": "Radar",
-            "box": "Box",
-        }
-
-        guidelines = """▼ Chart Selection Matrix
-    | Scenario                           | Chart Type      | When to Use                             |
-    |------------------------------------|-----------------|-----------------------------------------|
-    | Comparing two related metrics      | Bar (grouped)   | Compare pairs of values side by side    |
-    | Time series analysis               | Line            | Track trends over time (years, months)  |
-    | Comparing >3 categories            | Bar             | Compare discrete values across groups   |
-    | Distribution of data               | Histogram       | Show frequency distribution of data     |
-    | Comparing 2-5 categories           | Pie             | Show proportions (limit to 5 categories)|
-    | Part-to-whole relationships        | StackedBar      | Show cumulative totals and components  |
-    | Multivariate comparison            | Radar           | Compare multiple quantitative variables |
-    | Statistical distribution analysis  | Box             | Show quartiles and outliers            |"""
-
-        # Special handling for comparison questions
-        if "compare" in question.lower() or "vs" in question.lower() or "versus" in question.lower():
-            if "goal" in question.lower() and "Home Team Goals" in self.dataframe.columns:
-                return {
-                    "chart_type": "Bar",
-                    "chart_title": "Goals_Comparison",
-                    "columns": "Home Team Goals"  # This will trigger the special comparison logic
-                }
-
-        prompt = PromptTemplate(
-            input_variables=["data_cols", "guidelines", "question"],
-            template="""You are a data visualization expert. Based on the available columns and guidelines, select the most appropriate visualization type and column for the given question.
+    def select_chart_type(self, question: str) -> str:
+        self.chart_type_prompt = ChatPromptTemplate.from_messages([
+            ("system", """You are an expert at selecting chart types for data visualization. Strictly follow these rules:
             
-Available columns: {data_cols}
+            1. CHART SELECTION GUIDE:
+            - For comparing categories: Bar or HorizontalBar
+            - For trends over time: Line
+            - For parts of a whole: Pie (few categories)
+            - For relationships: XY
+            - For precise values across many categories: Dot
+            
+            3. OUTPUT FORMAT (EXACTLY):
+            chart_type: [Bar|HorizontalBar|Line|Pie|XY|Dot]
+            
+            Data Description: {data_description}
+            Available Columns: {columns}
+            Sample Data: {sample_data}
+            Question: {question}
+            
+            Respond ONLY with:
+            chart_type: [chart_type]""")
+        ])
 
-Chart selection guidelines:
-{guidelines}
-
-Question: {question}
-
-Respond in this exact format (no other text):
-chart_type: [type]
-column: [single column name]
-
-The column MUST be one of the available columns listed above.
-The chart_type should be one of: bar, line, pie, histogram, stackedbar, radar, box
-
-For questions about frequencies, distributions, or "most common" values, use Bar or Pie charts.
-For comparison questions between two metrics, use Bar with the primary metric."""
-        )
-
-        chain = prompt | llm
-
-        result = chain.invoke({
-            "data_cols": data_cols,
-            "guidelines": guidelines,
+        """Select only the chart type based on the question and data."""
+        self.llm.temperature = 0.3
+        chain = self.chart_type_prompt | self.llm
+        response = chain.invoke({
+            "data_description": self.data_description,
+            "columns": self.data_cols,
+            "sample_data": self.data_sample,
             "question": question
         })
+        self.llm.temperature = 0.7
+        # Parse response
+        chart_match = re.search(r'chart_type:\s*([a-zA-Z]+)', response, re.IGNORECASE)
+        chart_type = chart_match.group(1) if chart_match else None
+        
+        # Validate
+        allowed_charts = {'Bar', 'HorizontalBar', 'Line', 'Pie', 'XY', 
+                        'Dot'}
+        return chart_type if chart_type in allowed_charts else 'Bar'
+    
+    def select_columns(self, question: str) -> List[str]:
+        self.columns_prompt = ChatPromptTemplate.from_messages([
+            ("system", """You are an expert at selecting relevant columns for data visualization. Strictly follow:
+            
+            1. COLUMN SELECTION RULES:
+            - Focus on columns mentioned in the question
+            - What is being measured (numerical columns)
+            - What is being compared/grouped by (categorical columns)
+            - Any time dimensions for trends
+            - Never suggest columns not in Available Columns
+            
+            2. OUTPUT FORMAT (EXACTLY):
+            columns: [exact_column_name1, exact_column_name2]
+            
+            Data Description: {data_description}
+            Available Columns: {columns}
+            Sample Data: {sample_data}
+            Question: {question}
+            
+            Respond ONLY with:
+            columns: [column1, column2]""")
+        ])
 
-        # Parse the response
-        chart_type = None
-        column = None
-        
-        # Handle both string and AIMessage responses
-        response_text = result if isinstance(result, str) else result.content
-        print("Raw LLM response:", response_text)
-        
-        for line in response_text.split('\n'):
-            line = line.strip().lower()
-            if line.startswith('chart_type:'):
-                chart_type = line.split(':')[1].strip()
-            elif line.startswith('column:'):
-                # Get the column name and find the exact match in dataframe columns
-                col_name = line.split(':')[1].strip()
-                # Try to find an exact match first
-                for df_col in self.dataframe.columns:
-                    if df_col.lower() == col_name.lower():
-                        column = df_col
-                        break
-                # If no exact match, try partial match
-                if not column:
-                    for df_col in self.dataframe.columns:
-                        if col_name.lower() in df_col.lower():
-                            column = df_col
-                            break
-        
-        # Validate and clean up
-        if not chart_type or not column:
-            print("Warning: Could not parse chart type or column from response. Using defaults.")
-            print("Response was:", response_text)
-            print("Available columns:", self.data_cols)
-            
-            # Try to find a relevant column based on the question
-            question_lower = question.lower()
-            if "goal" in question_lower:
-                column = "Home Team Goals"  # This will trigger the special comparison logic
-                chart_type = "Bar"
-            else:
-                column = self.dataframe.columns[0]
-                chart_type = "Bar"
-            
-        chart_type = chart_type_mapping.get(chart_type, "Bar")
-        
-        # Verify column exists in dataframe
-        if column not in self.dataframe.columns:
-            print(f"Warning: Column '{column}' not found. Available columns: {self.data_cols}")
-            column = self.dataframe.columns[0]
-        
-        # Create descriptive title
-        if "goal" in question.lower():
-            title = "Goals_Analysis"
+        """Select only the relevant columns based on the question and data."""
+        self.llm.temperature = 0.3
+        chain = self.columns_prompt | self.llm
+        response = chain.invoke({
+            "data_description": self.data_description,
+            "columns":self.data_cols,
+            "sample_data": self.data_sample,
+            "question": question
+        })
+        self.llm.temperature = 0.7
+        # Parse response
+        cols_match = re.search(r'columns:\s*\[([^\]]+)\]', response)
+        if cols_match:
+            columns = [col.strip() for col in cols_match.group(1).split(',')]
         else:
-            title = f"{column}_Analysis"
-            
-        return {
-            "chart_type": chart_type,
-            "chart_title": title,
-            "columns": column
-        }
-
-    def visual(self, chart_type, column_name, data):
-        """Generate a visualization based on the specified chart type and data."""
-        try:
-            # Convert data to DataFrame if it's not already
-            df = pd.DataFrame(data) if not isinstance(data, pd.DataFrame) else data
-            
-            # Create a unique filename for the chart
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            safe_column_name = "".join(c if c.isalnum() else "_" for c in column_name)
-            filename = f"{chart_type}_{safe_column_name}_{timestamp}.html"
-            
-            # Font configurations
-            font_config = {
-                'family': 'Segoe UI',
-                'title_size': 20,      # Slightly smaller title
-                'axis_title_size': 14, # Smaller axis titles
-                'tick_size': 12,       # Smaller tick labels
-                'legend_size': 12,     # Smaller legend
-                'label_size': 10       # Smaller data labels
-            }
-            
-            # Define theme colors with blue and green data colors but dark background
-            theme_colors = {
-                'primary': '#2196F3',      # Bright blue
-                'secondary': '#4CAF50',    # Green
-                'accent': '#1976D2',       # Darker blue
-                'accent2': '#388E3C',      # Darker green
-                'accent3': '#64B5F6',      # Light blue
-                'accent4': '#81C784',      # Light green
-                'accent5': '#0D47A1',      # Navy blue
-                'background': '#708090 ',   # Dark background
-                'text': '#E0E0E0',         # Light gray text
-                'grid': '#1F2937'          # Dark grid lines
-            }
-            
-            # Custom theme for plotly
-            custom_theme = {
-                'layout': {
-                    'plot_bgcolor': theme_colors['background'],
-                    'paper_bgcolor': theme_colors['background'],
-                    'width': 1200,
-                    'height': 800,
-                    'font': {
-                        'family': font_config['family'],
-                        'color': theme_colors['text'],
-                        'size': font_config['label_size']
-                    },
-                    'title': {
-                        'font': {
-                            'color': theme_colors['text'],
-                            'size': font_config['title_size'],
-                            'family': font_config['family']
-                        }
-                    },
-                    'showlegend': True,
-                    'legend': {
-                        'bgcolor': 'rgba(17, 24, 39, 0.8)',  # Semi-transparent dark background
-                        'font': {'color': theme_colors['text']},
-                        'bordercolor': theme_colors['grid'],
-                        'borderwidth': 1
-                    },
-                    'colorway': [
-                        theme_colors['primary'],    # Bright blue
-                        theme_colors['secondary'],  # Green
-                        theme_colors['accent3'],    # Light blue
-                        theme_colors['accent4'],    # Light green
-                        theme_colors['accent'],     # Darker blue
-                        theme_colors['accent2'],    # Darker green
-                        theme_colors['accent5'],    # Navy blue
-                    ],
-                    'xaxis': {
-                        'gridcolor': theme_colors['grid'],
-                        'linecolor': theme_colors['grid'],
-                        'tickcolor': theme_colors['text'],
-                        'tickfont': {'color': theme_colors['text']},
-                        'title': {'font': {'color': theme_colors['text']}}
-                    },
-                    'yaxis': {
-                        'gridcolor': theme_colors['grid'],
-                        'linecolor': theme_colors['grid'],
-                        'tickcolor': theme_colors['text'],
-                        'tickfont': {'color': theme_colors['text']},
-                        'title': {'font': {'color': theme_colors['text']}}
-                    }
-                }
-            }
-            
-            # Ensure output directory exists
-            os.makedirs(self.rname, exist_ok=True)
-            output_path = os.path.join(self.rname, filename)
-            print(f"Generating chart at: {output_path}")
-            
-            # Special handling for goal comparison
-            if "goal" in column_name.lower():
-                home_goals = df["Home Team Goals"] if "Home Team Goals" in df.columns else None
-                away_goals = df["Away Team Goals"] if "Away Team Goals" in df.columns else None
-                
-                if home_goals is not None and away_goals is not None:
-                    # Create comparison bar chart with blue and green colors
-                    fig = go.Figure()
-                    
-                    # Add home goals with blue theme
-                    fig.add_trace(go.Bar(
-                        name='Home Team Goals',
-                        x=df.index,
-                        y=home_goals,
-                        text=[f"{v:,}" if pd.notna(v) else "N/A" for v in home_goals],
-                        textposition='auto',
-                        marker=dict(
-                            color='#2196F3',  # Bright blue
-                            line=dict(
-                                color='#1976D2',  # Darker blue
-                                width=1.5
-                            )
-                        ),
-                        opacity=0.9
-                    ))
-                    
-                    # Add away goals with green theme
-                    fig.add_trace(go.Bar(
-                        name='Away Team Goals',
-                        x=df.index,
-                        y=away_goals,
-                        text=[f"{v:,}" if pd.notna(v) else "N/A" for v in away_goals],
-                        textposition='auto',
-                        marker=dict(
-                            color='#4CAF50',  # Green
-                            line=dict(
-                                color='#388E3C',  # Darker green
-                                width=1.5
-                            )
-                        ),
-                        opacity=0.9
-                    ))
-                    
-                    # Create layout configuration with enhanced styling
-                    layout = {
-                        **custom_theme['layout'],
-                        'title': {
-                            'text': 'Comparison of Home vs Away Team Goals',
-                            'font': {
-                                'size': font_config['title_size'],
-                                'color': theme_colors['text'],
-                                'family': font_config['family']
-                            },
-                            'x': 0.5,
-                            'xanchor': 'center',
-                            'y': 0.95,
-                            'yanchor': 'top'
-                        },
-                        'xaxis_title': 'Match Index',
-                        'yaxis_title': 'Goals Scored',
-                        'barmode': 'group',
-                        'bargap': 0.15,        # Gap between bars
-                        'bargroupgap': 0.1,    # Gap between bar groups
-                        'showlegend': True,
-                        'legend': {
-                            'bgcolor': 'rgba(26, 35, 126, 0.8)',
-                            'bordercolor': theme_colors['grid'],
-                            'borderwidth': 1,
-                            'font': {
-                                'family': font_config['family'],
-                                'size': font_config['legend_size'],
-                                'color': theme_colors['text']
-                            }
-                        },
-                        'hoverlabel': {
-                            'bgcolor': theme_colors['background'],
-                            'bordercolor': theme_colors['grid'],
-                            'font': {
-                                'family': font_config['family'],
-                                'size': font_config['label_size'],
-                                'color': theme_colors['text']
-                            }
-                        }
-                    }
-                    
-                    # Update layout
-                    fig.update_layout(**layout)
-                    
-                    # Update axes for better readability
-                    fig.update_xaxes(
-                        showgrid=True,
-                        gridwidth=1,
-                        gridcolor=theme_colors['grid'],
-                        zeroline=False
-                    )
-                    
-                    fig.update_yaxes(
-                        showgrid=True,
-                        gridwidth=1,
-                        gridcolor=theme_colors['grid'],
-                        zeroline=False
-                    )
-                    
-                    fig.write_html(output_path)
-                    print(f"Successfully generated comparison chart at {output_path}")
-                    return output_path
-            
-            # If not a goal comparison or missing columns, fall back to regular chart
-            values = df[column_name].replace({np.nan: None})
-            
-            # Update the chart templates with new colors and sizing
-            chart_templates = {
-                'Bar': f"""
-fig = go.Figure(data=[
-    go.Bar(
-        x=[str(x) for x in df.index],
-        y=[v if v is not None else 0 for v in values],
-        text=[str(v) if v is not None else "N/A" for v in values],
-        textposition='auto',
-        marker_color='{theme_colors["primary"]}',
-        marker_line_color='{theme_colors["grid"]}',
-        marker_line_width=1,
-        textfont={{
-            'color': '{theme_colors["text"]}',
-            'size': {font_config['label_size']},
-            'family': '{font_config["family"]}'
-        }},
-        hoverinfo='y+text',
-        hoverlabel={{
-            'bgcolor': '{theme_colors["background"]}',
-            'bordercolor': '{theme_colors["grid"]}',
-            'font': {{
-                'size': {font_config['label_size']},
-                'family': '{font_config["family"]}'
-            }}
-        }}
-    )
-])
-
-layout = {{
-    **custom_theme['layout'],
-    'title': {{
-        'text': f'Analysis of {column_name}',
-        'font': {{
-            'size': {font_config['title_size']},
-            'color': '{theme_colors["text"]}',
-            'family': '{font_config["family"]}'
-        }},
-        'x': 0.5,
-        'xanchor': 'center',
-        'y': 0.95,
-        'yanchor': 'top'
-    }},
-    'xaxis_title': 'Index',
-    'yaxis_title': f'{column_name}'
-}}
-
-fig.update_layout(**layout)
-""",
-                'Pie': f"""
-fig = go.Figure(data=[
-    go.Pie(
-        labels=[str(x) for x in df.index],
-        values=[v if v is not None else 0 for v in values],
-        textinfo='percent+label',
-        textposition='auto',
-        hoverinfo='label+value+percent',
-        marker=dict(
-            colors=['{theme_colors["primary"]}', '{theme_colors["secondary"]}', '{theme_colors["accent"]}'],
-            line=dict(color='{theme_colors["grid"]}', width=2)
-        ),
-        textfont={{
-            'color': '{theme_colors["text"]}',
-            'size': {font_config['label_size']},
-            'family': '{font_config["family"]}'
-        }},
-        hoverlabel={{
-            'bgcolor': '{theme_colors["background"]}',
-            'bordercolor': '{theme_colors["grid"]}',
-            'font': {{
-                'size': {font_config['label_size']},
-                'family': '{font_config["family"]}'
-            }}
-        }}
-    )
-])
-
-layout = {{
-    **custom_theme['layout'],
-    'title': {{
-        'text': f'Distribution of {column_name}',
-        'font': {{
-            'size': {font_config['title_size']},
-            'color': '{theme_colors["text"]}',
-            'family': '{font_config["family"]}'
-        }},
-        'x': 0.5,
-        'xanchor': 'center',
-        'y': 0.95,
-        'yanchor': 'top'
-    }}
-}}
-
-fig.update_layout(**layout)
-""",
-                'Histogram': f"""
-fig = go.Figure(data=[
-    go.Histogram(
-        x=[v for v in values if v is not None],
-        nbinsx=30,
-        name='{column_name}',
-        marker_color='{theme_colors["primary"]}',
-        marker_line_color='{theme_colors["grid"]}',
-        marker_line_width=1,
-        opacity=0.8,
-        textfont={{
-            'color': '{theme_colors["text"]}',
-            'size': {font_config['label_size']},
-            'family': '{font_config["family"]}'
-        }},
-        hoverlabel={{
-            'bgcolor': '{theme_colors["background"]}',
-            'bordercolor': '{theme_colors["grid"]}',
-            'font': {{
-                'size': {font_config['label_size']},
-                'family': '{font_config["family"]}'
-            }}
-        }}
-    )
-])
-
-layout = {{
-    **custom_theme['layout'],
-    'title': {{
-        'text': f'Frequency Distribution of {column_name}',
-        'font': {{
-            'size': {font_config['title_size']},
-            'color': '{theme_colors["text"]}',
-            'family': '{font_config["family"]}'
-        }},
-        'x': 0.5,
-        'xanchor': 'center',
-        'y': 0.95,
-        'yanchor': 'top'
-    }},
-    'xaxis_title': f'{column_name}',
-    'yaxis_title': 'Count'
-}}
-
-fig.update_layout(**layout)
-""",
-                'Box': f"""
-fig = go.Figure(data=[
-    go.Box(
-        y=[v for v in values if v is not None],
-        name='{column_name}',
-        boxpoints='outliers',
-        jitter=0.3,
-        pointpos=-1.8,
-        marker_color='{theme_colors["primary"]}',
-        line_color='{theme_colors["secondary"]}',
-        fillcolor='{theme_colors["primary"]}',
-        marker=dict(
-            color='{theme_colors["accent"]}',
-            size=6,
-            line=dict(color='{theme_colors["grid"]}', width=1)
-        ),
-        hoverlabel=dict(
-            font=dict(
-                size={font_config['label_size']},
-                family='{font_config["family"]}'
-            ),
-            bgcolor='{theme_colors["background"]}',
-            bordercolor='{theme_colors["grid"]}'
-        )
-    )
-])
-
-layout = {{
-    **custom_theme['layout'],
-    'title': {{
-        'text': f'Distribution Analysis of {column_name}',
-        'font': {{
-            'size': {font_config['title_size']},
-            'color': '{theme_colors["text"]}',
-            'family': '{font_config["family"]}'
-        }},
-        'x': 0.5,
-        'xanchor': 'center',
-        'y': 0.95,
-        'yanchor': 'top'
-    }},
-    'yaxis_title': f'{column_name}'
-}}
-
-fig.update_layout(**layout)
-"""
-            }
-            
-            # Get the appropriate template or default to Bar
-            code = chart_templates.get(chart_type, chart_templates['Bar'])
-            
-            # Create a clean environment for executing the code
-            exec_env = {
-                'go': go,
-                'df': df,
-                'values': values,
-                'np': np,
-                'custom_theme': custom_theme
-            }
-            
-            # Execute the chart generation code
-            try:
-                exec(code, exec_env)
-                fig = exec_env['fig']
-                
-                # Add common layout updates for interactivity
-                fig.update_layout(
-                    hovermode='x unified',
-                    hoverlabel=dict(
-                        bgcolor=theme_colors['secondary'],
-                        font_size=14,
-                        font_family="Segoe UI"
-                    ),
-                    modebar=dict(
-                        bgcolor='rgba(0,0,0,0)',
-                        color=theme_colors['primary'],
-                        activecolor=theme_colors['secondary']
-                    )
-                )
-                
-                fig.write_html(output_path)
-                print(f"Successfully generated chart at {output_path}")
-
-                # Update the chart load finished handler
-                js = """
-                if (window.Plotly) {
-                    var gd = document.querySelector('.plotly-graph-div');
-                    if (gd) {
-                        Plotly.relayout(gd, {
-                            'showlink': false,
-                            'modeBarButtonsToRemove': ['sendDataToCloud'],
-                            'responsive': true,
-                            'displayModeBar': true,
-                            'scrollZoom': true,
-                            'editable': true,
-                            'dragmode': 'zoom',
-                            'hoverlabel': {
-                                'font': {
-                                    'size': 14,
-                                    'family': 'Segoe UI'
-                                }
-                            }
-                        });
-                        
-                        // Enable single-click interactions
-                        gd.on('plotly_click', function(data) {
-                            var point = data.points[0];
-                            console.log('Clicked point:', point);
-                        });
-                        
-                        // Make chart responsive
-                        window.addEventListener('resize', function() {
-                            Plotly.Plots.resize(gd);
-                        });
-                    }
-                }
-                """
-                return output_path
-            except Exception as e:
-                raise Exception(f"Error generating chart: {str(e)}")
-                
-        except Exception as e:
-            raise Exception(f"❌ Error generating chart: {str(e)}")
+            # Fallback parsing
+            cols_line = next((line for line in response.split('\n') if line.startswith('columns:')), '')
+            columns = [col.strip() for col in cols_line.replace('columns:', '').split(',') if col.strip()]
+        
+        # Validate columns exist in data
+        available_cols = self.dataframe.columns.tolist()
+        return [col for col in columns if col in available_cols]
+    
+    def get_chart_recommendation(self, question: str) -> Tuple[str, List[str]]:
+        """Combined recommendation (maintaining original interface)"""
+        chart_type = self.select_chart_type(question)
+        columns = self.select_columns(question)
+        return chart_type, columns
