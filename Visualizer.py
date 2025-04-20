@@ -17,7 +17,7 @@ class Visualizer:
         self._style = DefaultStyle
         self._valid_charts = {
             'Bar', 'HorizontalBar', 'Line', 'Histogram', 
-            'Pie', 'Scatter', 'StackedBar', 'Dot'
+            'Pie', 'XY', 'StackedBar', 'Dot'  # Changed 'Scatter' to 'XY'
         }
         
     def set_style(self, style_name: str) -> None:
@@ -59,6 +59,13 @@ class Visualizer:
         # Create output directory if needed
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         
+        # Add XY-specific validation
+        if chart_type == "XY" and len(columns) != 2:
+            return {
+                'success': False,
+                'message': "XY chart requires exactly 2 columns (x and y)"
+            }
+            
         try:
             # Generate the Pygal code
             pygal_code = self._generate_pygal_code(
@@ -190,7 +197,12 @@ chart.render_to_file({repr(output_path)})
 
     def _generate_series_code(self, chart_type: str, columns: List[str]) -> str:
         """Generate data series addition code"""
-        if chart_type in ["Scatter", "Line"]:
+        if chart_type == "XY":
+            if len(columns) != 2:
+                raise ValueError("XY chart requires exactly 2 columns (x and y)")
+            x_col, y_col = columns
+            return f"chart.add('XY Data', list(zip(df['{x_col}'], df['{y_col}'])))"
+        elif chart_type == "Line":
             return '\n'.join(f"chart.add('{col}', df['{col}'].tolist())" 
                             for col in columns)
         elif chart_type in ["Bar", "Histogram", "Pie"]:

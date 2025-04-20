@@ -197,11 +197,11 @@ class DataAnalyzer:
             - For comparing categories: Bar or HorizontalBar
             - For trends over time: Line
             - For parts of a whole: Pie (few categories)
-            - For relationships: Histogram
+            - For relationships: XY
             - For precise values across many categories: Dot
             
             3. OUTPUT FORMAT (EXACTLY):
-            chart_type: [Bar|HorizontalBar|Line|Pie|Histogram|Dot]
+            chart_type: [Bar|HorizontalBar|Line|Pie|XY|Dot]
             
             Data Description: {data_description}
             Available Columns: {columns}
@@ -227,7 +227,7 @@ class DataAnalyzer:
         chart_type = chart_match.group(1) if chart_match else None
         
         # Validate
-        allowed_charts = {'Bar', 'HorizontalBar', 'Line', 'Pie', 'Histogram', 
+        allowed_charts = {'Bar', 'HorizontalBar', 'Line', 'Pie', 'XY', 
                         'Dot'}
         return chart_type if chart_type in allowed_charts else 'Bar'
     
