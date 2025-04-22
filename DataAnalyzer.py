@@ -194,14 +194,14 @@ class DataAnalyzer:
             ("system", """You are an expert at selecting chart types for data visualization. Strictly follow these rules:
             
             1. CHART SELECTION GUIDE:
-            - For comparing categories: Bar or HorizontalBar
+            - For comparing categories: Bar 
             - For trends over time: Line
             - For parts of a whole: Pie (few categories)
-            - For relationships: XY
-            - For precise values across many categories: Dot
+            - For relationships: Scatter
+            - For the distribution of a numirecal variable: Histogram
             
             3. OUTPUT FORMAT (EXACTLY):
-            chart_type: [Bar|HorizontalBar|Line|Pie|XY|Dot]
+            chart_type: [Bar|Line|Pie|Scatter|Histogram]
             
             Data Description: {data_description}
             Available Columns: {columns}
@@ -227,8 +227,10 @@ class DataAnalyzer:
         chart_type = chart_match.group(1) if chart_match else None
         
         # Validate
-        allowed_charts = {'Bar', 'HorizontalBar', 'Line', 'Pie', 'XY', 
-                        'Dot'}
+        allowed_charts =  {
+            'Bar', 'Line', 'Histogram', 
+            'Pie', 'Scatter'
+        }
         return chart_type if chart_type in allowed_charts else 'Bar'
     
     def select_columns(self, question: str) -> List[str]:
@@ -254,7 +256,7 @@ class DataAnalyzer:
             columns: [column1, column2]""")
         ])
 
-        """Select only the relevant columns based on the question and data."""
+        """"Select only the relevant columns based on the question and data."""
         self.llm.temperature = 0.3
         chain = self.columns_prompt | self.llm
         response = chain.invoke({
