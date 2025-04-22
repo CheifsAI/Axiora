@@ -1,5 +1,4 @@
-import pygal
-from pygal.style import DefaultStyle
+import plotly.graph_objects as go
 import pandas as pd
 from typing import List, Dict, Optional, Union
 import re
@@ -14,23 +13,21 @@ class Visualizer:
             dataframe: Input data for visualization
         """
         self.df = dataframe
-        self._style = DefaultStyle
         self._valid_charts = {
-            'Bar', 'HorizontalBar', 'Line', 'Histogram', 
-            'Pie', 'XY', 'StackedBar', 'Dot'  # Changed 'Scatter' to 'XY'
+            'Bar', 'Line', 'Histogram', 
+            'Pie', 'Scatter', 'StackedBar'
         }
         
-    def set_style(self, style_name: str) -> None:
-        """
-        Change Pygal visualization style
-        
-        Args:
-            style_name: Pygal style class name (e.g., 'DarkStyle', 'LightSolarizedStyle')
-        """
-        try:
-            self._style = getattr(pygal.style, style_name)
-        except AttributeError:
-            raise ValueError(f"Invalid style. Available: {dir(pygal.style)}")
+        # Default theme colors
+        self._theme_colors = {
+            'primary': '#2196F3',      # Bright blue
+            'secondary': '#4CAF50',    # Green
+            'accent': '#1976D2',       # Darker blue
+            'accent2': '#388E3C',      # Darker green
+            'background': '#111827',   # Dark background
+            'text': '#E0E0E0',         # Light gray text
+            'grid': '#1F2937'          # Dark grid lines
+        }
 
     def generate_visualization(
         self,
@@ -41,108 +38,50 @@ class Visualizer:
         **chart_args
     ) -> Dict[str, Union[str, bool]]:
         """
-        Generate and execute Pygal visualization
+        Generate and execute Plotly visualization
         
         Args:
             question: Chart title/description
-            output_path: Where to save SVG (e.g., 'output/chart.svg')
+            output_path: Where to save HTML (e.g., 'output/chart.html')
             columns: List of columns to visualize
             chart_type: Type of chart to generate
             chart_args: Additional chart configuration
             
         Returns:
             Dictionary with:
-            - 'code': Generated Python code
             - 'success': Execution status
             - 'message': Additional info
+            - 'output_path': Path to generated chart
         """
         # Create output directory if needed
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         
-        # Add XY-specific validation
-        if chart_type == "XY" and len(columns) != 2:
-            return {
-                'success': False,
-                'message': "XY chart requires exactly 2 columns (x and y)"
-            }
-            
         try:
-            # Generate the Pygal code
-            pygal_code = self._generate_pygal_code(
-                question=question,
-                output_path=output_path,
-                columns=columns,
-                chart_type=chart_type,
-                **chart_args
-            )
+            # Validate inputs
+            self._validate_columns(columns)
+            self._validate_chart_type(chart_type)
             
-            # Execute the code
-            exec_env = {
-                'data_source': self.df,
-                'pygal': pygal,
-                'pd': pd,
-                'self': self 
-            }
-            print(pygal_code)
-            exec(pygal_code, exec_env)
+            # Create the figure based on chart type
+            fig = self._create_figure(chart_type, columns, question, chart_args)
+            
+            # Apply common layout settings
+            self._apply_layout(fig, question)
+            
+            # Save to HTML
+            fig.write_html(output_path)
             
             return {
-                'code': pygal_code,
                 'success': True,
-                'message': f"SVG saved to {output_path}",
+                'message': f"Chart saved to {output_path}",
                 'output_path': output_path
             }
             
         except Exception as e:
             return {
-                'code': pygal_code if 'pygal_code' in locals() else '',
                 'success': False,
-                'message': f"Error: {str(e)}"
+                'message': f"Error: {str(e)}",
+                'output_path': None
             }
-
-    def _generate_pygal_code(
-        self,
-        question: str,
-        output_path: str,
-        columns: List[str],
-        chart_type: str,
-        **chart_args
-    ) -> str:
-        """
-        Core code generation logic
-        """
-        # Validate inputs
-        self._validate_columns(columns)
-        self._validate_chart_type(chart_type)
-        
-        # Generate code components
-        data_code, x_labels = self._generate_data_code(chart_type, columns)
-        config_code = self._generate_config_code(chart_args)
-        series_code = self._generate_series_code(chart_type, columns)
-        
-        # Build full code template
-        return f"""# PYTHON CODE GENERATED BY PygalVisualizer
-import pygal
-import pandas as pd
-
-# DATA PREPARATION
-df = data_source  # Input DataFrame reference
-{data_code}
-{x_labels}
-
-# CHART CONFIGURATION
-{config_code}
-
-# CHART CREATION
-chart = pygal.{chart_type}(config)
-chart.title = {repr(self._clean_title(question))}
-
-# DATA SERIES
-{series_code}
-
-# OUTPUT
-chart.render_to_file({repr(output_path)})
-"""
 
     def _validate_columns(self, columns: List[str]) -> None:
         """Ensure columns exist in DataFrame"""
@@ -155,62 +94,149 @@ chart.render_to_file({repr(output_path)})
         if chart_type not in self._valid_charts:
             raise ValueError(f"Invalid chart type. Choose from: {self._valid_charts}")
 
-    def _generate_data_code(self, chart_type: str, columns: List[str]) -> tuple:
-        """Generate data preparation code based on chart type"""
-        if chart_type == "Histogram":
-            return (
-                f"data = df['{columns[0]}'].value_counts().sort_index()",
-                "x_labels = [str(interval) for interval in data.index]"
-            )
-        elif chart_type in ["Bar", "Pie"]:
-            return (
-                f"data = df['{columns[0]}'].value_counts().sort_values(ascending=False)",
-                "x_labels = data.index.astype(str).tolist()"
-            )
-        else:
-            return (
-                f"data = df[{columns}]",
-                ""
-            )
-
-    def _generate_config_code(self, chart_args: dict) -> str:
-        """Generate chart configuration code"""
-        defaults = {
-            'style': self._style.__name__,
-            'x_label_rotation': 45,
-            'truncate_label': 15,
-            'show_legend': True,
-            'tooltip_border_radius': 10
-        }
-        defaults.update(chart_args)
-        
-        config_items = []
-        for k, v in defaults.items():
-            if k == 'style':
-                config_items.append(f"style=pygal.style.{v}")
-            elif isinstance(v, bool):
-                config_items.append(f"{k}={v}")
-            else:
-                config_items.append(f"{k}={repr(v)}")
-        
-        return f"config = pygal.Config(\n    {',\n    '.join(config_items)}\n)"
-
-    def _generate_series_code(self, chart_type: str, columns: List[str]) -> str:
-        """Generate data series addition code"""
-        if chart_type == "XY":
-            if len(columns) != 2:
-                raise ValueError("XY chart requires exactly 2 columns (x and y)")
-            x_col, y_col = columns
-            return f"chart.add('XY Data', list(zip(df['{x_col}'], df['{y_col}'])))"
+    def _create_figure(self, chart_type: str, columns: List[str], title: str, chart_args: dict) -> go.Figure:
+        """Create appropriate Plotly figure based on chart type"""
+        if chart_type == "Bar":
+            return self._create_bar_chart(columns[0])
         elif chart_type == "Line":
-            return '\n'.join(f"chart.add('{col}', df['{col}'].tolist())" 
-                            for col in columns)
-        elif chart_type in ["Bar", "Histogram", "Pie"]:
-            return "chart.add('Distribution', data.values)"
+            return self._create_line_chart(columns)
+        elif chart_type == "Histogram":
+            return self._create_histogram(columns[0])
+        elif chart_type == "Pie":
+            return self._create_pie_chart(columns[0])
+        elif chart_type == "Scatter":
+            return self._create_scatter_plot(columns[0], columns[1] if len(columns) > 1 else None)
         elif chart_type == "StackedBar":
-            return '\n'.join(f"chart.add('{col}', df['{col}'].value_counts())" 
-                            for col in columns)
-        return ""
+            return self._create_stacked_bar(columns)
+        else:
+            raise ValueError(f"Unsupported chart type: {chart_type}")
+
+    def _create_bar_chart(self, column: str) -> go.Figure:
+        """Create a bar chart"""
+        data = self.df[column].value_counts()
+        fig = go.Figure(data=[
+            go.Bar(
+                x=data.index,
+                y=data.values,
+                marker_color=self._theme_colors['primary'],
+                marker_line_color=self._theme_colors['accent'],
+                marker_line_width=1.5
+            )
+        ])
+        return fig
+
+    def _create_line_chart(self, columns: List[str]) -> go.Figure:
+        """Create a line chart"""
+        fig = go.Figure()
+        for i, col in enumerate(columns):
+            fig.add_trace(
+                go.Scatter(
+                    x=self.df.index,
+                    y=self.df[col],
+                    name=col,
+                    mode='lines+markers',
+                    line=dict(
+                        color=self._theme_colors['primary' if i % 2 == 0 else 'secondary']
+                    )
+                )
+            )
+        return fig
+
+    def _create_histogram(self, column: str) -> go.Figure:
+        """Create a histogram"""
+        fig = go.Figure(data=[
+            go.Histogram(
+                x=self.df[column],
+                marker_color=self._theme_colors['primary'],
+                marker_line_color=self._theme_colors['accent'],
+                marker_line_width=1
+            )
+        ])
+        return fig
+
+    def _create_pie_chart(self, column: str) -> go.Figure:
+        """Create a pie chart"""
+        data = self.df[column].value_counts()
+        fig = go.Figure(data=[
+            go.Pie(
+                labels=data.index,
+                values=data.values,
+                marker=dict(
+                    colors=[self._theme_colors[color] for color in ['primary', 'secondary', 'accent', 'accent2']]
+                )
+            )
+        ])
+        return fig
+
+    def _create_scatter_plot(self, x_col: str, y_col: str) -> go.Figure:
+        """Create a scatter plot"""
+        fig = go.Figure(data=[
+            go.Scatter(
+                x=self.df[x_col],
+                y=self.df[y_col] if y_col else self.df.index,
+                mode='markers',
+                marker=dict(
+                    color=self._theme_colors['primary'],
+                    size=8,
+                    line=dict(
+                        color=self._theme_colors['accent'],
+                        width=1
+                    )
+                )
+            )
+        ])
+        return fig
+
+    def _create_stacked_bar(self, columns: List[str]) -> go.Figure:
+        """Create a stacked bar chart"""
+        fig = go.Figure()
+        for i, col in enumerate(columns):
+            data = self.df[col].value_counts()
+            fig.add_trace(
+                go.Bar(
+                    name=col,
+                    x=data.index,
+                    y=data.values,
+                    marker_color=self._theme_colors['primary' if i % 2 == 0 else 'secondary']
+                )
+            )
+        fig.update_layout(barmode='stack')
+        return fig
+
+    def _apply_layout(self, fig: go.Figure, title: str) -> None:
+        """Apply common layout settings to figure"""
+        fig.update_layout(
+            title=dict(
+                text=self._clean_title(title),
+                font=dict(
+                    size=20,
+                    color=self._theme_colors['text']
+                )
+            ),
+            plot_bgcolor=self._theme_colors['background'],
+            paper_bgcolor=self._theme_colors['background'],
+            font=dict(
+                family="Segoe UI",
+                size=12,
+                color=self._theme_colors['text']
+            ),
+            showlegend=True,
+            legend=dict(
+                bgcolor='rgba(17, 24, 39, 0.8)',
+                font=dict(color=self._theme_colors['text'])
+            ),
+            xaxis=dict(
+                gridcolor=self._theme_colors['grid'],
+                tickcolor=self._theme_colors['text'],
+                tickfont=dict(color=self._theme_colors['text'])
+            ),
+            yaxis=dict(
+                gridcolor=self._theme_colors['grid'],
+                tickcolor=self._theme_colors['text'],
+                tickfont=dict(color=self._theme_colors['text'])
+            ),
+            margin=dict(t=100, l=80, r=80, b=80)
+        )
 
     def _clean_title(self, text: str) -> str:
         """Clean and truncate chart title"""
