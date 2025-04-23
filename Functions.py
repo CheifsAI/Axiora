@@ -1,20 +1,24 @@
 #from Custom_Widgets import *
 #from Custom_Widgets.QAppSettings import QAppSettings
 #from Custom_Widgets.QCustomTipOverlay import QCustomTipOverlay
-from PySide6.QtCore import QSettings, QTimer, QThread, Signal
-from PySide6.QtGui import QColor, QFont, QFontDatabase
-from PySide6.QtWidgets import (QGraphicsDropShadowEffect, QApplication, QMainWindow, 
+from PySide6.QtCore import (QSettings, QTimer, QThread, Signal, Qt, QUrl)
+from PySide6.QtGui import (QColor, QFont, QFontDatabase, QCursor, QIcon, QPixmap)
+from PySide6.QtWidgets import (
+    QGraphicsDropShadowEffect, QApplication, QMainWindow, 
                              QFileDialog, QPushButton, QLabel, QDialog, QVBoxLayout, 
-                             QTableWidget, QTableWidgetItem, QSizePolicy)
+    QTableWidget, QTableWidgetItem, QSizePolicy, QHBoxLayout,
+    QFrame, QCheckBox, QWidget, QLineEdit, QGridLayout, QScrollArea,
+    QProgressBar
+)
 from PySide6.QtSvg import QSvgRenderer
+import random
+from Visualizer import Visualizer
 import shutil
-from PySide6.QtGui import QCursor
 from PySide6.QtCore import QFile
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWebEngineCore import QWebEngineSettings
 from PySide6 import QtCore
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt,QUrl,QSize
 from PySide6.QtWidgets import (QApplication, QMainWindow, QLineEdit,
                                QPushButton, QVBoxLayout, QWidget, QLabel,
                                QScrollArea, QSizePolicy, QHBoxLayout,
@@ -32,6 +36,14 @@ from uiEXT.ChatBubble import ChatBubble
 #from Axioradb import *
 from docx import Document
 from DatabaseManager import DatabaseManager
+import sys
+import platform
+from datetime import datetime
+
+# Add Shiboken path to sys.path if needed
+shiboken_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'Lib', 'site-packages', 'shiboken6')
+if os.path.exists(shiboken_path) and shiboken_path not in sys.path:
+    sys.path.append(shiboken_path)
 
 class SummaryWorker(QThread):
     finished = Signal(str)
@@ -48,8 +60,87 @@ class SummaryWorker(QThread):
         except Exception as e:
             self.error.emit(str(e))
 
+class LoadingOverlay(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setObjectName("loadingOverlay")
+        
+        # Set up the overlay
+        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        
+        # Create layout
+        layout = QVBoxLayout(self)
+        layout.setAlignment(Qt.AlignCenter)
+        
+        # Create loading spinner
+        self.spinner = QProgressBar()
+        self.spinner.setRange(0, 0)  # Makes it an "infinite" progress bar
+        self.spinner.setFixedSize(60, 60)
+        self.spinner.setTextVisible(False)
+        self.spinner.setStyleSheet("""
+            QProgressBar {
+                border: 2px solid #3498DB;
+                border-radius: 30px;
+                background-color: transparent;
+            }
+            QProgressBar::chunk {
+                background-color: transparent;
+            }
+        """)
+        
+        # Create loading text
+        self.label = QLabel("Loading...")
+        self.label.setObjectName("loadingLabel")
+        self.label.setAlignment(Qt.AlignCenter)
+        
+        # Add widgets to layout
+        layout.addWidget(self.spinner, alignment=Qt.AlignCenter)
+        layout.addWidget(self.label, alignment=Qt.AlignCenter)
+        
+        # Set up rotation animation
+        self.angle = 0
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self._rotate)
+        self.timer.start(80)
+        
+    def _rotate(self):
+        self.angle = (self.angle + 30) % 360
+        self.spinner.setStyleSheet(f"""
+            QProgressBar {{
+                border: 2px solid #3498DB;
+                border-radius: 30px;
+                background-color: transparent;
+            }}
+            QProgressBar::chunk {{
+                background-color: transparent;
+            }}
+        """)
+        
+    def showEvent(self, event):
+        self.resize(self.parent().size())
+        
+    def resizeEvent(self, event):
+        self.resize(self.parent().size())
+
+class QuestionWorker(QThread):
+    finished = Signal(list)
+    error = Signal(str)
+
+    def __init__(self, analyzer, num_questions):
+        super().__init__()
+        self.analyzer = analyzer
+        self.num_questions = num_questions
+
+    def run(self):
+        try:
+            questions = self.analyzer.questions_gen(self.num_questions)
+            self.finished.emit(questions)
+        except Exception as e:
+            self.error.emit(str(e))
+
 class GuiFunctions():
-    def __init__(self, MainWindow,user_id):
+    def __init__(self, MainWindow, user_id):
         self.main_window = MainWindow
         self.ui = MainWindow.ui
         self.user_id = user_id
@@ -61,10 +152,17 @@ class GuiFunctions():
         self.loading_timer = QTimer()
         self.loading_timer.timeout.connect(self.update_loading_animation)
         self.loading_dots = 0
-        #self.reportID = None
+        self.web_view = None  # Track web view instance
         
         # Connect LLM selection change
         self.ui.llm_combo.currentTextChanged.connect(self.handle_llm_change)
+        
+        # Initialize loading overlay
+        self.loading_overlay = LoadingOverlay(MainWindow)
+        self.loading_overlay.hide()
+        
+        # Update icons with modern versions
+        self.setup_modern_icons()
 
     def setup_connections(self):
         self.main_window.ui.openfile_btn.clicked.connect(self.handle_data_button)
@@ -79,7 +177,7 @@ class GuiFunctions():
         self.lineEdit_chat = self.main_window.ui.lineEdit_message
         self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
         self.main_window.ui.qu_data_btn.clicked.connect(self.handle_word_btn)
-        self.main_window.ui.btn_dashboard.clicked.connect(self.display_svg)
+        self.main_window.ui.btn_dashboard.clicked.connect(self.handle_dashboard_click)
         # Add done button connection
         self.main_window.ui.done_btn.clicked.connect(self.process_selected_questions)
 
@@ -180,7 +278,7 @@ class GuiFunctions():
             self.datasetID = self.db.saveDataSet(path=self.datasetPath,
                                                  name=self.dname,
                                                  info=self.data_info,
-                                                 summary=self.data_summary,
+                                                 description=self.data_description,
                                                  sample=self.data_sample,
                                                  cols=self.data_cols) 
             self.reportID = self.db.saveReport(user=self.user_id,
@@ -192,7 +290,7 @@ class GuiFunctions():
     def _analyzer_attributes(self):
             self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
             self.data_info = self.analyzer.data_info
-            self.data_summary = self.analyzer.data_summary
+            self.data_description = self.analyzer.data_description
             self.data_sample = self.analyzer.data_sample
             self.data_cols = self.analyzer.data_cols
     def _show_df(self):
@@ -210,26 +308,24 @@ class GuiFunctions():
                     self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))
 
     def handle_sum_btn(self):
-        # Disable the summary button and start loading animation
+        # Show loading overlay
+        self.show_loading("Generating Summary...")
+        
+        # Disable the summary button
         self.main_window.ui.sum_btn.setEnabled(False)
-        self.main_window.ui.sum_btn.setText("Generating")
-        self.loading_timer.start(500)  # Update every 500ms
         
         # Create and configure the worker
         self.summary_worker = SummaryWorker(self.analyzer)
         self.summary_worker.finished.connect(self.handle_summary_complete)
         self.summary_worker.error.connect(self.handle_summary_error)
         self.summary_worker.start()
+
     def _update_summary_text(self,summary):
             summary_md = markdown(summary)
             self.main_window.ui.summary_text.setMarkdown(summary_md)
 
     def handle_summary_complete(self, summary):
         try:
-            # Stop loading animation
-            self.loading_timer.stop()
-            self.main_window.ui.sum_btn.setText("Generate Summary")
-            
             # Save to database and update UI
             self.db.saveSummary(reportID=self.reportID, summary_content=summary)
             self._update_summary_text(summary)
@@ -238,17 +334,18 @@ class GuiFunctions():
         finally:
             # Reset UI state
             self.main_window.ui.sum_btn.setEnabled(True)
-            self.main_window.ui.sum_btn.setText("Generate Summary")
+            self.hide_loading()
             if self.summary_worker:
                 self.summary_worker.deleteLater()
                 self.summary_worker = None
 
     def handle_summary_error(self, error_message):
-        # Stop loading animation
-        self.loading_timer.stop()
-        self.main_window.ui.sum_btn.setText("Generate Summary")
-        print(f"Error generating summary: {error_message}")
+        # Hide loading overlay
+        self.hide_loading()
+        
+        # Reset button state
         self.main_window.ui.sum_btn.setEnabled(True)
+        print(f"Error generating summary: {error_message}")
         
         if self.summary_worker:
             self.summary_worker.deleteLater()
@@ -269,7 +366,7 @@ class GuiFunctions():
                                 path=self.cleaned_df_path,
                                 name=self.dname,
                                 info=self.data_info,
-                                summary=self.data_summary,
+                                description=self.data_description,
                                 sample=self.data_sample,
                                 cols=self.data_cols)
         self.db.saveCleanDatasetReport(reportId=self.reportID,cleandataset=self.datasetID)
@@ -299,28 +396,47 @@ class GuiFunctions():
             print("Analyzer not initialized. Load data first.")
             return
 
-        # Generate questions with error handling and retry mechanism
-        max_retries = 3
-        retries = 0
-        while retries < max_retries:
-            try:
-                self.g_questions = self.analyzer.questions_gen(self.num_qu)
-                if not isinstance(self.g_questions, list):
-                    self.g_questions = []  # Ensure it's a list
-            except Exception as e:
-                print(f"Question generation failed: {str(e)}")
-                self.g_questions = []
+        # Show loading overlay
+        self.show_loading("Generating Questions...")
+        
+        # Disable the questions button
+        self.main_window.ui.qu_btn.setEnabled(False)
+        
+        # Create and configure the worker
+        self.question_worker = QuestionWorker(self.analyzer, self.num_qu)
+        self.question_worker.finished.connect(self.handle_questions_complete)
+        self.question_worker.error.connect(self.handle_questions_error)
+        self.question_worker.start()
 
-            # Validate the number of generated questions
-            if len(self.g_questions) == self.num_qu:
-                break
-            else:
-                print(f"Warning: Expected {self.num_qu} questions, but got {len(self.g_questions)}")
-                retries += 1
+    def handle_questions_complete(self, questions):
+        try:
+            # Store the generated questions
+            self.g_questions = questions
+            # Clear the selected questions list
+            self.selected_qu_list = []
+            # Update the UI with new questions
+            self._ques_add()
+        except Exception as e:
+            print(f"Error handling questions completion: {str(e)}")
+        finally:
+            # Reset UI state
+            self.main_window.ui.qu_btn.setEnabled(True)
+            self.hide_loading()
+            if hasattr(self, 'question_worker'):
+                self.question_worker.deleteLater()
+                self.question_worker = None
 
-        # Clear the selected questions list when generating new questions
-        self.selected_qu_list = []
-        self._ques_add()
+    def handle_questions_error(self, error_message):
+        # Hide loading overlay
+        self.hide_loading()
+        
+        # Reset button state
+        self.main_window.ui.qu_btn.setEnabled(True)
+        print(f"Error generating questions: {error_message}")
+        
+        if hasattr(self, 'question_worker'):
+            self.question_worker.deleteLater()
+            self.question_worker = None
 
     def _ques_add(self): # Get references to UI components
         scroll_area = self.main_window.ui.scrollArea
@@ -440,13 +556,7 @@ class GuiFunctions():
                 self._add_ai_message(ai_response)
 
     def process_selected_questions(self):
-        for qu in self.selected_qu_list:
-            if qu not in self.saved_questions:
-                self.db.saveQuestion(reportID=self.reportID,
-                                     question=qu)
-                self.saved_questions.add(qu)
-        self.dashboardID = self.db.addDashboard(reportID=self.reportID)
-        """Process selected questions and generate charts"""
+        """Process selected questions and generate charts in a grid layout"""
         if not self.selected_qu_list:
             print("No questions selected!")
             print("Debug: Current selections:", self.selected_qu_list)
@@ -456,141 +566,238 @@ class GuiFunctions():
         print(f"Selected questions: {self.selected_qu_list}")
         
         try:
-            # Get visualization code for all selected questions
-            self.vis_codes = self.analyzer.visual(
-                questions_list=self.selected_qu_list,
-                report=self.rname  # Use the dataset directory
-            )
+            # Save questions and create dashboard first
+            for qu in self.selected_qu_list:
+                if not hasattr(self, 'saved_questions'):
+                    self.saved_questions = set()
+                if qu not in self.saved_questions:
+                    self.db.saveQuestion(reportID=self.reportID, question=qu)
+                    self.saved_questions.add(qu)
             
-            # Execute each visualization code
-            for i, code in enumerate(self.vis_codes):
-                #try:
-                    # Import required modules in the execution environment
-                    exec_env = {
-                        'df': self.analyzer.dataframe,
-                        #'pygal': __import__('pygal'),
-                        #'RedBlueStyle': getattr(__import__('pygal.style'), 'RedBlueStyle')
-                    }
-                    
-                    # Clean up the code and ensure proper file path
-                    code = "\n".join(line.strip() for line in code.splitlines() if line.strip())
-                    
-                    # Replace the chart rendering path to use numbered filenames
-                    #chart_path = os.path.join(self.rname, f"chart_{i+1}.svg")
-                    #code = code.replace(
-                      #  "chart.render_to_file('{report}/{chart_title}.svg')",
-                     #   f"chart.render_to_file(r'{chart_path}')"
-                    #)
-                    
-                    print(f"Executing visualization code for question {i+1}:")
-                    print(code)
-                    
-                    # Execute the visualization code
-                    exec(code, exec_env)
-                    
-                    # Verify the file was created
-                    #if os.path.exists(chart_path):
-                     #   print(f"Successfully created chart: {chart_path}")
-                    #else:
-                     #   print(f"Failed to create chart: {chart_path}")
-                      #  self.create_error_svg(chart_path, f"Error generating chart for question {i+1}")
-                    
-                #except Exception as e:
-                 #   print(f"Error executing visualization code for question {i+1}: {str(e)}")
-                  #  error_file = os.path.join(self.rname, f"chart_{i+1}.svg")
-                   # self.create_error_svg(error_file, f"Error: {str(e)}")
+            # Create dashboard
+            self.dashboardID = self.db.addDashboard(reportID=self.reportID)
+            print(f"Created dashboard with ID: {self.dashboardID}")
+            self.chart_paths = []
+
+            self.visualizer = Visualizer(dataframe=self.df)
+            # Store chart paths for all questions
+            #self.charts =[]
+            #self.charts_columns = []
             
-            # Set up for chart display
-            self.current_chart_index = 0
-            self.total_charts = len(self.selected_qu_list)
+            # Process each question and generate charts
+            for question in self.selected_qu_list:
+                # Get chart type and column from the question
+                chart_type = self.analyzer.select_chart_type(question)
+                #self.charts.append(self.analyzer.select_chart_type(question))
+                chart_columns = self.analyzer.select_columns(question)
+                #self.charts_columns.append(self.analyzer.select_columns(question))
+                chart_title = question[3:6] + str(random.randint(100, 2000))
+                chart_path = f"{self.rname}/{chart_title}.html"
+                # Generate visualization
+                self.visualizer.generate_visualization(
+                    question=question,
+                    output_path=chart_path,
+                    columns=chart_columns,  # Optional override
+                    chart_type=chart_type,  # Optional override
+                    width=1200,
+                    height=800 )
+                
+                if chart_path and os.path.exists(chart_path):
+                    print(f"Successfully generated chart at: {chart_path}")
+                    self.db.saveCharts(dashID=self.dashboardID, path=chart_path)
+                    self.chart_paths.append(chart_path)
             
-            # Display the first chart
-            self.display_current_chart()
+            # Configure the page widget
+            page_widget = self.main_window.ui.page
+            if page_widget.layout():
+                QWidget().setLayout(page_widget.layout())
+            page_layout = QVBoxLayout(page_widget)
+            page_layout.setContentsMargins(0, 0, 0, 0)
+            page_layout.setSpacing(0)
+            
+            # Configure widget_3
+            widget_3 = self.main_window.ui.widget_3
+            widget_3.setMinimumSize(800, 600)
+            widget_3.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            page_layout.addWidget(widget_3)
             
             # Switch to the visualization page
             self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
+            
+            # Display all charts
+            self.display_current_chart()
             
         except Exception as e:
             print(f"Error processing questions: {str(e)}")
             import traceback
             traceback.print_exc()
 
-    def create_error_svg(self, chart_path, error_message):
-        """Create a simple SVG with an error message"""
-        try:
-            svg_content = f'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-            <svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
-                <rect width="100%" height="100%" fill="#2b2b2b"/>
-                <text x="50%" y="50%" text-anchor="middle" fill="white" font-family="Arial">
-                    {error_message}
-                </text>
-            </svg>'''
-            
-            with open(chart_path, 'w', encoding='utf-8') as f:
-                f.write(svg_content)
-            print(f"Error SVG created at {chart_path}")
-        except Exception as e:
-            print(f"Error creating error SVG: {str(e)}")
-            import traceback
-            traceback.print_exc()
-
     def display_current_chart(self):
-        """Display the current chart in widget_3"""
+        """Display all charts in a scrollable layout"""
         try:
-            # Ensure we have a valid chart index
-            if not hasattr(self, 'current_chart_index'):
-                print("No current chart index set")
-                return
+            # Switch to the visualization page first
+            self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
             
-            # Get a list of all .svg files in the directory
-            svg_files = [f for f in os.listdir(self.rname) if f.endswith('.svg')]
-            for chart in svg_files:
-                self.db.saveCharts(dashID=self.dashboardID,path=chart)
-
-            # Check if there are any .svg files
-            if not svg_files:
-                print("No SVG files found in the directory")
-                return
-            
-            # Ensure the current_chart_index is within bounds
-            if self.current_chart_index < 0 or self.current_chart_index >= len(svg_files):
-                print("Invalid chart index")
-                return
-            
-            # Get the current chart file
-            current_chart_file = svg_files[self.current_chart_index]
-            current_chart_path = os.path.join(self.rname, current_chart_file)
-            
-            print(f"Looking for chart at: {current_chart_path}")
-            
-            if os.path.exists(current_chart_path):
-                print(f"Found chart file: {current_chart_path}")
-                
-                # Create navigation buttons if they don't exist
-                if not hasattr(self, 'nav_widget'):
-                    self.create_navigation_controls()
-                
-                # Display the SVG
-                if self.display_svg(current_chart_path):
-                    # Update navigation button states
-                    if hasattr(self, 'prev_btn') and hasattr(self, 'next_btn'):
-                        self.prev_btn.setEnabled(self.current_chart_index > 0)
-                        self.next_btn.setEnabled(self.current_chart_index < len(svg_files) - 1)
-                    
-                    # Update chart counter label
-                    if hasattr(self, 'chart_counter'):
-                        self.chart_counter.setText(f"Chart {self.current_chart_index + 1} of {len(svg_files)}")
-                else:
-                    print("Failed to display SVG widget")
+            # Get or create the page layout
+            page_widget = self.main_window.ui.page
+            if not page_widget.layout():
+                page_layout = QVBoxLayout(page_widget)
+                page_layout.setContentsMargins(0, 0, 0, 0)
+                page_layout.setSpacing(0)
             else:
-                print(f"Chart file not found: {current_chart_path}")
-                # Create error SVG if chart is missing
-                self.create_error_svg(current_chart_path, "Chart file not found")
+                page_layout = page_widget.layout()
+            
+            # Clear any existing widgets from the page layout
+            while page_layout.count():
+                item = page_layout.takeAt(0)
+                if item.widget():
+                    item.widget().setParent(None)
+                    item.widget().deleteLater()
+            
+            # Create a scroll area for the main layout
+            main_scroll = QScrollArea()
+            main_scroll.setWidgetResizable(True)
+            main_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+            main_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+            
+            # Create main container widget
+            main_container = QWidget()
+            main_layout = QVBoxLayout(main_container)
+            main_layout.setSpacing(20)
+            main_layout.setContentsMargins(20, 20, 20, 20)
+            
+            # Calculate grid dimensions
+            num_charts = len(self.chart_paths)
+            if num_charts == 0:
+                return
+            
+            # Calculate number of rows and columns for the grid
+            if num_charts <= 2:
+                cols = num_charts
+                rows = 1
+            else:
+                cols = 2  # Maximum 2 columns
+                rows = (num_charts + 1) // 2  # Ceiling division
+            
+            # Create grid layout for charts
+            grid_layout = QGridLayout()
+            grid_layout.setSpacing(20)
+            
+            # Create and add web views for each chart
+            for i, chart_path in enumerate(self.chart_paths):
+                if os.path.exists(chart_path):
+                    # Create container widget for each chart
+                    chart_container = QWidget()
+                    chart_container.setFixedSize(1200, 800)  # Fixed size for charts
+                    chart_layout = QVBoxLayout(chart_container)
+                    chart_layout.setContentsMargins(10, 10, 10, 10)
+                    
+                    # Create web view for the chart
+                    web_view = QWebEngineView()
+                    
+                    # Enable JavaScript and other settings
+                    settings = web_view.settings()
+                    settings.setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
+                    settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls, True)
+                    settings.setAttribute(QWebEngineSettings.WebAttribute.AllowRunningInsecureContent, True)
+                    settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessFileUrls, True)
+                    settings.setAttribute(QWebEngineSettings.WebAttribute.WebGLEnabled, True)
+                    settings.setAttribute(QWebEngineSettings.WebAttribute.ScrollAnimatorEnabled, True)
+                    settings.setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
+                    
+                    # Configure web view
+                    web_view.setFixedSize(1180, 780)  # Fixed size slightly smaller than container
+                    
+                    # Add interaction settings
+                    web_view.page().setBackgroundColor(Qt.transparent)
+                    web_view.setAttribute(Qt.WA_TranslucentBackground)
+                    web_view.setContextMenuPolicy(Qt.NoContextMenu)
+                    
+                    # Convert to absolute file URL
+                    abs_path = os.path.abspath(chart_path)
+                    file_url = QUrl.fromLocalFile(abs_path)
+                    
+                    # Connect signals
+                    web_view.loadFinished.connect(lambda ok, view=web_view: self._on_chart_load_finished(ok, view))
+                    
+                    # Load the HTML file
+                    web_view.load(file_url)
+                    
+                    # Add web view to container
+                    chart_layout.addWidget(web_view)
+                    
+                    # Add container to grid
+                    row = i // cols
+                    col = i % cols
+                    grid_layout.addWidget(chart_container, row, col)
+            
+            # Add grid layout to main layout
+            main_layout.addLayout(grid_layout)
+            
+            # Add stretch to push charts to the top
+            main_layout.addStretch()
+            
+            # Set the container widget as the scroll area's widget
+            main_scroll.setWidget(main_container)
+            
+            # Add scroll area to page layout
+            page_layout.addWidget(main_scroll)
+            
+            # Show everything
+            main_container.show()
+            main_scroll.show()
+            page_widget.show()
                 
         except Exception as e:
-            print(f"Error displaying chart: {str(e)}")
+            print(f"Error displaying charts: {str(e)}")
             import traceback
             traceback.print_exc()
+
+    def _on_chart_load_finished(self, ok, web_view):
+        """Handle chart load finished event"""
+        if ok:
+            # Inject JavaScript to enhance chart interactivity
+            js = """
+            if (window.Plotly) {
+                var gd = document.querySelector('.plotly-graph-div');
+                if (gd) {
+                    Plotly.relayout(gd, {
+                        'showlink': false,
+                        'modeBarButtonsToRemove': ['sendDataToCloud'],
+                        'responsive': true,
+                        'displayModeBar': true,
+                        'scrollZoom': true,
+                        'editable': true,
+                        'dragmode': 'zoom'
+                    });
+                    
+                    // Enable single-click interactions
+                    gd.on('plotly_click', function(data) {
+                        var point = data.points[0];
+                        console.log('Clicked point:', point);
+                    });
+                    
+                    // Make chart responsive
+                    window.addEventListener('resize', function() {
+                        Plotly.Plots.resize(gd);
+                    });
+                }
+            }
+            """
+            web_view.page().runJavaScript(js)
+
+    def show_previous_chart(self):
+        """Show the previous chart"""
+        if hasattr(self, 'current_chart_index') and self.current_chart_index > 0:
+            self.current_chart_index -= 1
+            self.display_current_chart()
+
+    def show_next_chart(self):
+        """Show the next chart"""
+        if hasattr(self, 'current_chart_index') and hasattr(self, 'total_charts'):
+            if self.current_chart_index < self.total_charts - 1:
+                self.current_chart_index += 1
+                self.display_current_chart()
 
     def create_navigation_controls(self):
         """Create navigation controls for multiple charts"""
@@ -618,22 +825,30 @@ class GuiFunctions():
             widget_3.setLayout(QVBoxLayout())
         widget_3.layout().addWidget(self.nav_widget)
 
-    def show_previous_chart(self):
-        """Show the previous chart"""
-        if self.current_chart_index > 0:
-            self.current_chart_index -= 1
-            self.display_current_chart()
-
-    def show_next_chart(self):
-        """Show the next chart"""
-        if self.current_chart_index < self.total_charts - 1:
-            self.current_chart_index += 1
-            self.display_current_chart()
-
-    def display_svg(self, svg_path):
+    def display_svg(self, svg_path=None):
         """Display an SVG file in widget_3"""
         try:
-            # Verify the file exists and is a valid path
+            # If no specific SVG path is provided, look for charts in the output directory
+            if svg_path is None:
+                output_dir = "output"
+                if os.path.exists(output_dir):
+                    html_files = sorted(
+                        [f for f in os.listdir(output_dir) if f.endswith('.html')],
+                        key=lambda x: os.path.getmtime(os.path.join(output_dir, x)),
+                        reverse=True
+                    )
+                    if html_files:
+                        # Display the most recent chart
+                        self.display_current_chart()
+                        return
+                    else:
+                        print("No charts found in output directory")
+                        return
+                else:
+                    print(f"Output directory {output_dir} does not exist")
+                    return
+            
+            # If a specific SVG path is provided, verify it exists
             if not isinstance(svg_path, str):
                 raise ValueError("SVG path must be a string")
             
@@ -654,10 +869,10 @@ class GuiFunctions():
             if not widget_3.layout():
                 widget_3.setLayout(QVBoxLayout())
             
-            # Clear existing content except navigation controls
+            # Clear existing content
             layout = widget_3.layout()
-            while layout.count() > 1:  # Keep navigation controls
-                item = layout.takeAt(1)
+            while layout.count():
+                item = layout.takeAt(0)
                 if item.widget():
                     item.widget().deleteLater()
             
@@ -711,3 +926,33 @@ class GuiFunctions():
         process = subprocess.run(install_code, shell=True, capture_output=True, text=True)
         if process.returncode != 0:
             raise RuntimeError(f"Failed to install model: {process.stderr}")
+
+    def handle_dashboard_click(self):
+        """Handle dashboard button click by displaying the most recent chart"""
+        print("Opening dashboard view...")
+        # Switch to the visualization page
+        self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
+        # Display the most recent chart
+        self.display_current_chart()
+
+    def setup_modern_icons(self):
+        # Update main icons
+        self.main_window.ui.btn_home.setIcon(QIcon("images/icons/home.png"))
+        self.main_window.ui.btn_dashboard.setIcon(QIcon("images/icons/dashboard.png"))
+        self.main_window.ui.btn_data.setIcon(QIcon("images/icons/database.png"))
+        self.main_window.ui.btn_anlysis.setIcon(QIcon("images/icons/analytics.png"))
+        self.main_window.ui.btn_chat.setIcon(QIcon("images/icons/chat.png"))
+        
+        # Update action icons
+        self.main_window.ui.openfile_btn.setIcon(QIcon("images/icons/upload.png"))
+        self.main_window.ui.clean_data_btn.setIcon(QIcon("images/icons/clean.png"))
+        self.main_window.ui.send_btn.setIcon(QIcon("images/icons/send.png"))
+        
+    def show_loading(self, message="Loading..."):
+        """Show loading overlay with custom message"""
+        self.loading_overlay.label.setText(message)
+        self.loading_overlay.show()
+        
+    def hide_loading(self):
+        """Hide loading overlay"""
+        self.loading_overlay.hide()

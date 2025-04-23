@@ -9,12 +9,12 @@ class DatabaseManager:
         SessionLocal = sessionmaker(bind=engine)
         self.session = SessionLocal()
 
-    def saveDataSet(self,path,name,info,summary,sample,cols):
+    def saveDataSet(self,path,name,info,description,sample,cols):
         #dataSet = self.Base.classes.dataset
         newDataSet = Dataset(raw_data=path,
                              dataset_name = name,
                              data_info=info,
-                             data_summary=summary,
+                             data_description=description,
                              data_sample=sample,
                              data_columns=cols)
         self.session.add(newDataSet)
@@ -22,14 +22,14 @@ class DatabaseManager:
         dataset_id = newDataSet.dataset_id
         self.session.commit()
         return dataset_id
-    def saveCleanDataset(self,ogID,path,name,info,summary,sample,cols):
+    def saveCleanDataset(self,ogID,path,name,info,description,sample,cols):
         #cleandataset = self.Base.classes.cleanDataset
         newCleanDataset = CleanDataset(original_dataset_id=ogID,
                             raw_data=path,
                             #uploaded_at=datetime.now(),
                              dataset_name = name,
                              data_info=info,
-                             data_summary=summary,
+                             data_description=description,
                              data_sample=sample,
                              data_columns=cols)
         self.session.add(newCleanDataset)
@@ -155,3 +155,11 @@ class DatabaseManager:
     def get_user_name(self,userID):
         user_name = self.session.query(User.username).filter(User.user_id == userID).first()
         return user_name if user_name else None
+
+    def get_report_charts(self, reportID):
+        charts = self.session.query(Charts.chart_path)\
+            .join(Dashboards, Charts.dashboard_id == Dashboards.dashboard_id)\
+            .join(Report, Dashboards.report_id == Report.report_id)\
+            .filter(Report.report_id == reportID)\
+            .all()
+        return [chart[0] for chart in charts] if charts else None

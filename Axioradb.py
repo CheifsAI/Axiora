@@ -67,7 +67,7 @@ class Dataset(Base):
     raw_data = Column(Text, nullable=False)
     uploaded_at = Column(DateTime, default=func.now())
     data_info = Column(Text)
-    data_summary = Column(Text)
+    data_description = Column(Text)
     data_sample = Column(Text)
     data_columns = Column(Text)
     
@@ -75,11 +75,11 @@ class Dataset(Base):
     reports = relationship("Report", back_populates="dataset")
     clean_datasets = relationship("CleanDataset", back_populates="original_dataset")
 
-    def __init__(self, dataset_name, raw_data, data_info=None, data_summary=None, data_sample=None, data_columns=None):
+    def __init__(self, dataset_name, raw_data, data_info=None, data_description=None, data_sample=None, data_columns=None):
         self.dataset_name = dataset_name
         self.raw_data = raw_data
         self.data_info = data_info
-        self.data_summary = data_summary
+        self.data_description = data_description
         self.data_sample = data_sample
         self.data_columns = data_columns
 
@@ -96,7 +96,7 @@ class CleanDataset(Base):
     original_dataset_id = Column(Integer, ForeignKey("dataset.dataset_id"))
     cleaned_at = Column(DateTime, default=func.now())
     data_info = Column(Text)
-    data_summary = Column(Text)
+    data_description = Column(Text)
     data_sample = Column(Text)
     data_columns = Column(Text)
     
@@ -104,12 +104,12 @@ class CleanDataset(Base):
     original_dataset = relationship("Dataset", back_populates="clean_datasets")
     reports = relationship("Report", back_populates="clean_dataset")
 
-    def __init__(self, dataset_name, raw_data, original_dataset_id, data_info=None, data_summary=None, data_sample=None, data_columns=None):
+    def __init__(self, dataset_name, raw_data, original_dataset_id, data_info=None, data_description=None, data_sample=None, data_columns=None):
         self.dataset_name = dataset_name
         self.raw_data = raw_data
         self.original_dataset_id = original_dataset_id
         self.data_info = data_info
-        self.data_summary = data_summary
+        self.data_description = data_description
         self.data_sample = data_sample
         self.data_columns = data_columns
 

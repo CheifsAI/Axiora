@@ -2,12 +2,24 @@ import sys
 import os
 import platform
 import ctypes
+
+# Import Qt modules first
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QHeaderView, QLabel, 
+    QVBoxLayout, QSizePolicy, QPushButton
+)
+from PySide6.QtGui import QIcon, QFont, QPixmap, QCursor
+from PySide6.QtCore import Qt, QSize
+
+# Import our modules
+from modules.app_settings import Settings
+from modules.ui_functions import UIFunctions
 from Functions import GuiFunctions
 from uiEXT.login.LoginWindow import LoginWindow
 from langchain_core.messages import HumanMessage, AIMessage
-from PySide6.QtWidgets import QApplication, QMainWindow, QHeaderView, QLabel, QVBoxLayout
-from PySide6.QtGui import QIcon, QFont, QPixmap
 from OprFuncs import read_file
+from modules.ui_main import Ui_MainWindow
+
 
 def resizeEvent(self, event):
     new_size = max(10, self.width() // 100)  
@@ -16,8 +28,6 @@ def resizeEvent(self, event):
 
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
-from modules import *
-from widgets import *
 os.environ["QT_FONT_DPI"] = "110" # FIX Problem for High DPI and Scale above 100%
 
 # SET AS GLOBAL WIDGETS
@@ -34,8 +44,13 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         global widgets
         widgets = self.ui
+        
+        # Initialize app functions after UI setup
         self.app_functions = GuiFunctions(self, self.user_id)
         self.load_reports()
+        
+        # Fix path separators for Windows - use forward slashes
+        self.report_logo = "images/icons/cil-report-colored-1.png"
         
         # USE CUSTOM TITLE BAR | USE AS "False" FOR MAC OR LINUX
         # ///////////////////////////////////////////////////////////////
@@ -99,9 +114,9 @@ class MainWindow(QMainWindow):
         
         
         # Set icons for buttons
-        #widgets.btn_home.setIcon(QIcon(r"images\icons\chat.png"))
-        widgets.btn_data.setIcon(QIcon("path/to/data_icon.png"))
-        widgets.btn_anlysis.setIcon(QIcon("path/to/new_icon.png"))
+        #widgets.btn_home.setIcon(QIcon("images/icons/chat.png"))
+        widgets.btn_data.setIcon(QIcon("images/icons/data_icon.png"))
+        widgets.btn_anlysis.setIcon(QIcon("images/icons/new_icon.png"))
 
         # EXTRA LEFT BOX
         def openCloseLeftBox():
@@ -121,7 +136,7 @@ class MainWindow(QMainWindow):
         # SET CUSTOM THEME
         # ///////////////////////////////////////////////////////////////
         useCustomTheme = True
-        themeFile = r"themes\py_dracula_light.qss"
+        themeFile = "themes/py_dracula_light.qss"
 
         # SET THEME AND HACKS
         if useCustomTheme:
@@ -158,7 +173,7 @@ class MainWindow(QMainWindow):
             report_btn.setProperty("report_id", report['id'])
             report_btn.setProperty("report_name", report['name'])
 
-            report_logo = "images\icons\cil-report-colored-1.png"
+            report_logo = "images/icons/cil-report-colored-1.png"
             pixmap_report_logo = QPixmap(report_logo)
             logo_icon = QIcon(pixmap_report_logo)
             report_btn.setIcon(logo_icon)
@@ -205,7 +220,13 @@ class MainWindow(QMainWindow):
                 if prompt:
                     self.app_functions.analyzer.memory.append(HumanMessage(content=prompt))
                     if response:
-                        self.app_functions.analyzer.memory.append(AIMessage(content=response))        
+                        self.app_functions.analyzer.memory.append(AIMessage(content=response))
+        
+        # Get and display charts
+        chart_paths = self.app_functions.db.get_report_charts(report_id)
+        if chart_paths:
+            self.app_functions.chart_paths = chart_paths
+            self.app_functions.display_current_chart()
 
     def _clear_chat_display(self):
         while self.ui.chat_layout.count() > 0:
@@ -294,7 +315,11 @@ class MainWindow(QMainWindow):
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
+    # Create QApplication instance
+    if not QApplication.instance():
+        app = QApplication(sys.argv)
+    else:
+        app = QApplication.instance()
     
     # Set up the application ID for Windows
     if platform.system() == 'Windows':

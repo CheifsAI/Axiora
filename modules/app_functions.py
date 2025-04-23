@@ -16,26 +16,342 @@
 
 # MAIN FILE
 # ///////////////////////////////////////////////////////////////
-from Axiora import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
+from modules.app_settings import Settings
 
-# WITH ACCESS TO MAIN WINDOW WIDGETS
+# GLOBALS
 # ///////////////////////////////////////////////////////////////
-class AppFunctions(MainWindow):
-    def setThemeHack(self):
-        Settings.BTN_LEFT_BOX_COLOR = "background-color: #495474;"
-        Settings.BTN_RIGHT_BOX_COLOR = "background-color: #495474;"
-        Settings.MENU_SELECTED_STYLESHEET = MENU_SELECTED_STYLESHEET = """
-        border-left: 22px solid qlineargradient(spread:pad, x1:0.034, y1:0, x2:0.216, y2:0, stop:0.499 rgba(255, 121, 198, 255), stop:0.5 rgba(85, 170, 255, 0));
-        background-color: #566388;
-        """
+GLOBAL_STATE = False
+GLOBAL_TITLE_BAR = True
 
-        # SET MANUAL STYLES
-        self.ui.lineEdit.setStyleSheet("background-color: #6272a4;")
-        self.ui.pushButton.setStyleSheet("background-color: #6272a4;")
-        self.ui.plainTextEdit.setStyleSheet("background-color: #6272a4;")
-        self.ui.tableWidget.setStyleSheet("QScrollBar:vertical { background: #6272a4; } QScrollBar:horizontal { background: #6272a4; }")
-        self.ui.scrollArea.setStyleSheet("QScrollBar:vertical { background: #6272a4; } QScrollBar:horizontal { background: #6272a4; }")
-        self.ui.comboBox.setStyleSheet("background-color: #6272a4;")
-        self.ui.horizontalScrollBar.setStyleSheet("background-color: #6272a4;")
-        self.ui.verticalScrollBar.setStyleSheet("background-color: #6272a4;")
-        self.ui.commandLinkButton.setStyleSheet("color: #ff79c6;")
+class CustomGrip(QWidget):
+    def __init__(self, parent, edge, disable_color = False):
+        QWidget.__init__(self)
+        self.parent = parent
+        self.setParent(parent)
+        self.edge = edge
+        self.disable_color = disable_color
+
+        # SHOW TOP GRIP
+        if edge == Qt.TopEdge:
+            self.setCursor(Qt.SizeVerCursor)
+            self.resizeFunc = self.resizeTop
+
+        # SHOW BOTTOM GRIP
+        elif edge == Qt.BottomEdge:
+            self.setCursor(Qt.SizeVerCursor)
+            self.resizeFunc = self.resizeBottom
+
+        # SHOW LEFT GRIP
+        elif edge == Qt.LeftEdge:
+            self.setCursor(Qt.SizeHorCursor)
+            self.resizeFunc = self.resizeLeft
+
+        # SHOW RIGHT GRIP
+        elif edge == Qt.RightEdge:
+            self.setCursor(Qt.SizeHorCursor)
+            self.resizeFunc = self.resizeRight
+
+        # SHOW NORMAL GRIP
+        else:
+            self.setCursor(Qt.ArrowCursor)
+
+    def resizeLeft(self, event):
+        delta = event.pos()
+        width = max(self.parent.minimumWidth(), self.parent.width() - delta.x())
+        geo = self.parent.geometry()
+        geo.setLeft(geo.right() - width)
+        self.parent.setGeometry(geo)
+        event.accept()
+
+    def resizeTop(self, event):
+        delta = event.pos()
+        height = max(self.parent.minimumHeight(), self.parent.height() - delta.y())
+        geo = self.parent.geometry()
+        geo.setTop(geo.bottom() - height)
+        self.parent.setGeometry(geo)
+        event.accept()
+
+    def resizeRight(self, event):
+        delta = event.pos()
+        width = max(self.parent.minimumWidth(), self.parent.width() + delta.x())
+        self.parent.resize(width, self.parent.height())
+        event.accept()
+
+    def resizeBottom(self, event):
+        delta = event.pos()
+        height = max(self.parent.minimumHeight(), self.parent.height() + delta.y())
+        self.parent.resize(self.parent.width(), height)
+        event.accept()
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.mousePos = event.pos()
+
+    def mouseMoveEvent(self, event):
+        if self.edge and not self.parent.isMaximized():
+            self.resizeFunc(event)
+
+    def paintEvent(self, event):
+        if not self.disable_color:
+            qp = QPainter()
+            qp.begin(self)
+            qp.setPen(Qt.NoPen)
+            qp.setBrush(QColor(255, 255, 255, 1))
+            qp.drawRect(self.rect())
+            qp.end()
+
+class UIFunctions:
+    def __init__(self, ui):
+        self.ui = ui
+        self.settings = Settings()
+
+    @staticmethod
+    def maximize_restore(self):
+        global GLOBAL_STATE
+        status = GLOBAL_STATE
+        if status == False:
+            self.showMaximized()
+            GLOBAL_STATE = True
+            self.ui.appMargins.setContentsMargins(0, 0, 0, 0)
+            self.ui.maximizeRestoreAppBtn.setToolTip("Restore")
+            self.ui.maximizeRestoreAppBtn.setIcon(QIcon(u":/icons/images/icons/icon_restore.png"))
+            self.ui.frame_size_grip.hide()
+            self.left_grip.hide()
+            self.right_grip.hide()
+            self.top_grip.hide()
+            self.bottom_grip.hide()
+        else:
+            GLOBAL_STATE = False
+            self.showNormal()
+            self.resize(self.width()+1, self.height()+1)
+            self.ui.appMargins.setContentsMargins(10, 10, 10, 10)
+            self.ui.maximizeRestoreAppBtn.setToolTip("Maximize")
+            self.ui.maximizeRestoreAppBtn.setIcon(QIcon(u":/icons/images/icons/icon_maximize.png"))
+            self.ui.frame_size_grip.show()
+            self.left_grip.show()
+            self.right_grip.show()
+            self.top_grip.show()
+            self.bottom_grip.show()
+
+    @staticmethod
+    def returStatus():
+        return GLOBAL_STATE
+
+    @staticmethod
+    def setStatus(status):
+        global GLOBAL_STATE
+        GLOBAL_STATE = status
+
+    @staticmethod
+    def toggleMenu(self, enable):
+        if enable:
+            # GET WIDTH
+            width = self.ui.leftMenuBg.width()
+            maxExtend = Settings.MENU_WIDTH
+            standard = 60
+
+            # SET MAX WIDTH
+            if width == 60:
+                widthExtended = maxExtend
+            else:
+                widthExtended = standard
+
+            # ANIMATION
+            self.animation = QPropertyAnimation(self.ui.leftMenuBg, b"minimumWidth")
+            self.animation.setDuration(Settings.TIME_ANIMATION)
+            self.animation.setStartValue(width)
+            self.animation.setEndValue(widthExtended)
+            self.animation.setEasingCurve(QEasingCurve.InOutQuart)
+            self.animation.start()
+
+    @staticmethod
+    def selectMenu(getStyle):
+        select = getStyle + Settings.MENU_SELECTED_STYLESHEET
+        return select
+
+    @staticmethod
+    def deselectMenu(getStyle):
+        deselect = getStyle.replace(Settings.MENU_SELECTED_STYLESHEET, "")
+        return deselect
+
+    @staticmethod
+    def selectStandardMenu(self, widget):
+        for w in self.ui.topMenu.findChildren(QPushButton):
+            if w.objectName() == widget:
+                w.setStyleSheet(UIFunctions.selectMenu(w.styleSheet()))
+
+    # TOGGLE LEFT BOX
+    # ///////////////////////////////////////////////////////////////
+    def toggleLeftBox(self, enable):
+        if enable:
+            # GET WIDTH
+            width = self.ui.extraLeftBox.width()
+            widthRightBox = self.ui.extraRightBox.width()
+            maxExtend = Settings.LEFT_BOX_WIDTH
+            color = Settings.BTN_LEFT_BOX_COLOR
+            standard = 0
+
+            # GET BTN STYLE
+            style = self.ui.toggleLeftBox.styleSheet()
+
+            # SET MAX WIDTH
+            if width == 0:
+                widthExtended = maxExtend
+                # SELECT BTN
+                self.ui.toggleLeftBox.setStyleSheet(style + color)
+                if widthRightBox != 0:
+                    style = self.ui.optionsTopBtn.styleSheet()
+                    self.ui.optionsTopBtn.setStyleSheet(style.replace(Settings.BTN_RIGHT_BOX_COLOR, ''))
+            else:
+                widthExtended = standard
+                # RESET BTN
+                self.ui.toggleLeftBox.setStyleSheet(style.replace(color, ''))
+                
+        UIFunctions.start_box_animation(self, width, widthRightBox, "left")
+
+    # TOGGLE RIGHT BOX
+    # ///////////////////////////////////////////////////////////////
+    def toggleRightBox(self, enable):
+        if enable:
+            # GET WIDTH
+            width = self.ui.extraRightBox.width()
+            widthLeftBox = self.ui.extraLeftBox.width()
+            maxExtend = Settings.RIGHT_BOX_WIDTH
+            color = Settings.BTN_RIGHT_BOX_COLOR
+            standard = 0
+
+            # GET BTN STYLE
+            style = self.ui.optionsTopBtn.styleSheet()
+
+            # SET MAX WIDTH
+            if width == 0:
+                widthExtended = maxExtend
+                # SELECT BTN
+                self.ui.optionsTopBtn.setStyleSheet(style + color)
+                if widthLeftBox != 0:
+                    style = self.ui.toggleLeftBox.styleSheet()
+                    self.ui.toggleLeftBox.setStyleSheet(style.replace(Settings.BTN_LEFT_BOX_COLOR, ''))
+            else:
+                widthExtended = standard
+                # RESET BTN
+                self.ui.optionsTopBtn.setStyleSheet(style.replace(color, ''))
+
+            UIFunctions.start_box_animation(self, widthLeftBox, width, "right")
+
+    def start_box_animation(self, left_box_width, right_box_width, direction):
+        right_width = 0
+        left_width = 0 
+
+        # Check values
+        if left_box_width == 0 and direction == "left":
+            left_width = 240
+        else:
+            left_width = 0
+        # Check values
+        if right_box_width == 0 and direction == "right":
+            right_width = 240
+        else:
+            right_width = 0       
+
+        # ANIMATION LEFT BOX        
+        self.left_box = QPropertyAnimation(self.ui.extraLeftBox, b"minimumWidth")
+        self.left_box.setDuration(Settings.TIME_ANIMATION)
+        self.left_box.setStartValue(left_box_width)
+        self.left_box.setEndValue(left_width)
+        self.left_box.setEasingCurve(QEasingCurve.InOutQuart)
+
+        # ANIMATION RIGHT BOX        
+        self.right_box = QPropertyAnimation(self.ui.extraRightBox, b"minimumWidth")
+        self.right_box.setDuration(Settings.TIME_ANIMATION)
+        self.right_box.setStartValue(right_box_width)
+        self.right_box.setEndValue(right_width)
+        self.right_box.setEasingCurve(QEasingCurve.InOutQuart)
+
+        # GROUP ANIMATION
+        self.group = QParallelAnimationGroup()
+        self.group.addAnimation(self.left_box)
+        self.group.addAnimation(self.right_box)
+        self.group.start()
+
+    # RESET SELECTION
+    def resetStyle(self, widget):
+        for w in self.ui.topMenu.findChildren(QPushButton):
+            if w.objectName() != widget:
+                w.setStyleSheet(UIFunctions.deselectMenu(w.styleSheet()))
+
+    # IMPORT THEMES FILES QSS/CSS
+    # ///////////////////////////////////////////////////////////////
+    def theme(self, file, useCustomTheme):
+        if useCustomTheme:
+            str = open(file, 'r').read()
+            self.ui.styleSheet.setStyleSheet(str)
+
+    # START - GUI DEFINITIONS
+    # ///////////////////////////////////////////////////////////////
+    def uiDefinitions(self):
+        def dobleClickMaximizeRestore(event):
+            # IF DOUBLE CLICK CHANGE STATUS
+            if event.type() == QEvent.MouseButtonDblClick:
+                QTimer.singleShot(250, lambda: UIFunctions.maximize_restore(self))
+        self.ui.titleRightInfo.mouseDoubleClickEvent = dobleClickMaximizeRestore
+
+        if Settings.ENABLE_CUSTOM_TITLE_BAR:
+            #STANDARD TITLE BAR
+            self.setWindowFlags(Qt.FramelessWindowHint)
+            self.setAttribute(Qt.WA_TranslucentBackground)
+
+            # MOVE WINDOW / MAXIMIZE / RESTORE
+            def moveWindow(event):
+                # IF MAXIMIZED CHANGE TO NORMAL
+                if UIFunctions.returStatus(self):
+                    UIFunctions.maximize_restore(self)
+                # MOVE WINDOW
+                if event.buttons() == Qt.LeftButton:
+                    self.move(self.pos() + event.globalPos() - self.dragPos)
+                    self.dragPos = event.globalPos()
+                    event.accept()
+            self.ui.titleRightInfo.mouseMoveEvent = moveWindow
+
+            # CUSTOM GRIPS
+            self.left_grip = CustomGrip(self, Qt.LeftEdge, True)
+            self.right_grip = CustomGrip(self, Qt.RightEdge, True)
+            self.top_grip = CustomGrip(self, Qt.TopEdge, True)
+            self.bottom_grip = CustomGrip(self, Qt.BottomEdge, True)
+
+        else:
+            self.ui.appMargins.setContentsMargins(0, 0, 0, 0)
+            self.ui.minimizeAppBtn.hide()
+            self.ui.maximizeRestoreAppBtn.hide()
+            self.ui.closeAppBtn.hide()
+            self.ui.frame_size_grip.hide()
+
+        # DROP SHADOW
+        self.shadow = QGraphicsDropShadowEffect(self)
+        self.shadow.setBlurRadius(17)
+        self.shadow.setXOffset(0)
+        self.shadow.setYOffset(0)
+        self.shadow.setColor(QColor(0, 0, 0, 150))
+        self.ui.bgApp.setGraphicsEffect(self.shadow)
+
+        # RESIZE WINDOW
+        self.sizegrip = QSizeGrip(self.ui.frame_size_grip)
+        self.sizegrip.setStyleSheet("width: 20px; height: 20px; margin 0px; padding: 0px;")
+
+        # MINIMIZE
+        self.ui.minimizeAppBtn.clicked.connect(lambda: self.showMinimized())
+
+        # MAXIMIZE/RESTORE
+        self.ui.maximizeRestoreAppBtn.clicked.connect(lambda: UIFunctions.maximize_restore(self))
+
+        # CLOSE APPLICATION
+        self.ui.closeAppBtn.clicked.connect(lambda: self.close())
+
+    def resize_grips(self):
+        if Settings.ENABLE_CUSTOM_TITLE_BAR:
+            self.left_grip.setGeometry(0, 10, 10, self.height())
+            self.right_grip.setGeometry(self.width() - 10, 10, 10, self.height())
+            self.top_grip.setGeometry(0, 0, self.width(), 10)
+            self.bottom_grip.setGeometry(0, self.height() - 10, self.width(), 10)
