@@ -319,17 +319,10 @@ class MainWindow(QMainWindow):
 
     def show_column_dialog(self, column_index):
         """Show the column dialog when a column header is clicked"""
-        print(f"Column header clicked: {column_index}")  # Debug print
-        try:
-            column_name = widgets.tableData.horizontalHeaderItem(column_index).text()
-            print(f"Column name: {column_name}")  # Debug print
-            dialog = ColDialog(self)
-            dialog.setWindowTitle(f"Column Options - {column_name}")
-            print("Showing dialog...")  # Debug print
-            dialog.exec_()
-            print("Dialog closed")  # Debug print
-        except Exception as e:
-            print(f"Error showing dialog: {str(e)}")  # Error print
+        column_name = widgets.tableData.horizontalHeaderItem(column_index).text()
+        dialog = ColDialog(self, self.app_functions.df, column_name)
+        dialog.setWindowTitle(f"Column Options - {column_name}")
+        dialog.exec_()
 
 if __name__ == "__main__":
     # Create QApplication instance
