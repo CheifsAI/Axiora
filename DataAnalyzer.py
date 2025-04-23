@@ -12,6 +12,8 @@ import re
 #from modelEXT.PygalCodeComponents import PygalCodeComponents
 #from langchain.output_parsers import PydanticOutputParser
 from DatabaseManager import DatabaseManager
+from langchain_experimental.agents import create_pandas_dataframe_agent
+
 class DataAnalyzer:
     def __init__(self,dataframe,llm):
         self.dataframe = dataframe
