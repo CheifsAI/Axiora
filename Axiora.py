@@ -19,6 +19,7 @@ from uiEXT.login.LoginWindow import LoginWindow
 from langchain_core.messages import HumanMessage, AIMessage
 from OprFuncs import read_file
 from modules.ui_main import Ui_MainWindow
+from uiEXT.ColDialog import ColDialog
 
 
 def resizeEvent(self, event):
@@ -155,6 +156,9 @@ class MainWindow(QMainWindow):
         welcome_label.setStyleSheet("font-size: 20px; font-weight: bold;")
         widgets.home_2.layout().addWidget(welcome_label)
         widgets.btn_home.setStyleSheet(UIFunctions.selectMenu(widgets.btn_home.styleSheet()))
+
+        # Connect column header click event
+        widgets.tableData.horizontalHeader().sectionClicked.connect(self.show_column_dialog)
 
     def load_reports(self):
         #self.report_list.clear()
@@ -313,6 +317,19 @@ class MainWindow(QMainWindow):
         if event.buttons() == Qt.RightButton:
             print('Mouse click: RIGHT CLICK')
 
+    def show_column_dialog(self, column_index):
+        """Show the column dialog when a column header is clicked"""
+        print(f"Column header clicked: {column_index}")  # Debug print
+        try:
+            column_name = widgets.tableData.horizontalHeaderItem(column_index).text()
+            print(f"Column name: {column_name}")  # Debug print
+            dialog = ColDialog(self)
+            dialog.setWindowTitle(f"Column Options - {column_name}")
+            print("Showing dialog...")  # Debug print
+            dialog.exec_()
+            print("Dialog closed")  # Debug print
+        except Exception as e:
+            print(f"Error showing dialog: {str(e)}")  # Error print
 
 if __name__ == "__main__":
     # Create QApplication instance
