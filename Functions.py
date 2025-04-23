@@ -152,10 +152,6 @@ class GuiFunctions():
         self.loading_dots = 0
         self.web_view = None  # Track web view instance
         
-        # Create output directory with forward slashes
-        self.output_dir = "output"
-        os.makedirs(self.output_dir, exist_ok=True)
-        
         # Connect LLM selection change
         self.ui.llm_combo.currentTextChanged.connect(self.handle_llm_change)
         
@@ -280,7 +276,7 @@ class GuiFunctions():
             self.datasetID = self.db.saveDataSet(path=self.datasetPath,
                                                  name=self.dname,
                                                  info=self.data_info,
-                                                 summary=self.data_summary,
+                                                 description=self.data_description,
                                                  sample=self.data_sample,
                                                  cols=self.data_cols) 
             self.reportID = self.db.saveReport(user=self.user_id,
@@ -292,7 +288,7 @@ class GuiFunctions():
     def _analyzer_attributes(self):
             self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
             self.data_info = self.analyzer.data_info
-            self.data_summary = self.analyzer.data_summary
+            self.data_description = self.analyzer.data_description
             self.data_sample = self.analyzer.data_sample
             self.data_cols = self.analyzer.data_cols
     def _show_df(self):
@@ -368,7 +364,7 @@ class GuiFunctions():
                                 path=self.cleaned_df_path,
                                 name=self.dname,
                                 info=self.data_info,
-                                summary=self.data_summary,
+                                description=self.data_description,
                                 sample=self.data_sample,
                                 cols=self.data_cols)
         self.db.saveCleanDatasetReport(reportId=self.reportID,cleandataset=self.datasetID)

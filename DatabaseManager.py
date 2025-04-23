@@ -9,12 +9,12 @@ class DatabaseManager:
         SessionLocal = sessionmaker(bind=engine)
         self.session = SessionLocal()
 
-    def saveDataSet(self,path,name,info,summary,sample,cols):
+    def saveDataSet(self,path,name,info,description,sample,cols):
         #dataSet = self.Base.classes.dataset
         newDataSet = Dataset(raw_data=path,
                              dataset_name = name,
                              data_info=info,
-                             data_summary=summary,
+                             data_description=description,
                              data_sample=sample,
                              data_columns=cols)
         self.session.add(newDataSet)
@@ -22,14 +22,14 @@ class DatabaseManager:
         dataset_id = newDataSet.dataset_id
         self.session.commit()
         return dataset_id
-    def saveCleanDataset(self,ogID,path,name,info,summary,sample,cols):
+    def saveCleanDataset(self,ogID,path,name,info,description,sample,cols):
         #cleandataset = self.Base.classes.cleanDataset
         newCleanDataset = CleanDataset(original_dataset_id=ogID,
                             raw_data=path,
                             #uploaded_at=datetime.now(),
                              dataset_name = name,
                              data_info=info,
-                             data_summary=summary,
+                             data_description=description,
                              data_sample=sample,
                              data_columns=cols)
         self.session.add(newCleanDataset)
