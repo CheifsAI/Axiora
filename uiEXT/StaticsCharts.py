@@ -3,11 +3,8 @@ import matplotlib.pyplot as plt
 from scipy.stats import skew
 
 def skwness(col_name, df):
-    # Calculate skewness
     skewness = skew(df[col_name])
     print(f"Skewness of {col_name}: {skewness:.4f}")
-    
-    # Plot histogram with KDE (to visualize skewness)
     sns.histplot(df[col_name], kde=True)
     plt.title(f'{col_name} Distribution')
     plt.xlabel(col_name)
@@ -21,7 +18,6 @@ def boxBlot(col_name, df):
     plt.savefig(f'{col_name}_boxplot.png', dpi=300)
     plt.close()
 
-# Example usage:
-# Assuming you have a pandas DataFrame called 'df'
-# skwness('your_column_name', df)
-# boxBlot('your_column_name', df)
+def col_desc(col_name,df):
+    describtion = df.describe()[[col_name]]
+    return describtion
