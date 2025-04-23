@@ -156,6 +156,64 @@ class DatabaseManager:
         user_name = self.session.query(User.username).filter(User.user_id == userID).first()
         return user_name if user_name else None
 
+    def get_user_context(self, userID):
+        user = self.session.query(User).filter(User.user_id == userID).first()
+        return user.user_context if user else None
+
+    def update_user_context(self, userID, new_context):
+        user = self.session.query(User).filter(User.user_id == userID).first()
+        if user:
+            user.user_context = new_context
+            self.session.commit()
+            return True
+        return False
+
+    def generate_user_context(self, userID):
+        """Generate a summary of user's data history using LLM"""
+        # Get all reports for the user
+        reports = self.session.query(Report).filter(Report.user_id == userID).all()
+        
+        if not reports:
+            return None
+            
+        # Collect data from reports
+        report_data = []
+        for report in reports:
+            # Get dataset info
+            dataset = self.session.query(Dataset).filter(Dataset.dataset_id == report.dataset_id).first()
+            if dataset:
+                report_data.append({
+                    'dataset_name': dataset.dataset_name,
+                    'data_info': dataset.data_info,
+                    'data_description': dataset.data_description
+                })
+            
+            # Get summary if exists
+            summary = self.session.query(Summary).filter(Summary.report_id == report.report_id).first()
+            if summary and summary.summary_content:
+                report_data[-1]['summary'] = summary.summary_content
+                
+        # Generate context using LLM
+        context_prompt = f"""
+        Based on the following user's data history, generate a comprehensive summary of their data analysis patterns and preferences:
+        
+        {report_data}
+        
+        Please provide insights about:
+        1. Types of datasets they typically work with
+        2. Common analysis patterns
+        3. Areas of interest
+        4. Any notable trends in their analysis
+        """
+        
+        # Here you would use your LLM to generate the context
+        # For now, we'll return a simple summary
+        context = f"User has analyzed {len(report_data)} datasets. "
+        if report_data:
+            context += f"Most recent dataset: {report_data[-1]['dataset_name']}"
+        
+        return context
+
     def get_report_charts(self, reportID):
         charts = self.session.query(Charts.chart_path)\
             .join(Dashboards, Charts.dashboard_id == Dashboards.dashboard_id)\
