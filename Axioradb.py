@@ -19,13 +19,15 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     email = Column(String)
     preferred_llm = Column(Integer, ForeignKey('llm.llm_id'), nullable=True)
+    user_context = Column(Text)
     
     reports = relationship("Report", back_populates="user")
     llm = relationship("LLM", back_populates="users")
 
-    def __init__(self, username, email, password):
+    def __init__(self, username, email, password, user_context=None):
         self.username = username
         self.email = email
+        self.user_context = user_context
         self.set_password(password) 
 
     def set_password(self, password):
