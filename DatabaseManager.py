@@ -155,3 +155,11 @@ class DatabaseManager:
     def get_user_name(self,userID):
         user_name = self.session.query(User.username).filter(User.user_id == userID).first()
         return user_name if user_name else None
+
+    def get_report_charts(self, reportID):
+        charts = self.session.query(Charts.chart_path)\
+            .join(Dashboards, Charts.dashboard_id == Dashboards.dashboard_id)\
+            .join(Report, Dashboards.report_id == Report.report_id)\
+            .filter(Report.report_id == reportID)\
+            .all()
+        return [chart[0] for chart in charts] if charts else None

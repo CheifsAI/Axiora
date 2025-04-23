@@ -20,10 +20,6 @@ from langchain_core.messages import HumanMessage, AIMessage
 from OprFuncs import read_file
 from modules.ui_main import Ui_MainWindow
 
-# Add Shiboken path to sys.path if needed
-shiboken_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'Lib', 'site-packages', 'shiboken6')
-if os.path.exists(shiboken_path) and shiboken_path not in sys.path:
-    sys.path.append(shiboken_path)
 
 def resizeEvent(self, event):
     new_size = max(10, self.width() // 100)  
@@ -224,7 +220,13 @@ class MainWindow(QMainWindow):
                 if prompt:
                     self.app_functions.analyzer.memory.append(HumanMessage(content=prompt))
                     if response:
-                        self.app_functions.analyzer.memory.append(AIMessage(content=response))        
+                        self.app_functions.analyzer.memory.append(AIMessage(content=response))
+        
+        # Get and display charts
+        chart_paths = self.app_functions.db.get_report_charts(report_id)
+        if chart_paths:
+            self.app_functions.chart_paths = chart_paths
+            self.app_functions.display_current_chart()
 
     def _clear_chat_display(self):
         while self.ui.chat_layout.count() > 0:
