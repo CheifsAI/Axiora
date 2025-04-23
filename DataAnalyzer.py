@@ -29,7 +29,7 @@ class DataAnalyzer:
         data_sample = self.data_sample
         data_description = self.data_description
 
-        analysis_prompt = '''
+        analysis_template = '''
         You are a data analyst. You are provided with:
         1. Dataset metadata: {data_info}
         2. Dataset sample: {data_sample}
@@ -39,17 +39,20 @@ class DataAnalyzer:
         1. Key trends and patterns.
         3. Recommendations or actionable insights based on the analyzed data.
         '''
-        analysis_template = PromptTemplate(
-            input_variables=["data_info","data_sample"],
-            template=analysis_prompt
+        analysis_prompt = PromptTemplate(
+            input_variables=["data_info", "data_sample", "data_description"],
+            template=analysis_template
         )
         
-        analysis_chain = LLMChain(llm=self.llm, prompt=analysis_template)
+        analysis_chain = analysis_prompt | self.llm
 
-        
-        analysis = analysis_chain.run(data_info=data_info,data_sample=data_sample,data_description=data_description)
+        analysis = analysis_chain.invoke({
+            "data_info": data_info,
+            "data_sample": data_sample,
+            "data_description": data_description
+        })
 
-        formatted_analysis_prompt = analysis_prompt.format(data_info=data_info,data_sample=data_sample,data_description=data_description)
+        formatted_analysis_prompt = analysis_template.format(data_info=data_info,data_sample=data_sample,data_description=data_description)
         self.memory.append(HumanMessage(content=formatted_analysis_prompt))
         self.memory.append(AIMessage(content=analysis))
         self.db.saveMemory(reportID=self.report_id,
@@ -106,8 +109,8 @@ class DataAnalyzer:
         Create {num} analysis questions about the dataset.
 
         Please format each question on a new line, starting with a number, as in this example:
-        1. What is the average price?
-        2. How does revenue correlate with stock levels?
+        1. question 1?
+        2. question 2?
         """
 
         question_template = PromptTemplate(
