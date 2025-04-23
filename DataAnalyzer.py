@@ -15,7 +15,7 @@ from DatabaseManager import DatabaseManager
 from langchain_experimental.agents import create_pandas_dataframe_agent
 
 class DataAnalyzer:
-    def __init__(self,dataframe,llm):
+    def __init__(self,dataframe,llm,user_id=None):
         self.dataframe = dataframe
         self.llm = llm
         self.data_info = data_infer(dataframe)
@@ -25,6 +25,15 @@ class DataAnalyzer:
         self.db = DatabaseManager()
         self.report_id = None
         self.memory = []
+        
+        # Load user context if user_id is provided
+        if user_id:
+            self.user_context = self.db.get_user_context(user_id)
+            if self.user_context:
+                # Add user context to memory
+                self.memory.append(HumanMessage(content=f"User Context: {self.user_context}"))
+        else:
+            self.user_context = None
 
     def analysis_data(self):
         data_info = self.data_info
@@ -35,14 +44,15 @@ class DataAnalyzer:
         You are a data analyst. You are provided with:
         1. Dataset metadata: {data_info}
         2. Dataset sample: {data_sample}
-        3. Dataset summary: {data_description} 
+        3. Dataset summary: {data_description}
+        {user_context}
 
         Please analyze the data and provide insights about:
         1. Key trends and patterns.
         3. Recommendations or actionable insights based on the analyzed data.
         '''
         analysis_prompt = PromptTemplate(
-            input_variables=["data_info", "data_sample", "data_description"],
+            input_variables=["data_info", "data_sample", "data_description", "user_context"],
             template=analysis_template
         )
         
@@ -51,7 +61,8 @@ class DataAnalyzer:
         analysis = analysis_chain.invoke({
             "data_info": data_info,
             "data_sample": data_sample,
-            "data_description": data_description
+            "data_description": data_description,
+            "user_context": f"\nUser's Previous Analysis Context:\n{self.user_context}" if self.user_context else ""
         })
 
         formatted_analysis_prompt = analysis_template.format(data_info=data_info,data_sample=data_sample,data_description=data_description)
