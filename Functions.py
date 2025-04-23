@@ -11,6 +11,8 @@ from PySide6.QtWidgets import (
     QProgressBar
 )
 from PySide6.QtSvg import QSvgRenderer
+import random
+from Visualizer import Visualizer
 import shutil
 from PySide6.QtCore import QFile
 from PySide6.QtWebEngineWidgets import QWebEngineView
@@ -575,21 +577,30 @@ class GuiFunctions():
             # Create dashboard
             self.dashboardID = self.db.addDashboard(reportID=self.reportID)
             print(f"Created dashboard with ID: {self.dashboardID}")
-            
-            # Store chart paths for all questions
             self.chart_paths = []
+
+            self.visualizer = Visualizer(dataframe=self.df)
+            # Store chart paths for all questions
+            #self.charts =[]
+            #self.charts_columns = []
             
             # Process each question and generate charts
             for question in self.selected_qu_list:
                 # Get chart type and column from the question
-                chart_info = self.analyzer._chart_select_chain(question)
-                
+                chart_type = self.analyzer.select_chart_type(question)
+                #self.charts.append(self.analyzer.select_chart_type(question))
+                chart_columns = self.analyzer.select_columns(question)
+                #self.charts_columns.append(self.analyzer.select_columns(question))
+                chart_title = question[3:6] + str(random.randint(100, 2000))
+                chart_path = f"{self.rname}/{chart_title}.html"
                 # Generate visualization
-                chart_path = self.analyzer.visual(
-                    chart_type=chart_info['chart_type'],
-                    column_name=chart_info['columns'],
-                    data=self.analyzer.dataframe
-                )
+                self.visualizer.generate_visualization(
+                    question=question,
+                    output_path=chart_path,
+                    columns=chart_columns,  # Optional override
+                    chart_type=chart_type,  # Optional override
+                    width=1200,
+                    height=800 )
                 
                 if chart_path and os.path.exists(chart_path):
                     print(f"Successfully generated chart at: {chart_path}")
