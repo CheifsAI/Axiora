@@ -1,9 +1,7 @@
-from passlib.hash import bcrypt
-from sqlalchemy.orm import sessionmaker
-import sqlalchemy as sa
+import bcrypt
 from sqlalchemy import (
-    PrimaryKeyConstraint, create_engine, ForeignKey,
-    Column, String, Integer, CHAR, SmallInteger,
+ create_engine, ForeignKey,
+    Column, String, Integer, SmallInteger,
     Text, DateTime, Boolean
 )
 from sqlalchemy import func
@@ -19,20 +17,22 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     email = Column(String)
     preferred_llm = Column(Integer, ForeignKey('llm.llm_id'), nullable=True)
+    user_context = Column(Text)
     
     reports = relationship("Report", back_populates="user")
     llm = relationship("LLM", back_populates="users")
 
-    def __init__(self, username, email, password):
+    def __init__(self, username, email, password, user_context=None):
         self.username = username
         self.email = email
+        self.user_context = user_context
         self.set_password(password) 
 
     def set_password(self, password):
-        self.password_hash = bcrypt.hash(password)
+        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
     def check_password(self, password):
-        return bcrypt.verify(password, self.password_hash)
+        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
     
     def __repr__(self):
         return f"<User(user_id={self.user_id}, username='{self.username}', email='{self.email}')>"

@@ -6,7 +6,7 @@ import ctypes
 # Import Qt modules first
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QHeaderView, QLabel, 
-    QVBoxLayout, QSizePolicy, QPushButton
+    QVBoxLayout, QSizePolicy, QPushButton, QGridLayout, QWidget, QFrame
 )
 from PySide6.QtGui import QIcon, QFont, QPixmap, QCursor
 from PySide6.QtCore import Qt, QSize
@@ -19,6 +19,7 @@ from uiEXT.login.LoginWindow import LoginWindow
 from langchain_core.messages import HumanMessage, AIMessage
 from OprFuncs import read_file
 from modules.ui_main import Ui_MainWindow
+from uiEXT.ColDialog import ColDialog
 
 
 def resizeEvent(self, event):
@@ -47,7 +48,7 @@ class MainWindow(QMainWindow):
         
         # Initialize app functions after UI setup
         self.app_functions = GuiFunctions(self, self.user_id)
-        self.load_reports()
+        self.load_oldreports()
         
         # Fix path separators for Windows - use forward slashes
         self.report_logo = "images/icons/cil-report-colored-1.png"
@@ -156,30 +157,107 @@ class MainWindow(QMainWindow):
         widgets.home_2.layout().addWidget(welcome_label)
         widgets.btn_home.setStyleSheet(UIFunctions.selectMenu(widgets.btn_home.styleSheet()))
 
-    def load_reports(self):
-        #self.report_list.clear()
-        reports = self.app_functions.db.get_user_reports(self.user_id)
-        for report in reports:
-            report_btn = QPushButton(self.ui.topMenus)
-            report_btn.setObjectName(report['name'])
-            sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-            sizePolicy1.setHeightForWidth(report_btn.sizePolicy().hasHeightForWidth())
-            report_btn.setSizePolicy(sizePolicy1)
-            report_btn.setMinimumSize(QSize(0, 45))
-           # report_btn.setFont(Qfont)
-            report_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-            report_btn.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-            report_btn.setText(report['name'])
-            report_btn.setProperty("report_id", report['id'])
-            report_btn.setProperty("report_name", report['name'])
+        # Connect column header click event
+        widgets.tableData.horizontalHeader().sectionClicked.connect(self.show_column_dialog)
 
-            report_logo = "images/icons/cil-report-colored-1.png"
-            pixmap_report_logo = QPixmap(report_logo)
-            logo_icon = QIcon(pixmap_report_logo)
-            report_btn.setIcon(logo_icon)
+    def load_oldreports(self):
 
-            report_btn.clicked.connect(self.report_button_clicked)
-            self.ui.verticalLayout_14.addWidget(report_btn)
+        # Create a grid layout for the home page
+        if hasattr(self.ui, 'home_2'):
+            # Clear existing layout if any
+            if self.ui.home_2.layout():
+                QWidget().setLayout(self.ui.home_2.layout())
+            
+            # Create new grid layout
+            grid_layout = QGridLayout(self.ui.home_2)
+            grid_layout.setSpacing(10)
+            grid_layout.setContentsMargins(20, 20, 20, 20)
+
+            # Create welcome message widget for top left
+            welcome_widget = QWidget()
+            welcome_layout = QVBoxLayout(welcome_widget)
+            welcome_layout.addStretch()
+
+            # Add welcome widget to top left
+            grid_layout.addWidget(welcome_widget, 0, 0)
+
+            # Create reports container for top right
+            reports_container = QWidget()
+            reports_layout = QVBoxLayout(reports_container)
+            reports_layout.setSpacing(5)
+            reports_layout.setContentsMargins(0, 0, 0, 0)
+
+            # Add title
+            title_label = QLabel("Your Reports")
+            title_label.setStyleSheet("""
+                QLabel {
+                    font-size: 16px;
+                    font-weight: bold;
+                    color: white;
+                    padding: 10px;
+                    background-color: rgb(196, 7, 105);
+                    border-radius: 4px;
+                }
+            """)
+            title_label.setAlignment(Qt.AlignCenter)
+            reports_layout.addWidget(title_label)
+            reports_layout.addSpacing(10)
+
+            reports = self.app_functions.db.get_user_reports(self.user_id)
+            for report in reports:
+                report_btn = QPushButton()
+                report_btn.setObjectName(report['name'])
+                report_btn.setMinimumHeight(40)
+                report_btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+                report_btn.setText(report['name'])
+                report_btn.setProperty("report_id", report['id'])
+                report_btn.setProperty("report_name", report['name'])
+                
+                # Set button style
+                report_btn.setStyleSheet("""
+                    QPushButton {
+                        background-color: rgb(24, 196, 199);
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                        padding: 5px 10px;
+                        text-align: left;
+                    }
+                    QPushButton:hover {
+                        background-color: rgb(7, 60, 196);
+                    }
+                """)
+                
+                # Add icon
+                report_logo = "images/icons/cil-report-colored-1.png"
+                pixmap_report_logo = QPixmap(report_logo)
+                if not pixmap_report_logo.isNull():
+                    scaled_pixmap = pixmap_report_logo.scaled(24, 24, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                    report_btn.setIcon(QIcon(scaled_pixmap))
+                    report_btn.setIconSize(QSize(24, 24))
+                
+                report_btn.clicked.connect(self.report_button_clicked)
+                reports_layout.addWidget(report_btn)
+
+            # Add reports container to top right
+            grid_layout.addWidget(reports_container, 0, 1)
+
+            # Add empty widgets for bottom left and right
+            bottom_left = QWidget()
+            bottom_right = QWidget()
+            grid_layout.addWidget(bottom_left, 1, 0)
+            grid_layout.addWidget(bottom_right, 1, 1)
+
+            # Add horizontal line
+            horizontal_line = QFrame()
+            horizontal_line.setFrameShape(QFrame.Shape.HLine)
+            horizontal_line.setStyleSheet("background-color: #ddd;")
+            grid_layout.addWidget(horizontal_line, 1, 0, 1, 2)
+
+            # Add vertical line
+            vertical_line = QFrame()
+            vertical_line.setFrameShape(QFrame.Shape.VLine)
+            vertical_line.setStyleSheet("background-color: #ddd;")
+            grid_layout.addWidget(vertical_line, 0, 1, 2, 1)
 
     def report_button_clicked(self):
         btn = self.sender()
@@ -313,6 +391,12 @@ class MainWindow(QMainWindow):
         if event.buttons() == Qt.RightButton:
             print('Mouse click: RIGHT CLICK')
 
+    def show_column_dialog(self, column_index):
+        """Show the column dialog when a column header is clicked"""
+        column_name = widgets.tableData.horizontalHeaderItem(column_index).text()
+        dialog = ColDialog(self, self.app_functions.df, column_name)
+        dialog.setWindowTitle(f"Column Options - {column_name}")
+        dialog.exec_()
 
 if __name__ == "__main__":
     # Create QApplication instance

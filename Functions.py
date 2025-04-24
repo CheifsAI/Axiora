@@ -33,6 +33,7 @@ from LLM import *
 from markdown import markdown
 from functools import partial
 from uiEXT.ChatBubble import ChatBubble
+from uiEXT.CleanDataDialog import CleanDataDialog
 #from Axioradb import *
 from docx import Document
 from DatabaseManager import DatabaseManager
@@ -167,7 +168,7 @@ class GuiFunctions():
     def setup_connections(self):
         self.main_window.ui.openfile_btn.clicked.connect(self.handle_data_button)
         self.main_window.ui.sum_btn.clicked.connect(self.handle_sum_btn)
-        self.main_window.ui.btn_LLMs.clicked.connect(self.handle_btn_LLMs)
+       # self.main_window.ui.btn_LLMs.clicked.connect(self.handle_btn_LLMs)
         self.main_window.ui.clean_data_btn.clicked.connect(self.handle_clean_data_btn)
         self.main_window.ui.qu_num_list.currentIndexChanged.connect(self.handle_qu_num)
         self.main_window.ui.qu_btn.clicked.connect(self.handle_qu_btn)
@@ -288,7 +289,7 @@ class GuiFunctions():
             self._show_df()
             
     def _analyzer_attributes(self):
-            self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
+            self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm, user_id=self.user_id)
             self.data_info = self.analyzer.data_info
             self.data_description = self.analyzer.data_description
             self.data_sample = self.analyzer.data_sample
@@ -351,26 +352,10 @@ class GuiFunctions():
             self.summary_worker.deleteLater()
             self.summary_worker = None
 
-    def handle_btn_LLMs(self):
-        print("Clicked LLM")
 
     def handle_clean_data_btn(self):
-        self.cleaned_df = self.analyzer.drop_nulls()
-        self.dname = f"cleaned_{self.dname}"
-        self.cleaned_df_path = os.path.join(self.rname, self.dname)
-        print(self.cleaned_df_path)
-        self.cleaned_df.to_csv(self.cleaned_df_path, index=False)
-        self.df = self.cleaned_df
-        self._analyzer_attributes()
-        self.datasetID = self.db.saveCleanDataset(ogID=self.datasetID,
-                                path=self.cleaned_df_path,
-                                name=self.dname,
-                                info=self.data_info,
-                                description=self.data_description,
-                                sample=self.data_sample,
-                                cols=self.data_cols)
-        self.db.saveCleanDatasetReport(reportId=self.reportID,cleandataset=self.datasetID)
-        self._show_df()
+        clean_dialog = CleanDataDialog(parent=self.main_window, df=self.df)
+        clean_dialog.exec()
 
     def extract_questions(self, text):
         """Extracts questions from the text by splitting on newlines."""
@@ -432,7 +417,13 @@ class GuiFunctions():
         
         # Reset button state
         self.main_window.ui.qu_btn.setEnabled(True)
-        print(f"Error generating questions: {error_message}")
+        
+        # Handle Unicode characters in error message
+        try:
+            error_msg = str(error_message).encode('ascii', 'replace').decode('ascii')
+            print(f"Error generating questions: {error_msg}")
+        except Exception as e:
+            print(f"Error handling questions: {str(e)}")
         
         if hasattr(self, 'question_worker'):
             self.question_worker.deleteLater()
