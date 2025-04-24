@@ -2,11 +2,13 @@ from PySide6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout,
                             QLabel, QWidget, QSizePolicy, QFrame,
                             QPushButton)
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap, QFont
+from PySide6.QtGui import QFont
 from uiEXT.StaticsCharts import skwness, boxBlot, col_desc
 from uiEXT.CleanDataDialog import CleanDataDialog
 import pandas as pd
 import numpy as np
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
 
 class ColDialog(QDialog):
     def __init__(self, parent=None, df=None, column_name=None):
@@ -136,10 +138,6 @@ class ColDialog(QDialog):
                 border-radius: 15px;
                 padding: 10px;
             }
-            QLabel {
-                color: #fff;
-                background-color: transparent;
-            }
         """)
         layout = QVBoxLayout(section)
         layout.setContentsMargins(15, 15, 15, 15)
@@ -152,16 +150,11 @@ class ColDialog(QDialog):
         layout.addWidget(title)
         
         if self.df is not None and self.column_name is not None:
-            skwness(self.column_name, self.df)
-            dist_plot = QLabel()
-            dist_pixmap = QPixmap(f'{self.column_name}_skewness.png')
-            dist_plot.setPixmap(dist_pixmap.scaled(
-                350, 350, 
-                Qt.KeepAspectRatio, 
-                Qt.SmoothTransformation
-            ))
-            dist_plot.setAlignment(Qt.AlignCenter)
-            layout.addWidget(dist_plot)
+            # Create matplotlib canvas
+            fig = skwness(self.column_name, self.df)
+            canvas = FigureCanvas(fig)
+            canvas.setStyleSheet("background-color: transparent;")
+            layout.addWidget(canvas)
         
         return section
     
@@ -176,10 +169,6 @@ class ColDialog(QDialog):
                 border-radius: 15px;
                 padding: 10px;
             }
-            QLabel {
-                color: #fff;
-                background-color: transparent;
-            }
         """)
         layout = QVBoxLayout(section)
         layout.setContentsMargins(15, 15, 15, 15)
@@ -192,16 +181,11 @@ class ColDialog(QDialog):
         layout.addWidget(title)
         
         if self.df is not None and self.column_name is not None:
-            boxBlot(self.column_name, self.df)
-            boxplot_plot = QLabel()
-            boxplot_pixmap = QPixmap(f'{self.column_name}_boxplot.png')
-            boxplot_plot.setPixmap(boxplot_pixmap.scaled(
-                350, 350, 
-                Qt.KeepAspectRatio, 
-                Qt.SmoothTransformation
-            ))
-            boxplot_plot.setAlignment(Qt.AlignCenter)
-            layout.addWidget(boxplot_plot)
+            # Create matplotlib canvas
+            fig = boxBlot(self.column_name, self.df)
+            canvas = FigureCanvas(fig)
+            canvas.setStyleSheet("background-color: transparent;")
+            layout.addWidget(canvas)
         
         return section
     
