@@ -143,22 +143,26 @@ class DataAnalyzer:
                 "data_description": data_description
             })
 
-            print("🔹 Raw LLM Output:", repr(generated_questions))
+            # Ensure the response is properly encoded
+            if isinstance(generated_questions, str):
+                generated_questions = generated_questions.encode('utf-8', 'replace').decode('utf-8')
+
+            print("Raw LLM Output:", repr(generated_questions))
 
             if not generated_questions.strip():
-                print("⚠️ LLM did not generate any questions.")
+                print("Warning: LLM did not generate any questions.")
                 return []
 
             # Use the improved extraction function
             questions_list = extract_questions(generated_questions)
 
-            print("🟢 Extracted Questions List:", questions_list)
+            print("Extracted Questions List:", questions_list)
 
             # Trim or handle missing questions
             if len(questions_list) > num:
                 questions_list = questions_list[:num]
             elif len(questions_list) < num:
-                print(f"⚠️ Warning: Expected {num} questions, but got {len(questions_list)}")
+                print(f"Warning: Expected {num} questions, but got {len(questions_list)}")
 
             # Store in memory
             formatted_question_prompt = question_template.format(
@@ -178,7 +182,7 @@ class DataAnalyzer:
             return questions_list
 
         except Exception as e:
-            print(f"❌ Error generating questions: {e}")
+            print(f"Error generating questions: {str(e)}")
             return []
 
     

@@ -417,7 +417,13 @@ class GuiFunctions():
         
         # Reset button state
         self.main_window.ui.qu_btn.setEnabled(True)
-        print(f"Error generating questions: {error_message}")
+        
+        # Handle Unicode characters in error message
+        try:
+            error_msg = str(error_message).encode('ascii', 'replace').decode('ascii')
+            print(f"Error generating questions: {error_msg}")
+        except Exception as e:
+            print(f"Error handling questions: {str(e)}")
         
         if hasattr(self, 'question_worker'):
             self.question_worker.deleteLater()
