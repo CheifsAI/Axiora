@@ -33,6 +33,7 @@ from LLM import *
 from markdown import markdown
 from functools import partial
 from uiEXT.ChatBubble import ChatBubble
+from uiEXT.CleanDataDialog import CleanDataDialog
 #from Axioradb import *
 from docx import Document
 from DatabaseManager import DatabaseManager
@@ -167,7 +168,7 @@ class GuiFunctions():
     def setup_connections(self):
         self.main_window.ui.openfile_btn.clicked.connect(self.handle_data_button)
         self.main_window.ui.sum_btn.clicked.connect(self.handle_sum_btn)
-        self.main_window.ui.btn_LLMs.clicked.connect(self.handle_btn_LLMs)
+       # self.main_window.ui.btn_LLMs.clicked.connect(self.handle_btn_LLMs)
         self.main_window.ui.clean_data_btn.clicked.connect(self.handle_clean_data_btn)
         self.main_window.ui.qu_num_list.currentIndexChanged.connect(self.handle_qu_num)
         self.main_window.ui.qu_btn.clicked.connect(self.handle_qu_btn)
@@ -351,26 +352,13 @@ class GuiFunctions():
             self.summary_worker.deleteLater()
             self.summary_worker = None
 
-    def handle_btn_LLMs(self):
-        print("Clicked LLM")
+    def open_clean_data_dialog(self):
+        """Open the CleanDataDialog"""
+        clean_dialog = CleanDataDialog(self, self.df)
+        clean_dialog.exec() 
 
     def handle_clean_data_btn(self):
-        self.cleaned_df = self.analyzer.drop_nulls()
-        self.dname = f"cleaned_{self.dname}"
-        self.cleaned_df_path = os.path.join(self.rname, self.dname)
-        print(self.cleaned_df_path)
-        self.cleaned_df.to_csv(self.cleaned_df_path, index=False)
-        self.df = self.cleaned_df
-        self._analyzer_attributes()
-        self.datasetID = self.db.saveCleanDataset(ogID=self.datasetID,
-                                path=self.cleaned_df_path,
-                                name=self.dname,
-                                info=self.data_info,
-                                description=self.data_description,
-                                sample=self.data_sample,
-                                cols=self.data_cols)
-        self.db.saveCleanDatasetReport(reportId=self.reportID,cleandataset=self.datasetID)
-        self._show_df()
+        self.open_clean_data_dialog()
 
     def extract_questions(self, text):
         """Extracts questions from the text by splitting on newlines."""
