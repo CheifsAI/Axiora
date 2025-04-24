@@ -1,9 +1,7 @@
 from passlib.hash import bcrypt
-from sqlalchemy.orm import sessionmaker
-import sqlalchemy as sa
 from sqlalchemy import (
-    PrimaryKeyConstraint, create_engine, ForeignKey,
-    Column, String, Integer, CHAR, SmallInteger,
+ create_engine, ForeignKey,
+    Column, String, Integer, SmallInteger,
     Text, DateTime, Boolean
 )
 from sqlalchemy import func
