@@ -26,11 +26,10 @@ class DataAnalyzer:
         self.report_id = None
         self.memory = []
         
-        # Load user context if user_id is provided
         if user_id:
+            self.user_id = user_id
             self.user_context = self.db.get_user_context(user_id)
             if self.user_context:
-                # Add user context to memory
                 self.memory.append(HumanMessage(content=f"User Context: {self.user_context}"))
         else:
             self.user_context = None
@@ -45,7 +44,7 @@ class DataAnalyzer:
         1. Dataset metadata: {data_info}
         2. Dataset sample: {data_sample}
         3. Dataset summary: {data_description}
-        {user_context}
+        4. User_context: {user_context}
 
         Please analyze the data and provide insights about:
         1. Key trends and patterns.
@@ -58,22 +57,23 @@ class DataAnalyzer:
         
         analysis_chain = analysis_prompt | self.llm
 
-        analysis = analysis_chain.invoke({
+        self.analysis = analysis_chain.invoke({
             "data_info": data_info,
             "data_sample": data_sample,
             "data_description": data_description,
-            "user_context": f"\nUser's Previous Analysis Context:\n{self.user_context}" if self.user_context else ""
+            "user_context":self.user_context or "No prior context available"
         })
 
         formatted_analysis_prompt = analysis_template.format(data_info=data_info,data_sample=data_sample,data_description=data_description)
         self.memory.append(HumanMessage(content=formatted_analysis_prompt))
-        self.memory.append(AIMessage(content=analysis))
+        self.memory.append(AIMessage(content=self.analysis))
         self.db.saveMemory(reportID=self.report_id,
                            llm=self.db.llm_id_by_name(self.llm.model),
                            prompet=formatted_analysis_prompt,
-                           response=analysis,
+                           response=self.analysis,
                            chat=False)
-        return analysis        
+        self.generate_user_context()
+        return self.analysis        
 
     # Drop Nulls
     def drop_nulls(self):
@@ -300,3 +300,37 @@ class DataAnalyzer:
         chart_type = self.select_chart_type(question)
         columns = self.select_columns(question)
         return chart_type, columns
+    
+    def generate_user_context(self):
+        if not self.user_id:
+            return "No user ID provided"
+            
+        context_template = """
+        Generate a concise user profile context based on:
+
+        User's existing context: {existing_context}
+        Current analysis: {current_analysis}
+        Conversation history: {conversation_summary}
+        Focus on:
+        - Key analysis interests
+        - Frequently asked about metrics
+        - Data domains of interest
+        
+        Format as bullet points, max 5 items.
+        """
+        
+        conversation = "\n".join([msg.content for msg in self.memory[-4:]])
+        
+        context_prompt = PromptTemplate(
+            template=context_template,
+            input_variables=["existing_context", "current_analysis", "conversation_summary"]
+        )
+        
+        new_context = (context_prompt | self.llm).invoke({
+            "existing_context": self.user_context or "No prior context available",
+            "current_analysis": self.analysis,
+            "conversation_summary": conversation
+        })
+        
+        self.db.update_user_context(userID=self.user_id, new_context=new_context)
+        return new_context
