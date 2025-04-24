@@ -289,7 +289,7 @@ class GuiFunctions():
             self._show_df()
             
     def _analyzer_attributes(self):
-            self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm)
+            self.analyzer = DataAnalyzer(dataframe=self.df, llm=self.llm, user_id=self.user_id)
             self.data_info = self.analyzer.data_info
             self.data_description = self.analyzer.data_description
             self.data_sample = self.analyzer.data_sample
