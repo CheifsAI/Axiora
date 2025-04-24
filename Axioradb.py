@@ -1,4 +1,4 @@
-from passlib.hash import bcrypt
+import bcrypt
 from sqlalchemy import (
  create_engine, ForeignKey,
     Column, String, Integer, SmallInteger,
@@ -29,10 +29,10 @@ class User(Base):
         self.set_password(password) 
 
     def set_password(self, password):
-        self.password_hash = bcrypt.hash(password)
+        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
     def check_password(self, password):
-        return bcrypt.verify(password, self.password_hash)
+        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
     
     def __repr__(self):
         return f"<User(user_id={self.user_id}, username='{self.username}', email='{self.email}')>"
