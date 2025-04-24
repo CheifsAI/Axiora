@@ -64,7 +64,9 @@ class DataAnalyzer:
             "user_context":self.user_context or "No prior context available"
         })
 
-        formatted_analysis_prompt = analysis_template.format(data_info=data_info,data_sample=data_sample,data_description=data_description)
+        formatted_analysis_prompt = analysis_template.format(data_info=data_info,data_sample=data_sample,
+                                                             data_description=data_description,
+                                                             user_context=self.user_context)
         self.memory.append(HumanMessage(content=formatted_analysis_prompt))
         self.memory.append(AIMessage(content=self.analysis))
         self.db.saveMemory(reportID=self.report_id,
