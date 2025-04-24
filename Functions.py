@@ -352,13 +352,10 @@ class GuiFunctions():
             self.summary_worker.deleteLater()
             self.summary_worker = None
 
-    def open_clean_data_dialog(self):
-        """Open the CleanDataDialog"""
-        clean_dialog = CleanDataDialog(self, self.df)
-        clean_dialog.exec() 
 
     def handle_clean_data_btn(self):
-        self.open_clean_data_dialog()
+        clean_dialog = CleanDataDialog(parent=self.main_window, df=self.df)
+        clean_dialog.exec()
 
     def extract_questions(self, text):
         """Extracts questions from the text by splitting on newlines."""

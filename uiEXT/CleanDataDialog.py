@@ -7,11 +7,10 @@ import pandas as pd
 import numpy as np
 
 class CleanDataDialog(QDialog):
-    def __init__(self, parent=None, df=None, column_name=None):
+    def __init__(self, parent=None, df=None):
         super().__init__(parent)
         self.df = df
-        self.column_name = column_name
-        self.setWindowTitle(f"Data Cleaning - {column_name}")
+        self.setWindowTitle("Data Cleaning")
         self.resize(800, 600)
         self.setMinimumSize(600, 400)
         
@@ -106,11 +105,14 @@ class CleanDataDialog(QDialog):
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
         
-        if self.df is not None and self.column_name is not None:
+        if self.df is not None:
             # Null values info
-            null_count = self.df[self.column_name].isnull().sum()
-            null_percent = (null_count / len(self.df)) * 100
-            null_info = QLabel(f"Null Values: {null_count} ({null_percent:.1f}%)")
+            null_counts = self.df.isnull().sum()
+            total_nulls = null_counts.sum()
+            total_cells = self.df.size
+            null_percent = (total_nulls / total_cells) * 100
+            
+            null_info = QLabel(f"Total Null Values: {total_nulls} ({null_percent:.1f}%)")
             null_info.setStyleSheet("color: #ff6b6b;")
             layout.addWidget(null_info)
             
@@ -134,59 +136,51 @@ class CleanDataDialog(QDialog):
             
             layout.addLayout(operations_layout)
             
-            # Outliers info
-            Q1 = self.df[self.column_name].quantile(0.25)
-            Q3 = self.df[self.column_name].quantile(0.75)
-            IQR = Q3 - Q1
-            lower_bound = Q1 - 1.5 * IQR
-            upper_bound = Q3 + 1.5 * IQR
-            outliers = self.df[(self.df[self.column_name] < lower_bound) | 
-                             (self.df[self.column_name] > upper_bound)][self.column_name]
-            outlier_count = len(outliers)
-            outlier_percent = (outlier_count / len(self.df)) * 100
-            
-            outlier_info = QLabel(f"Outliers: {outlier_count} ({outlier_percent:.1f}%)")
-            outlier_info.setStyleSheet("color: #ffd166;")
-            layout.addWidget(outlier_info)
-            
-            # Outlier handling
-            outlier_layout = QHBoxLayout()
-            
-            # Remove outliers button
-            remove_outliers_btn = QPushButton("Remove Outliers")
-            remove_outliers_btn.clicked.connect(self.remove_outliers)
-            outlier_layout.addWidget(remove_outliers_btn)
-            
-            # Cap outliers button
-            cap_outliers_btn = QPushButton("Cap Outliers")
-            cap_outliers_btn.clicked.connect(self.cap_outliers)
-            outlier_layout.addWidget(cap_outliers_btn)
-            
-            layout.addLayout(outlier_layout)
+            # Outliers info (for numeric columns)
+            numeric_cols = self.df.select_dtypes(include=[np.number]).columns
+            if len(numeric_cols) > 0:
+                outlier_info = QLabel("Outlier Detection (for numeric columns)")
+                outlier_info.setStyleSheet("color: #ffd166;")
+                layout.addWidget(outlier_info)
+                
+                # Outlier handling
+                outlier_layout = QHBoxLayout()
+                
+                # Remove outliers button
+                remove_outliers_btn = QPushButton("Remove Outliers")
+                remove_outliers_btn.clicked.connect(self.remove_outliers)
+                outlier_layout.addWidget(remove_outliers_btn)
+                
+                # Cap outliers button
+                cap_outliers_btn = QPushButton("Cap Outliers")
+                cap_outliers_btn.clicked.connect(self.cap_outliers)
+                outlier_layout.addWidget(cap_outliers_btn)
+                
+                layout.addLayout(outlier_layout)
         
         return section
     
     def drop_nulls(self):
-        """Drop null values from the column"""
-        if self.df is not None and self.column_name is not None:
+        """Drop null values from the dataframe"""
+        if self.df is not None:
             initial_len = len(self.df)
-            self.df.dropna(subset=[self.column_name], inplace=True)
+            self.df.dropna(inplace=True)
             dropped = initial_len - len(self.df)
             QMessageBox.information(self, "Success", 
-                                  f"Dropped {dropped} null values from {self.column_name}")
+                                  f"Dropped {dropped} rows with null values")
             self.update_display()
     
     def fill_nulls(self, method):
         """Fill null values using the specified method"""
-        if self.df is not None and self.column_name is not None:
+        if self.df is not None:
             if method == "Mean":
-                self.df[self.column_name].fillna(self.df[self.column_name].mean(), inplace=True)
+                self.df.fillna(self.df.mean(), inplace=True)
             elif method == "Median":
-                self.df[self.column_name].fillna(self.df[self.column_name].median(), inplace=True)
+                self.df.fillna(self.df.median(), inplace=True)
             elif method == "Mode":
-                self.df[self.column_name].fillna(self.df[self.column_name].mode()[0], inplace=True)
+                self.df.fillna(self.df.mode().iloc[0], inplace=True)
             elif method == "Zero":
-                self.df[self.column_name].fillna(0, inplace=True)
+                self.df.fillna(0, inplace=True)
             elif method == "Custom":
                 # TODO: Implement custom value input dialog
                 pass
@@ -196,44 +190,51 @@ class CleanDataDialog(QDialog):
             self.update_display()
     
     def remove_outliers(self):
-        """Remove outliers using IQR method"""
-        if self.df is not None and self.column_name is not None:
-            Q1 = self.df[self.column_name].quantile(0.25)
-            Q3 = self.df[self.column_name].quantile(0.75)
-            IQR = Q3 - Q1
-            lower_bound = Q1 - 1.5 * IQR
-            upper_bound = Q3 + 1.5 * IQR
-            
-            initial_len = len(self.df)
-            self.df = self.df[(self.df[self.column_name] >= lower_bound) & 
-                            (self.df[self.column_name] <= upper_bound)]
-            removed = initial_len - len(self.df)
-            
-            QMessageBox.information(self, "Success", 
-                                  f"Removed {removed} outliers from {self.column_name}")
-            self.update_display()
+        """Remove outliers using IQR method for numeric columns"""
+        if self.df is not None:
+            numeric_cols = self.df.select_dtypes(include=[np.number]).columns
+            if len(numeric_cols) > 0:
+                initial_len = len(self.df)
+                
+                for col in numeric_cols:
+                    Q1 = self.df[col].quantile(0.25)
+                    Q3 = self.df[col].quantile(0.75)
+                    IQR = Q3 - Q1
+                    lower_bound = Q1 - 1.5 * IQR
+                    upper_bound = Q3 + 1.5 * IQR
+                    
+                    self.df = self.df[(self.df[col] >= lower_bound) & 
+                                    (self.df[col] <= upper_bound)]
+                
+                removed = initial_len - len(self.df)
+                QMessageBox.information(self, "Success", 
+                                      f"Removed {removed} rows with outliers")
+                self.update_display()
     
     def cap_outliers(self):
-        """Cap outliers using IQR method"""
-        if self.df is not None and self.column_name is not None:
-            Q1 = self.df[self.column_name].quantile(0.25)
-            Q3 = self.df[self.column_name].quantile(0.75)
-            IQR = Q3 - Q1
-            lower_bound = Q1 - 1.5 * IQR
-            upper_bound = Q3 + 1.5 * IQR
-            
-            self.df[self.column_name] = self.df[self.column_name].clip(lower_bound, upper_bound)
-            
-            QMessageBox.information(self, "Success", 
-                                  f"Capped outliers in {self.column_name}")
-            self.update_display()
+        """Cap outliers using IQR method for numeric columns"""
+        if self.df is not None:
+            numeric_cols = self.df.select_dtypes(include=[np.number]).columns
+            if len(numeric_cols) > 0:
+                for col in numeric_cols:
+                    Q1 = self.df[col].quantile(0.25)
+                    Q3 = self.df[col].quantile(0.75)
+                    IQR = Q3 - Q1
+                    lower_bound = Q1 - 1.5 * IQR
+                    upper_bound = Q3 + 1.5 * IQR
+                    
+                    self.df[col] = self.df[col].clip(lower_bound, upper_bound)
+                
+                QMessageBox.information(self, "Success", 
+                                      "Capped outliers in numeric columns")
+                self.update_display()
     
     def clean_all_data(self):
         """Perform all cleaning steps in sequence"""
-        if self.df is not None and self.column_name is not None:
+        if self.df is not None:
             # Store initial state
             initial_len = len(self.df)
-            initial_nulls = self.df[self.column_name].isnull().sum()
+            initial_nulls = self.df.isnull().sum().sum()
             
             # Step 1: Fill nulls with median
             self.fill_nulls("Median")
@@ -242,7 +243,7 @@ class CleanDataDialog(QDialog):
             self.cap_outliers()
             
             # Calculate changes
-            final_nulls = self.df[self.column_name].isnull().sum()
+            final_nulls = self.df.isnull().sum().sum()
             nulls_filled = initial_nulls - final_nulls
             
             # Show summary
