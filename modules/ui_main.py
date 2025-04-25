@@ -1493,10 +1493,10 @@ class Ui_MainWindow(object):
         self.verticalLayout_22.setContentsMargins(0, 0, 0, 0)
         
         # Add web view for displaying predictions
-        self.prediction_webview = QWebEngineView(self.prediction_results)
-        self.prediction_webview.setObjectName(u"prediction_webview")
-        self.prediction_webview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.verticalLayout_22.addWidget(self.prediction_webview)
+       # self.prediction_webview = QWebEngineView(self.prediction_results)
+       # self.prediction_webview.setObjectName(u"prediction_webview")
+       # self.prediction_webview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+       # self.verticalLayout_22.addWidget(self.prediction_webview)
         
         self.verticalLayout_21.addWidget(self.prediction_results)
         
