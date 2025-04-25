@@ -3,21 +3,19 @@ import matplotlib.pyplot as plt
 from scipy.stats import skew
 
 def skwness(col_name, df):
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=(6, 4), constrained_layout=True)
     skewness = skew(df[col_name])
     print(f"Skewness of {col_name}: {skewness:.4f}")
     sns.histplot(df[col_name], kde=True, ax=ax)
     ax.set_title(f'{col_name} Distribution')
     ax.set_xlabel(col_name)
     ax.set_ylabel('Frequency')
-    plt.tight_layout()
     return fig
 
 def boxBlot(col_name, df):
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=(6, 4), constrained_layout=True)
     sns.boxplot(y=df[col_name], ax=ax)
     ax.set_title(f'Boxplot of {col_name}')
-    plt.tight_layout()
     return fig
 
 def col_desc(col_name, df):
@@ -31,12 +29,11 @@ def col_corrBlot(col_name, df):
     
     # Check if the target column is numeric
     if not col_name in numeric_cols:
-        fig, ax = plt.subplots(figsize=(8, 4))
+        fig, ax = plt.subplots(figsize=(6, 4), constrained_layout=True)
         ax.text(0.5, 0.5, 'Correlation plot not available\nfor non-numeric columns',
                 ha='center', va='center', fontsize=12)
         ax.set_xticks([])
         ax.set_yticks([])
-        plt.tight_layout()
         return fig
     
     # Calculate correlation only for numeric columns
@@ -44,7 +41,7 @@ def col_corrBlot(col_name, df):
     target_corr = correlation_matrix[[col_name]].drop(col_name)
 
     if len(target_corr) == 0:
-        fig, ax = plt.subplots(figsize=(8, 4))
+        fig, ax = plt.subplots(figsize=(6, 4), constrained_layout=True)
         ax.text(0.5, 0.5, 'No other numeric columns\nto calculate correlations',
                 ha='center', va='center', fontsize=12)
         ax.set_xticks([])
@@ -52,10 +49,10 @@ def col_corrBlot(col_name, df):
     else:
         # Calculate figure height based on number of columns
         num_cols = len(target_corr)
-        fig_height = max(4, min(8, 0.4 * num_cols))  # Reduced height per column
+        fig_height = max(6, 0.4 * num_cols)  # Allow figure to grow taller
         
         # Create figure with calculated height
-        fig, ax = plt.subplots(figsize=(8, fig_height))
+        fig, ax = plt.subplots(figsize=(6, fig_height), constrained_layout=True)
         
         # Sort and plot
         target_corr_sorted = target_corr.sort_values(col_name, ascending=True)
@@ -74,7 +71,7 @@ def col_corrBlot(col_name, df):
                    f'{v:.3f}',
                    va='center',
                    ha='left' if v >= 0 else 'right',
-                   fontsize=9)  # Slightly smaller font
+                   fontsize=9)
         
         # Adjust layout
         ax.axvline(x=0, color='black', linestyle='-', linewidth=0.5)
@@ -85,11 +82,9 @@ def col_corrBlot(col_name, df):
                           abs(target_corr_sorted[col_name].min()))
         ax.set_xlim(-max(0.1, max_abs_corr * 1.2), max(0.1, max_abs_corr * 1.2))
         
-        # Adjust margins and spacing
-        plt.subplots_adjust(left=0.25, right=0.95, top=0.95, bottom=0.1)
-        
-        # Reduce font size of y-axis labels if there are many columns
-        if num_cols > 10:
-            ax.tick_params(axis='y', labelsize=8)
+        # Set consistent font sizes
+        ax.tick_params(axis='y', labelsize=9)
+        ax.tick_params(axis='x', labelsize=9)
+        ax.set_title(ax.get_title(), fontsize=10, pad=10)
     
     return fig
