@@ -6,7 +6,7 @@ import ctypes
 # Import Qt modules first
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QHeaderView, QLabel, 
-    QVBoxLayout, QSizePolicy, QPushButton, QGridLayout, QWidget, QFrame, QCheckBox, QTableWidget, QTableWidgetItem
+    QVBoxLayout, QSizePolicy, QPushButton, QGridLayout, QWidget, QFrame, QCheckBox, QTableWidget, QTableWidgetItem, QScrollArea
 )
 from PySide6.QtGui import QIcon, QFont, QPixmap, QCursor
 from PySide6.QtCore import Qt, QSize
@@ -508,8 +508,9 @@ class MainWindow(QMainWindow):
                     feature_table.setItem(i, j, item)
             
             # Set table properties
-            feature_table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-            feature_table.setMaximumHeight(200)  # Limit table height
+            feature_table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            feature_table.setMinimumHeight(200)
+            feature_table.setMaximumHeight(400)
             feature_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
             feature_table.setAlternatingRowColors(True)
             feature_table.setStyleSheet("""
@@ -517,6 +518,7 @@ class MainWindow(QMainWindow):
                     background-color: white;
                     alternate-background-color: #f0f0f0;
                     gridline-color: #d0d0d0;
+                    border: 1px solid #d0d0d0;
                 }
                 QHeaderView::section {
                     background-color: #f0f0f0;
@@ -539,6 +541,7 @@ class MainWindow(QMainWindow):
                 if plot is not None:  # Skip None plots
                     canvas = FigureCanvas(plot)
                     canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                    canvas.setMinimumSize(400, 300)  # Set minimum size for each plot
                     
                     # Position the plots in the grid
                     if i == 0:  # Initial plot
@@ -562,8 +565,15 @@ class MainWindow(QMainWindow):
                     existing_layout.setSpacing(20)
                     existing_layout.setContentsMargins(20, 20, 20, 20)
                 
-                # Add the new content container to the existing layout
-                existing_layout.addWidget(content_container)
+                # Create a scroll area for the entire page
+                scroll_area = QScrollArea()
+                scroll_area.setWidgetResizable(True)
+                scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                scroll_area.setWidget(content_container)
+                
+                # Add the scroll area to the existing layout
+                existing_layout.addWidget(scroll_area)
             
         except Exception as e:
             print(f"Error generating predictions: {str(e)}")
