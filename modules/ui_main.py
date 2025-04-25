@@ -1368,7 +1368,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
         self.horizontalLayout_13.setContentsMargins(10, 10, 10, 10)
         self.horizontalLayout_13.setSpacing(10)
-        
+
+        self.horizontalLayout_13.addWidget(self.prediction_controls, alignment=Qt.AlignmentFlag.AlignTop)
+
         # Add target column selection
         self.target_col_label = QLabel(self.prediction_controls)
         self.target_col_label.setObjectName(u"target_col_label")
@@ -1483,14 +1485,14 @@ class Ui_MainWindow(object):
         self.verticalLayout_21.addWidget(self.prediction_controls)
         
         # Add prediction results area
-        self.prediction_results = QFrame(self.predictions_page)
-        self.prediction_results.setObjectName(u"prediction_results")
-        self.prediction_results.setFrameShape(QFrame.Shape.StyledPanel)
-        self.prediction_results.setFrameShadow(QFrame.Shadow.Raised)
-        self.prediction_results.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.verticalLayout_22 = QVBoxLayout(self.prediction_results)
-        self.verticalLayout_22.setObjectName(u"verticalLayout_22")
-        self.verticalLayout_22.setContentsMargins(0, 0, 0, 0)
+       # self.prediction_results = QFrame(self.predictions_page)
+       # self.prediction_results.setObjectName(u"prediction_results")
+       # self.prediction_results.setFrameShape(QFrame.Shape.StyledPanel)
+       # self.prediction_results.setFrameShadow(QFrame.Shadow.Raised)
+       # self.prediction_results.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+       # self.verticalLayout_22 = QVBoxLayout(self.prediction_results)
+       # self.verticalLayout_22.setObjectName(u"verticalLayout_22")
+       # self.verticalLayout_22.setContentsMargins(0, 0, 0, 0)
         
         # Add web view for displaying predictions
        # self.prediction_webview = QWebEngineView(self.prediction_results)
@@ -1498,7 +1500,7 @@ class Ui_MainWindow(object):
        # self.prediction_webview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
        # self.verticalLayout_22.addWidget(self.prediction_webview)
         
-        self.verticalLayout_21.addWidget(self.prediction_results)
+        #self.verticalLayout_21.addWidget(self.prediction_results)
         
         # Set stretch factors to make the chart take up most of the space
         self.verticalLayout_21.setStretch(0, 0)  # Controls - no stretch
