@@ -6,7 +6,7 @@ import ctypes
 # Import Qt modules first
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QHeaderView, QLabel, 
-    QVBoxLayout, QSizePolicy, QPushButton, QGridLayout, QWidget, QFrame, QCheckBox
+    QVBoxLayout, QSizePolicy, QPushButton, QGridLayout, QWidget, QFrame, QCheckBox, QTableWidget, QTableWidgetItem
 )
 from PySide6.QtGui import QIcon, QFont, QPixmap, QCursor
 from PySide6.QtCore import Qt, QSize
@@ -489,6 +489,45 @@ class MainWindow(QMainWindow):
                 forecast_horizon=horizon
             )
             
+            # Create a container for the predictions page content
+            content_container = QWidget()
+            content_layout = QVBoxLayout(content_container)
+            content_layout.setSpacing(20)
+            content_layout.setContentsMargins(20, 20, 20, 20)
+            
+            # Create and add the feature DataFrame table
+            feature_table = QTableWidget()
+            feature_table.setColumnCount(len(predictions.columns))
+            feature_table.setRowCount(len(predictions))
+            feature_table.setHorizontalHeaderLabels(predictions.columns)
+            
+            # Fill the table with data
+            for i in range(len(predictions)):
+                for j in range(len(predictions.columns)):
+                    item = QTableWidgetItem(str(predictions.iloc[i, j]))
+                    feature_table.setItem(i, j, item)
+            
+            # Set table properties
+            feature_table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            feature_table.setMaximumHeight(200)  # Limit table height
+            feature_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            feature_table.setAlternatingRowColors(True)
+            feature_table.setStyleSheet("""
+                QTableWidget {
+                    background-color: white;
+                    alternate-background-color: #f0f0f0;
+                    gridline-color: #d0d0d0;
+                }
+                QHeaderView::section {
+                    background-color: #f0f0f0;
+                    padding: 4px;
+                    border: 1px solid #d0d0d0;
+                }
+            """)
+            
+            # Add table to content layout
+            content_layout.addWidget(feature_table)
+            
             # Create a container for the plots
             plot_container = QWidget()
             plot_layout = QGridLayout(plot_container)
@@ -511,7 +550,10 @@ class MainWindow(QMainWindow):
                     elif i == 3:  # Prediction figure
                         plot_layout.addWidget(canvas, 1, 1)
             
-            # Add the plot container to the predictions page
+            # Add plot container to content layout
+            content_layout.addWidget(plot_container)
+            
+            # Add the content container to the predictions page
             if hasattr(widgets, 'predictions_page'):
                 # Get the existing layout
                 existing_layout = widgets.predictions_page.layout()
@@ -520,8 +562,8 @@ class MainWindow(QMainWindow):
                     existing_layout.setSpacing(20)
                     existing_layout.setContentsMargins(20, 20, 20, 20)
                 
-                # Add the new plot container to the existing layout
-                existing_layout.addWidget(plot_container)
+                # Add the new content container to the existing layout
+                existing_layout.addWidget(content_container)
             
         except Exception as e:
             print(f"Error generating predictions: {str(e)}")
