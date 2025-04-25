@@ -491,27 +491,37 @@ class MainWindow(QMainWindow):
             
             # Create a container for the plots
             plot_container = QWidget()
-            plot_layout = QVBoxLayout(plot_container)
+            plot_layout = QGridLayout(plot_container)
             plot_layout.setSpacing(20)
             plot_layout.setContentsMargins(20, 20, 20, 20)
             
-            # Add each plot to the container
-            for plot in plots:
+            # Add plots in specific positions
+            for i, plot in enumerate(plots):
                 if plot is not None:  # Skip None plots
                     canvas = FigureCanvas(plot)
                     canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                    plot_layout.addWidget(canvas)
+                    
+                    # Position the plots in the grid
+                    if i == 0:  # Initial plot
+                        plot_layout.addWidget(canvas, 0, 0)
+                    elif i == 1:  # Prediction plot
+                        plot_layout.addWidget(canvas, 0, 1)
+                    elif i == 2:  # Importance figure
+                        plot_layout.addWidget(canvas, 1, 0)
+                    elif i == 3:  # Prediction figure
+                        plot_layout.addWidget(canvas, 1, 1)
             
             # Add the plot container to the predictions page
             if hasattr(widgets, 'predictions_page'):
-                # Clear existing content
-                while widgets.predictions_page.layout().count():
-                    item = widgets.predictions_page.layout().takeAt(0)
-                    if item.widget():
-                        item.widget().deleteLater()
+                # Get the existing layout
+                existing_layout = widgets.predictions_page.layout()
+                if existing_layout is None:
+                    existing_layout = QVBoxLayout(widgets.predictions_page)
+                    existing_layout.setSpacing(20)
+                    existing_layout.setContentsMargins(20, 20, 20, 20)
                 
-                # Add the new plot container
-                widgets.predictions_page.layout().addWidget(plot_container)
+                # Add the new plot container to the existing layout
+                existing_layout.addWidget(plot_container)
             
         except Exception as e:
             print(f"Error generating predictions: {str(e)}")
