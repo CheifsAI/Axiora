@@ -21,7 +21,7 @@ from OprFuncs import read_file
 from modules.ui_main import Ui_MainWindow
 from uiEXT.ColDialog import ColDialog
 from time_series_forecaster import time_series_forecaster
-
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 def resizeEvent(self, event):
     new_size = max(10, self.width() // 100)  
@@ -481,15 +481,39 @@ class MainWindow(QMainWindow):
             
             horizon = widgets.horizon_spin.value()
             
-            # Generate predictions
-            predictions = time_series_forecaster(
+            # Generate predictions and get plots
+            predictions, plots = time_series_forecaster(
                 dataframe=df,
                 target_col=target_col,
                 date_cols=date_cols,
                 forecast_horizon=horizon
             )
             
-            # Create HTML visualization with responsive sizing
+            # Create a container for the plots
+            plot_container = QWidget()
+            plot_layout = QVBoxLayout(plot_container)
+            plot_layout.setSpacing(20)
+            plot_layout.setContentsMargins(20, 20, 20, 20)
+            
+            # Add each plot to the container
+            for plot in plots:
+                if plot is not None:  # Skip None plots
+                    canvas = FigureCanvas(plot)
+                    canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                    plot_layout.addWidget(canvas)
+            
+            # Add the plot container to the predictions page
+            if hasattr(widgets, 'predictions_page'):
+                # Clear existing content
+                while widgets.predictions_page.layout().count():
+                    item = widgets.predictions_page.layout().takeAt(0)
+                    if item.widget():
+                        item.widget().deleteLater()
+                
+                # Add the new plot container
+                widgets.predictions_page.layout().addWidget(plot_container)
+            
+            # Create HTML visualization for predictions
             html_content = f"""
             <html>
             <head>

@@ -79,11 +79,13 @@ def time_series_forecaster(dataframe, target_col, date_cols=None, test_size=0.2,
         
         has_datetime_index = True
     
-    # Initial visualization if we have a datetime index
+    # Create initial visualization figure if we have a datetime index
+    initial_plot = None
     if has_datetime_index:
-        plt.figure(figsize=(15, 5))
-        df[target_col].plot(style='.', title=f'{target_col} Time Series')
-        plt.show()
+        fig, ax = plt.subplots(figsize=(15, 5))
+        df[target_col].plot(style='.', title=f'{target_col} Time Series', ax=ax)
+        plt.tight_layout()
+        initial_plot = fig
     
     # Create features for the entire dataset
     df = create_features(df)
@@ -170,12 +172,13 @@ def time_series_forecaster(dataframe, target_col, date_cols=None, test_size=0.2,
            eval_set=[(X_train, y_train), (X_test, y_test)],
            verbose=100)
     
-    # Feature importance
+    # Create feature importance plot
     fi = pd.DataFrame(data=reg.feature_importances_,
                      index=reg.feature_names_in_,
                      columns=['importance'])
-    fi.sort_values('importance').plot(kind='barh', title='Feature Importance')
-    plt.show()
+    importance_fig, importance_ax = plt.subplots(figsize=(10, 6))
+    fi.sort_values('importance').plot(kind='barh', title='Feature Importance', ax=importance_ax)
+    plt.tight_layout()
     
     # Predictions with proper feature handling
     test['prediction'] = reg.predict(X_test)
@@ -183,13 +186,15 @@ def time_series_forecaster(dataframe, target_col, date_cols=None, test_size=0.2,
     # Ensure we're using all features for prediction
     df = df.merge(test[['prediction']], how='left', left_index=True, right_index=True)
     
-    # Visualization
+    # Create actual vs predicted plot
+    prediction_fig = None
     if has_datetime_index:
-        ax = df[[target_col]].plot(figsize=(15, 5))
+        prediction_fig, ax = plt.subplots(figsize=(15, 5))
+        df[[target_col]].plot(ax=ax)
         df['prediction'].plot(ax=ax, style='.')
         plt.legend(['Actual Data', 'Predictions'])
         ax.set_title('Actual vs Predicted')
-        plt.show()
+        plt.tight_layout()
     
     # Evaluation
     r2 = r2_score(test[target_col], test['prediction'])
@@ -197,25 +202,24 @@ def time_series_forecaster(dataframe, target_col, date_cols=None, test_size=0.2,
     print(f'R² Score on Test set: {r2:0.4f}')
     print(f'RMSE Score on Test set: {rmse:0.2f}')
     
-    # Plot R² visualization
-    plt.figure(figsize=(8, 8))
-    plt.scatter(test[target_col], test['prediction'], alpha=0.5)
-    plt.plot([test[target_col].min(), test[target_col].max()], 
+    # Create R² visualization
+    r2_fig, r2_ax = plt.subplots(figsize=(8, 8))
+    r2_ax.scatter(test[target_col], test['prediction'], alpha=0.5)
+    r2_ax.plot([test[target_col].min(), test[target_col].max()], 
              [test[target_col].min(), test[target_col].max()], 
              'r--', lw=2)
-    plt.xlabel('Actual Values')
-    plt.ylabel('Predicted Values')
-    plt.title(f'Fit line, R² = {r2:0.4f}')
-    plt.grid(True)
+    r2_ax.set_xlabel('Actual Values')
+    r2_ax.set_ylabel('Predicted Values')
+    r2_ax.set_title(f'Fit line, R² = {r2:0.4f}')
+    r2_ax.grid(True)
     plt.tight_layout()
-    plt.show()
     
     # Future forecasting (if requested)
     if forecast_horizon:
         if not has_datetime_index:
             warning_no_datetime = "Warning: Future forecasting requires datetime index. Skipping..."
             print(warning_no_datetime)
-            return test['prediction']
+            return test['prediction'], [initial_plot, importance_fig, prediction_fig, r2_fig]
         
         last_date = df.index.max()
         future_dates = pd.date_range(start=last_date, periods=forecast_horizon+1, freq='D')[1:]
@@ -261,6 +265,6 @@ def time_series_forecaster(dataframe, target_col, date_cols=None, test_size=0.2,
         
         # Make predictions
         future_df['prediction'] = reg.predict(future_df[FEATURES])        
-        return future_df
+        return future_df, [initial_plot, importance_fig, prediction_fig, r2_fig]
     
-    return test
+    return test, [initial_plot, importance_fig, prediction_fig, r2_fig]
