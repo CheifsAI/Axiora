@@ -23,3 +23,12 @@ def boxBlot(col_name, df):
 def col_desc(col_name, df):
     description = df.describe()[[col_name]]
     return description
+
+def col_corr(col_name,df):
+    correlation_matrix = df.corr()
+    target_corr = correlation_matrix[[col_name]].drop(col_name)
+
+    # Sort and plot
+    target_corr_sorted = target_corr.sort_values(col_name)
+    target_corr_sorted.plot(kind='barh', title='Correlation with {col_name}')
+    plt.show()
