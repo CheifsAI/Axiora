@@ -20,7 +20,8 @@ from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplicat
     QHeaderView, QLabel, QLineEdit, QMainWindow,
     QPushButton, QScrollArea, QSizePolicy, QStackedWidget,
     QTabWidget, QTableWidget, QTableWidgetItem, QTextEdit,
-    QVBoxLayout, QWidget)
+    QVBoxLayout, QWidget, QSpinBox, QRadioButton)
+from PySide6.QtWebEngineWidgets import QWebEngineView
 import resources_rc
 
 class Ui_MainWindow(object):
@@ -714,6 +715,18 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addWidget(self.btn_dashboard)
 
+        self.btn_predictions = QPushButton(self.topMenu)
+        self.btn_predictions.setObjectName(u"btn_predictions")
+        sizePolicy1.setHeightForWidth(self.btn_predictions.sizePolicy().hasHeightForWidth())
+        self.btn_predictions.setSizePolicy(sizePolicy1)
+        self.btn_predictions.setMinimumSize(QSize(0, 45))
+        self.btn_predictions.setFont(font)
+        self.btn_predictions.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.btn_predictions.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.btn_predictions.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-chart-line.png);")
+
+        self.verticalLayout_8.addWidget(self.btn_predictions)
+
         self.btn_new = QPushButton(self.topMenu)
         self.btn_new.setObjectName(u"btn_new")
         sizePolicy1.setHeightForWidth(self.btn_new.sizePolicy().hasHeightForWidth())
@@ -1336,6 +1349,163 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.row_3, 0, Qt.AlignmentFlag.AlignBottom)
 
         self.stackedWidget.addWidget(self.data_page)
+        
+        # Add predictions page
+        self.predictions_page = QWidget()
+        self.predictions_page.setObjectName(u"predictions_page")
+        self.verticalLayout_21 = QVBoxLayout(self.predictions_page)
+        self.verticalLayout_21.setObjectName(u"verticalLayout_21")
+        self.verticalLayout_21.setContentsMargins(10, 10, 10, 10)
+        self.verticalLayout_21.setSpacing(10)
+        
+        # Add prediction controls
+        self.prediction_controls = QFrame(self.predictions_page)
+        self.prediction_controls.setObjectName(u"prediction_controls")
+        self.prediction_controls.setFrameShape(QFrame.Shape.StyledPanel)
+        self.prediction_controls.setFrameShadow(QFrame.Shadow.Raised)
+        self.prediction_controls.setMaximumHeight(150)  # Limit height of controls
+        self.horizontalLayout_13 = QHBoxLayout(self.prediction_controls)
+        self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
+        self.horizontalLayout_13.setContentsMargins(10, 10, 10, 10)
+        self.horizontalLayout_13.setSpacing(10)
+        
+        # Add target column selection
+        self.target_col_label = QLabel(self.prediction_controls)
+        self.target_col_label.setObjectName(u"target_col_label")
+        self.target_col_label.setText("Target Column:")
+        self.horizontalLayout_13.addWidget(self.target_col_label)
+        
+        self.target_col_combo = QComboBox(self.prediction_controls)
+        self.target_col_combo.setObjectName(u"target_col_combo")
+        self.horizontalLayout_13.addWidget(self.target_col_combo)
+        
+        # Add date columns selection group
+        self.date_group = QGroupBox(self.prediction_controls)
+        self.date_group.setObjectName(u"date_group")
+        self.date_group.setTitle("Date Selection")
+        self.date_group_layout = QVBoxLayout(self.date_group)
+        self.date_group_layout.setContentsMargins(10, 10, 10, 10)
+        self.date_group_layout.setSpacing(5)
+        
+        # Add mode selection
+        self.date_mode_frame = QFrame(self.date_group)
+        self.date_mode_layout = QHBoxLayout(self.date_mode_frame)
+        self.date_mode_layout.setContentsMargins(0, 0, 0, 0)
+        self.date_mode_layout.setSpacing(10)
+        
+        # Single date column mode
+        self.single_date_radio = QRadioButton("Single Date Column")
+        self.single_date_radio.setChecked(True)
+        self.date_mode_layout.addWidget(self.single_date_radio)
+        
+        # Multiple columns mode
+        self.multi_date_radio = QRadioButton("Separate Year/Month/Day")
+        self.date_mode_layout.addWidget(self.multi_date_radio)
+        
+        self.date_group_layout.addWidget(self.date_mode_frame)
+        
+        # Stack for different selection modes
+        self.date_stack = QStackedWidget(self.date_group)
+        
+        # Single date column page
+        self.single_date_page = QWidget()
+        self.single_date_layout = QVBoxLayout(self.single_date_page)
+        self.single_date_layout.setContentsMargins(0, 5, 0, 0)
+        self.single_date_layout.setSpacing(5)
+        
+        self.date_col_combo = QComboBox(self.single_date_page)
+        self.date_col_combo.setObjectName(u"date_col_combo")
+        self.date_col_combo.setMinimumHeight(25)
+        self.single_date_layout.addWidget(self.date_col_combo)
+        self.date_stack.addWidget(self.single_date_page)
+        
+        # Multiple columns page
+        self.multi_date_page = QWidget()
+        self.multi_date_layout = QGridLayout(self.multi_date_page)
+        self.multi_date_layout.setContentsMargins(0, 5, 0, 0)
+        self.multi_date_layout.setSpacing(5)
+        
+        # Year selection
+        self.year_label = QLabel("Year:")
+        self.year_combo = QComboBox()
+        self.year_combo.setMinimumHeight(25)
+        self.multi_date_layout.addWidget(self.year_label, 0, 0)
+        self.multi_date_layout.addWidget(self.year_combo, 0, 1)
+        
+        # Month selection
+        self.month_label = QLabel("Month:")
+        self.month_combo = QComboBox()
+        self.month_combo.setMinimumHeight(25)
+        self.multi_date_layout.addWidget(self.month_label, 1, 0)
+        self.multi_date_layout.addWidget(self.month_combo, 1, 1)
+        
+        # Day selection
+        self.day_label = QLabel("Day:")
+        self.day_combo = QComboBox()
+        self.day_combo.setMinimumHeight(25)
+        self.multi_date_layout.addWidget(self.day_label, 2, 0)
+        self.multi_date_layout.addWidget(self.day_combo, 2, 1)
+        
+        self.date_stack.addWidget(self.multi_date_page)
+        
+        self.date_group_layout.addWidget(self.date_stack)
+        
+        # Connect radio buttons to stack switching
+        self.single_date_radio.toggled.connect(lambda checked: 
+            self.date_stack.setCurrentWidget(self.single_date_page if checked 
+            else self.multi_date_page))
+        
+        self.horizontalLayout_13.addWidget(self.date_group)
+        
+        # Add forecast horizon input
+        self.horizon_label = QLabel(self.prediction_controls)
+        self.horizon_label.setObjectName(u"horizon_label")
+        self.horizon_label.setText("Forecast Horizon:")
+        self.horizontalLayout_13.addWidget(self.horizon_label)
+        
+        self.horizon_spin = QSpinBox(self.prediction_controls)
+        self.horizon_spin.setObjectName(u"horizon_spin")
+        self.horizon_spin.setMinimum(1)
+        self.horizon_spin.setMaximum(365)
+        self.horizon_spin.setValue(30)
+        self.horizon_spin.setMinimumHeight(25)
+        self.horizontalLayout_13.addWidget(self.horizon_spin)
+        
+        # Add predict button
+        self.predict_btn = QPushButton(self.prediction_controls)
+        self.predict_btn.setObjectName(u"predict_btn")
+        self.predict_btn.setText("Generate Predictions")
+        self.predict_btn.setStyleSheet(u"background-color: rgb(52, 59, 72);")
+        self.predict_btn.setMinimumWidth(120)
+        self.predict_btn.setMinimumHeight(30)
+        self.horizontalLayout_13.addWidget(self.predict_btn)
+        
+        self.verticalLayout_21.addWidget(self.prediction_controls)
+        
+        # Add prediction results area
+        self.prediction_results = QFrame(self.predictions_page)
+        self.prediction_results.setObjectName(u"prediction_results")
+        self.prediction_results.setFrameShape(QFrame.Shape.StyledPanel)
+        self.prediction_results.setFrameShadow(QFrame.Shadow.Raised)
+        self.prediction_results.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.verticalLayout_22 = QVBoxLayout(self.prediction_results)
+        self.verticalLayout_22.setObjectName(u"verticalLayout_22")
+        self.verticalLayout_22.setContentsMargins(0, 0, 0, 0)
+        
+        # Add web view for displaying predictions
+        self.prediction_webview = QWebEngineView(self.prediction_results)
+        self.prediction_webview.setObjectName(u"prediction_webview")
+        self.prediction_webview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.verticalLayout_22.addWidget(self.prediction_webview)
+        
+        self.verticalLayout_21.addWidget(self.prediction_results)
+        
+        # Set stretch factors to make the chart take up most of the space
+        self.verticalLayout_21.setStretch(0, 0)  # Controls - no stretch
+        self.verticalLayout_21.setStretch(1, 1)  # Chart - expand to fill space
+        
+        self.stackedWidget.addWidget(self.predictions_page)
+        
         self.new_page = QWidget()
         self.new_page.setObjectName(u"new_page")
         sizePolicy5.setHeightForWidth(self.new_page.sizePolicy().hasHeightForWidth())
@@ -1378,6 +1548,10 @@ class Ui_MainWindow(object):
         self.gridLayout_4.addWidget(self.scrollArea, 3, 0, 3, 5)
 
         self.qu_num_list = QComboBox(self.qu_widget)
+        self.qu_num_list.addItem("")
+        self.qu_num_list.addItem("")
+        self.qu_num_list.addItem("")
+        self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
@@ -1602,6 +1776,7 @@ class Ui_MainWindow(object):
         self.btn_data.setText(QCoreApplication.translate("MainWindow", u"Data", None))
         self.btn_anlysis.setText(QCoreApplication.translate("MainWindow", u"Analysis", None))
         self.btn_dashboard.setText(QCoreApplication.translate("MainWindow", u"Dashboard", None))
+        self.btn_predictions.setText(QCoreApplication.translate("MainWindow", u"Predictions", None))
         self.btn_new.setText(QCoreApplication.translate("MainWindow", u"New Report", None))
         self.toggleLeftBox.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
         self.extraLabel.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))

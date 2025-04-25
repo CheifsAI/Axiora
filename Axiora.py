@@ -6,7 +6,7 @@ import ctypes
 # Import Qt modules first
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QHeaderView, QLabel, 
-    QVBoxLayout, QSizePolicy, QPushButton, QGridLayout, QWidget, QFrame
+    QVBoxLayout, QSizePolicy, QPushButton, QGridLayout, QWidget, QFrame, QCheckBox
 )
 from PySide6.QtGui import QIcon, QFont, QPixmap, QCursor
 from PySide6.QtCore import Qt, QSize
@@ -20,6 +20,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 from OprFuncs import read_file
 from modules.ui_main import Ui_MainWindow
 from uiEXT.ColDialog import ColDialog
+from time_series_forecaster import time_series_forecaster
 
 
 def resizeEvent(self, event):
@@ -112,6 +113,7 @@ class MainWindow(QMainWindow):
         widgets.btn_new.clicked.connect(self.buttonClick)
         widgets.btn_home.clicked.connect(self.buttonClick)
         widgets.btn_dashboard.clicked.connect(self.buttonClick)
+        widgets.btn_predictions.clicked.connect(self.buttonClick)
         
         
         # Set icons for buttons
@@ -337,37 +339,96 @@ class MainWindow(QMainWindow):
         btn = self.sender()
         btnName = btn.objectName()
 
+        print(f"Button clicked: {btnName}")  # Debug print
+
         if btnName == "btn_home":
             widgets.stackedWidget.setCurrentWidget(widgets.home_2)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
-        if btnName == "btn_dashboard":
+        elif btnName == "btn_dashboard":
             widgets.stackedWidget.setCurrentWidget(widgets.page)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
+        elif btnName == "btn_predictions":
+            print("Attempting to switch to predictions page...")  # Debug print
+            try:
+                widgets.stackedWidget.setCurrentWidget(widgets.predictions_page)
+                print("Successfully switched to predictions page")  # Debug print
+                UIFunctions.resetStyle(self, btnName)
+                btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
+                
+                # Update prediction controls with current dataset columns
+                if hasattr(self.app_functions, 'df'):
+                    print("Updating prediction controls with dataset columns")  # Debug print
+                    df = self.app_functions.df
+                    
+                    # Update target column combo
+                    widgets.target_col_combo.clear()
+                    widgets.target_col_combo.addItems(df.columns)
+                    
+                    # Update date column combos
+                    all_columns = list(df.columns)
+                    
+                    # Update single date column combo
+                    widgets.date_col_combo.clear()
+                    widgets.date_col_combo.addItems(all_columns)
+                    # Try to select a date column by default
+                    for i, col in enumerate(all_columns):
+                        if 'date' in col.lower():
+                            widgets.date_col_combo.setCurrentIndex(i)
+                            break
+                    
+                    # Update year/month/day combos
+                    widgets.year_combo.clear()
+                    widgets.month_combo.clear()
+                    widgets.day_combo.clear()
+                    
+                    widgets.year_combo.addItems(all_columns)
+                    widgets.month_combo.addItems(all_columns)
+                    widgets.day_combo.addItems(all_columns)
+                    
+                    # Try to select appropriate columns by default
+                    for i, col in enumerate(all_columns):
+                        col_lower = col.lower()
+                        if 'year' in col_lower:
+                            widgets.year_combo.setCurrentIndex(i)
+                        elif 'month' in col_lower:
+                            widgets.month_combo.setCurrentIndex(i)
+                        elif 'day' in col_lower:
+                            widgets.day_combo.setCurrentIndex(i)
+                    
+                    # Connect radio buttons to stack switching
+                    widgets.single_date_radio.toggled.connect(lambda checked: 
+                        widgets.date_stack.setCurrentWidget(widgets.single_date_page if checked 
+                        else widgets.multi_date_page))
+                    
+                    # Connect predict button
+                    try:
+                        widgets.predict_btn.clicked.disconnect()
+                    except:
+                        pass
+                    widgets.predict_btn.clicked.connect(self.generate_predictions)
+            except Exception as e:
+                print(f"Error switching to predictions page: {str(e)}")  # Debug print
 
-
-        # SHOW HOME PAGE
-        if btnName == "btn_chat":
+        elif btnName == "btn_chat":
             widgets.stackedWidget.setCurrentWidget(widgets.home)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
-        # SHOW WIDGETS PAGE
-        if btnName == "btn_data":
+        elif btnName == "btn_data":
             widgets.stackedWidget.setCurrentWidget(widgets.data_page)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
-        # SHOW NEW PAGE
-        if btnName == "btn_anlysis":
+        elif btnName == "btn_anlysis":
             widgets.stackedWidget.setCurrentWidget(widgets.new_page)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
-        if btnName == "btn_new":
+        elif btnName == "btn_new":
             print("Save BTN clicked!")
 
         # PRINT BTN NAME
@@ -397,6 +458,132 @@ class MainWindow(QMainWindow):
         dialog = ColDialog(self, self.app_functions.df, column_name)
         dialog.setWindowTitle(f"Column Options - {column_name}")
         dialog.exec_()
+
+    def generate_predictions(self):
+        """Generate predictions using the time series forecaster"""
+        try:
+            if not hasattr(self.app_functions, 'df'):
+                print("No dataset loaded!")
+                return
+                
+            df = self.app_functions.df
+            target_col = widgets.target_col_combo.currentText()
+            
+            # Get date columns based on selection mode
+            if widgets.single_date_radio.isChecked():
+                date_cols = widgets.date_col_combo.currentText()
+            else:
+                date_cols = [
+                    widgets.year_combo.currentText(),
+                    widgets.month_combo.currentText(),
+                    widgets.day_combo.currentText()
+                ]
+            
+            horizon = widgets.horizon_spin.value()
+            
+            # Generate predictions
+            predictions = time_series_forecaster(
+                dataframe=df,
+                target_col=target_col,
+                date_cols=date_cols,
+                forecast_horizon=horizon
+            )
+            
+            # Create HTML visualization with responsive sizing
+            html_content = f"""
+            <html>
+            <head>
+                <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                <style>
+                    body {{
+                        margin: 0;
+                        padding: 0;
+                        height: 100vh;
+                        width: 100vw;
+                    }}
+                    #plot {{
+                        width: 100%;
+                        height: 100%;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div id="plot"></div>
+                <script>
+                    var data = [
+                        {{
+                            x: {predictions.index.tolist()},
+                            y: {predictions['prediction'].tolist()},
+                            type: 'scatter',
+                            mode: 'lines+markers',
+                            name: 'Predictions',
+                            line: {{
+                                color: 'rgb(55, 128, 191)',
+                                width: 2
+                            }},
+                            marker: {{
+                                color: 'rgb(55, 128, 191)',
+                                size: 6
+                            }}
+                        }}
+                    ];
+                    var layout = {{
+                        title: {{
+                            text: 'Time Series Predictions',
+                            font: {{
+                                size: 24,
+                                color: '#ffffff'
+                            }}
+                        }},
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        plot_bgcolor: 'rgba(0,0,0,0)',
+                        xaxis: {{
+                            title: 'Date',
+                            color: '#ffffff',
+                            gridcolor: 'rgba(128,128,128,0.2)',
+                            tickfont: {{ color: '#ffffff' }}
+                        }},
+                        yaxis: {{
+                            title: '{target_col}',
+                            color: '#ffffff',
+                            gridcolor: 'rgba(128,128,128,0.2)',
+                            tickfont: {{ color: '#ffffff' }}
+                        }},
+                        margin: {{
+                            l: 60,
+                            r: 40,
+                            t: 60,
+                            b: 60
+                        }},
+                        showlegend: true,
+                        legend: {{
+                            font: {{ color: '#ffffff' }}
+                        }}
+                    }};
+                    var config = {{
+                        responsive: true,
+                        displayModeBar: true,
+                        displaylogo: false,
+                        modeBarButtonsToRemove: ['lasso2d', 'select2d']
+                    }};
+                    Plotly.newPlot('plot', data, layout, config);
+                    
+                    // Make plot responsive
+                    window.onresize = function() {{
+                        Plotly.Plots.resize('plot');
+                    }};
+                </script>
+            </body>
+            </html>
+            """
+            
+            # Display in web view
+            widgets.prediction_webview.setHtml(html_content)
+            
+        except Exception as e:
+            print(f"Error generating predictions: {str(e)}")
+            import traceback
+            traceback.print_exc()
 
 if __name__ == "__main__":
     # Create QApplication instance
