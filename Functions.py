@@ -933,11 +933,13 @@ class GuiFunctions():
         self.main_window.ui.btn_data.setIcon(QIcon("images/icons/database.png"))
         self.main_window.ui.btn_anlysis.setIcon(QIcon("images/icons/analytics.png"))
         self.main_window.ui.btn_chat.setIcon(QIcon("images/icons/chat.png"))
+        self.main_window.ui.btn_predictions.setIcon(QIcon("images/icons/chart-line.png"))
         
         # Update action icons
         self.main_window.ui.openfile_btn.setIcon(QIcon("images/icons/upload.png"))
         self.main_window.ui.clean_data_btn.setIcon(QIcon("images/icons/clean.png"))
         self.main_window.ui.send_btn.setIcon(QIcon("images/icons/send.png"))
+        self.main_window.ui.predict_btn.setIcon(QIcon("images/icons/chart-line.png"))
         
     def show_loading(self, message="Loading..."):
         """Show loading overlay with custom message"""

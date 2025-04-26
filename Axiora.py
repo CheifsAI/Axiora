@@ -6,7 +6,7 @@ import ctypes
 # Import Qt modules first
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QHeaderView, QLabel, 
-    QVBoxLayout, QSizePolicy, QPushButton, QGridLayout, QWidget, QFrame
+    QVBoxLayout, QSizePolicy, QPushButton, QGridLayout, QWidget, QFrame, QCheckBox, QTableWidget, QTableWidgetItem, QScrollArea
 )
 from PySide6.QtGui import QIcon, QFont, QPixmap, QCursor
 from PySide6.QtCore import Qt, QSize
@@ -20,7 +20,8 @@ from langchain_core.messages import HumanMessage, AIMessage
 from OprFuncs import read_file
 from modules.ui_main import Ui_MainWindow
 from uiEXT.ColDialog import ColDialog
-
+from time_series_forecaster import time_series_forecaster
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 def resizeEvent(self, event):
     new_size = max(10, self.width() // 100)  
@@ -112,6 +113,7 @@ class MainWindow(QMainWindow):
         widgets.btn_new.clicked.connect(self.buttonClick)
         widgets.btn_home.clicked.connect(self.buttonClick)
         widgets.btn_dashboard.clicked.connect(self.buttonClick)
+        widgets.btn_predictions.clicked.connect(self.buttonClick)
         
         
         # Set icons for buttons
@@ -337,37 +339,96 @@ class MainWindow(QMainWindow):
         btn = self.sender()
         btnName = btn.objectName()
 
+        print(f"Button clicked: {btnName}")  # Debug print
+
         if btnName == "btn_home":
             widgets.stackedWidget.setCurrentWidget(widgets.home_2)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
-        if btnName == "btn_dashboard":
+        elif btnName == "btn_dashboard":
             widgets.stackedWidget.setCurrentWidget(widgets.page)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
+        elif btnName == "btn_predictions":
+            print("Attempting to switch to predictions page...")  # Debug print
+            try:
+                widgets.stackedWidget.setCurrentWidget(widgets.predictions_page)
+                print("Successfully switched to predictions page")  # Debug print
+                UIFunctions.resetStyle(self, btnName)
+                btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
+                
+                # Update prediction controls with current dataset columns
+                if hasattr(self.app_functions, 'df'):
+                    print("Updating prediction controls with dataset columns")  # Debug print
+                    df = self.app_functions.df
+                    
+                    # Update target column combo
+                    widgets.target_col_combo.clear()
+                    widgets.target_col_combo.addItems(df.columns)
+                    
+                    # Update date column combos
+                    all_columns = list(df.columns)
+                    
+                    # Update single date column combo
+                    widgets.date_col_combo.clear()
+                    widgets.date_col_combo.addItems(all_columns)
+                    # Try to select a date column by default
+                    for i, col in enumerate(all_columns):
+                        if 'date' in col.lower():
+                            widgets.date_col_combo.setCurrentIndex(i)
+                            break
+                    
+                    # Update year/month/day combos
+                    widgets.year_combo.clear()
+                    widgets.month_combo.clear()
+                    widgets.day_combo.clear()
+                    
+                    widgets.year_combo.addItems(all_columns)
+                    widgets.month_combo.addItems(all_columns)
+                    widgets.day_combo.addItems(all_columns)
+                    
+                    # Try to select appropriate columns by default
+                    for i, col in enumerate(all_columns):
+                        col_lower = col.lower()
+                        if 'year' in col_lower:
+                            widgets.year_combo.setCurrentIndex(i)
+                        elif 'month' in col_lower:
+                            widgets.month_combo.setCurrentIndex(i)
+                        elif 'day' in col_lower:
+                            widgets.day_combo.setCurrentIndex(i)
+                    
+                    # Connect radio buttons to stack switching
+                    widgets.single_date_radio.toggled.connect(lambda checked: 
+                        widgets.date_stack.setCurrentWidget(widgets.single_date_page if checked 
+                        else widgets.multi_date_page))
+                    
+                    # Connect predict button
+                    try:
+                        widgets.predict_btn.clicked.disconnect()
+                    except:
+                        pass
+                    widgets.predict_btn.clicked.connect(self.generate_predictions)
+            except Exception as e:
+                print(f"Error switching to predictions page: {str(e)}")  # Debug print
 
-
-        # SHOW HOME PAGE
-        if btnName == "btn_chat":
+        elif btnName == "btn_chat":
             widgets.stackedWidget.setCurrentWidget(widgets.home)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
-        # SHOW WIDGETS PAGE
-        if btnName == "btn_data":
+        elif btnName == "btn_data":
             widgets.stackedWidget.setCurrentWidget(widgets.data_page)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
-        # SHOW NEW PAGE
-        if btnName == "btn_anlysis":
+        elif btnName == "btn_anlysis":
             widgets.stackedWidget.setCurrentWidget(widgets.new_page)
             UIFunctions.resetStyle(self, btnName)
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
-        if btnName == "btn_new":
+        elif btnName == "btn_new":
             print("Save BTN clicked!")
 
         # PRINT BTN NAME
@@ -397,6 +458,127 @@ class MainWindow(QMainWindow):
         dialog = ColDialog(self, self.app_functions.df, column_name)
         dialog.setWindowTitle(f"Column Options - {column_name}")
         dialog.exec_()
+
+    def generate_predictions(self):
+        """Generate predictions using the time series forecaster"""
+        try:
+            if not hasattr(self.app_functions, 'df'):
+                print("No dataset loaded!")
+                return
+                
+            df = self.app_functions.df
+            target_col = widgets.target_col_combo.currentText()
+            
+            # Get date columns based on selection mode
+            if widgets.single_date_radio.isChecked():
+                date_cols = widgets.date_col_combo.currentText()
+            else:
+                date_cols = [
+                    widgets.year_combo.currentText(),
+                    widgets.month_combo.currentText(),
+                    widgets.day_combo.currentText()
+                ]
+            
+            horizon = widgets.horizon_spin.value()
+            
+            # Generate predictions and get plots
+            predictions, plots = time_series_forecaster(
+                dataframe=df,
+                target_col=target_col,
+                date_cols=date_cols,
+                forecast_horizon=horizon
+            )
+            
+            # Create a container for the predictions page content
+            content_container = QWidget()
+            content_layout = QVBoxLayout(content_container)
+            content_layout.setSpacing(20)
+            content_layout.setContentsMargins(20, 20, 20, 20)
+            
+            # Create and add the feature DataFrame table
+            feature_table = QTableWidget()
+            feature_table.setColumnCount(len(predictions.columns))
+            feature_table.setRowCount(len(predictions))
+            feature_table.setHorizontalHeaderLabels(predictions.columns)
+            
+            # Fill the table with data
+            for i in range(len(predictions)):
+                for j in range(len(predictions.columns)):
+                    item = QTableWidgetItem(str(predictions.iloc[i, j]))
+                    feature_table.setItem(i, j, item)
+            
+            # Set table properties
+            feature_table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            feature_table.setMinimumHeight(200)
+            feature_table.setMaximumHeight(400)
+            feature_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            feature_table.setAlternatingRowColors(True)
+            feature_table.setStyleSheet("""
+                QTableWidget {
+                    background-color: white;
+                    alternate-background-color: #f0f0f0;
+                    gridline-color: #d0d0d0;
+                    border: 1px solid #d0d0d0;
+                }
+                QHeaderView::section {
+                    background-color: #f0f0f0;
+                    padding: 4px;
+                    border: 1px solid #d0d0d0;
+                }
+            """)
+            
+            # Add table to content layout
+            content_layout.addWidget(feature_table)
+            
+            # Create a container for the plots
+            plot_container = QWidget()
+            plot_layout = QGridLayout(plot_container)
+            plot_layout.setSpacing(20)
+            plot_layout.setContentsMargins(20, 20, 20, 20)
+            
+            # Add plots in specific positions
+            for i, plot in enumerate(plots):
+                if plot is not None:  # Skip None plots
+                    canvas = FigureCanvas(plot)
+                    canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                    canvas.setMinimumSize(400, 300)  # Set minimum size for each plot
+                    
+                    # Position the plots in the grid
+                    if i == 0:  # Initial plot
+                        plot_layout.addWidget(canvas, 0, 0)
+                    elif i == 1:  # Prediction plot
+                        plot_layout.addWidget(canvas, 0, 1)
+                    elif i == 2:  # Importance figure
+                        plot_layout.addWidget(canvas, 1, 0)
+                    elif i == 3:  # Prediction figure
+                        plot_layout.addWidget(canvas, 1, 1)
+            
+            # Add plot container to content layout
+            content_layout.addWidget(plot_container)
+            
+            # Add the content container to the predictions page
+            if hasattr(widgets, 'predictions_page'):
+                # Get the existing layout
+                existing_layout = widgets.predictions_page.layout()
+                if existing_layout is None:
+                    existing_layout = QVBoxLayout(widgets.predictions_page)
+                    existing_layout.setSpacing(20)
+                    existing_layout.setContentsMargins(20, 20, 20, 20)
+                
+                # Create a scroll area for the entire page
+                scroll_area = QScrollArea()
+                scroll_area.setWidgetResizable(True)
+                scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                scroll_area.setWidget(content_container)
+                
+                # Add the scroll area to the existing layout
+                existing_layout.addWidget(scroll_area)
+            
+        except Exception as e:
+            print(f"Error generating predictions: {str(e)}")
+            import traceback
+            traceback.print_exc()
 
 if __name__ == "__main__":
     # Create QApplication instance
