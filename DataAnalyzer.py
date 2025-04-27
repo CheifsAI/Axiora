@@ -46,9 +46,37 @@ class DataAnalyzer:
         3. Dataset summary: {data_description}
         4. User_context: {user_context}
 
-        Please analyze the data and provide insights about:
-        1. Key trends and patterns.
-        3. Recommendations or actionable insights based on the analyzed data.
+        Please perform a detailed statistical analysis of the dataset and provide insights in the following format:
+
+1. **Descriptive Statistics**:
+   - For each numerical column, calculate and display:
+     - Mean, Median, Standard Deviation, Minimum, Maximum, Range, and Interquartile Range (IQR).
+     - Report the number of missing values (if any) for each column and provide suggestions on handling them.
+   
+2. **Skewness and Kurtosis**:
+   - For each numerical column, calculate the **Skewness** and **Kurtosis**.
+   - Interpret the results of Skewness:
+     - Positive skew indicates a longer right tail (right-skewed data).
+     - Negative skew indicates a longer left tail (left-skewed data).
+     - A skewness close to zero indicates a more symmetric distribution.
+   - Interpret the results of Kurtosis:
+     - High Kurtosis indicates data with heavy tails or outliers.
+     - Low Kurtosis indicates data with light tails or fewer outliers.
+   
+3. **Correlations**:
+   - Calculate and report the correlation coefficients between numerical columns.
+   - Identify any strong correlations (above 0.7 or below -0.7) and provide an interpretation of these relationships.
+   
+4. **Outliers**:
+   - Identify any outliers using statistical methods (e.g., using the IQR or Z-score).
+   - Provide recommendations on how to handle these outliers (e.g., removal or transformation).
+
+5. **Key Insights**:
+   - Summarize the key findings from the statistical analysis.
+   - Based on the data, provide actionable insights or recommendations for further analysis or decisions.
+
+Please ensure that the analysis is clear, with numeric values and interpretations provided for each of the requested metrics. Avoid including visualizations or plots; focus solely on the statistical analysis and insights.
+
         '''
         analysis_prompt = PromptTemplate(
             input_variables=["data_info", "data_sample", "data_description", "user_context"],
