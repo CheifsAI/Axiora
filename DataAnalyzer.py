@@ -155,9 +155,21 @@ class DataAnalyzer:
         3. Dataset summary: {data_description} 
         Create {num} analysis questions about the dataset.
 
-        Please format each question on a new line, starting with a number, as in this example:
+        Your task is to generate {num} precise and insightful analysis questions about the dataset.
+
+        Instructions:
+        - Each question must be short, clear, and directly related to the dataset.
+        - Focus only on specific, meaningful, and data-driven points.
+        - Avoid broad, general, or vague questions.
+        - Focus on questions that can be answered by charts (numerical measures, comparisons, distributions, or categorizations).
+        - Do not include any explanations, examples, or extra commentary.
+        - Only list the questions.
+
+        Format:
         1. question 1?
         2. question 2?
+        3. question 3?
+
         """
 
         question_template = PromptTemplate(
@@ -344,19 +356,22 @@ class DataAnalyzer:
             return "No user ID provided"
             
         context_template = """
-        Generate a concise user profile context based on:
+        You are tasked with generating a concise user profile based on the following information:
+        - Existing user context: {existing_context}
+        - Current analysis content: {current_analysis}
+        - Recent conversation summary: {conversation_summary}
 
-        User's existing context: {existing_context}
-        Current analysis: {current_analysis}
-        Conversation history: {conversation_summary}
-        Focus on:
-        - Key analysis interests
-        - Frequently asked about metrics
-        - Data domains of interest
-        
-        Format as bullet points, max 5 items.
+        Instructions:
+        - Identify the user's top analysis interests.
+        - Highlight any metrics the user frequently asks about.
+        - Note the primary data domains the user is interested in.
+        - Prioritize the most recent and most frequently mentioned themes.
+        - Only include clear, factual insights. Avoid assumptions or generic statements.
+        - Format the output as 3 to 5 bullet points. Keep each bullet point brief and specific.
+
+        Output ONLY the bullet points. Do not add any explanations, headings, or introductions.
         """
-        
+
         conversation = "\n".join([msg.content for msg in self.memory[-4:]])
         
         context_prompt = PromptTemplate(
@@ -372,3 +387,4 @@ class DataAnalyzer:
         
         self.db.update_user_context(userID=self.user_id, new_context=new_context)
         return new_context
+    
