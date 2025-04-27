@@ -111,9 +111,13 @@ class DataAnalyzer:
         
         
         drop_nulls_prompt = '''
-        create a code to drop the nulls from the DataFrame named 'df',
-        only include the dropping part and importing pandas,
-        insure that inplace = True, no extra context or reading the file.
+        Analyze the dataset's missing values. For each column, provide:
+        1. Total count and percentage of missing values.
+        2. Suggest methods to handle missing values based on data type (categorical or numerical):
+        - For categorical columns: Suggest filling with mode or adding a placeholder.
+        - For numerical columns: Suggest imputation with mean, median, or deletion.
+        3. Identify any columns highly correlated with missing values.
+        4. Provide a recommendation: Drop or impute missing values based on the data and column importance.
         '''
         
         drop_nulls_template = PromptTemplate(
