@@ -134,29 +134,30 @@ class DataAnalyzer:
         data_info = self.data_info
         data_sample = self.data_sample
         data_description = self.data_description
+        
 
         question_prompt = f"""
-        You are a data analyst. You are provided with:
-        1. Dataset metadata: {data_info}
-        2. Dataset sample: {data_sample}
-        3. Dataset summary: {data_description} 
-        Create {num} analysis questions about the dataset.
+        You are a professional data analyst. Based on the following information about the dataset:
+        1. Dataset Overview: {data_info}
+        2. Dataset Sample: {data_sample}
+        3. Data Summary: {data_description}
+        4. Business Context: {self.user_context}
 
-        Your task is to generate {num} precise and insightful analysis questions about the dataset.
+        Your task is to generate strategic investigative questions based on:
+        - Your deep understanding of the data and its type.
+        - Your interpretation of what the data means in the context of the provided business context.
+        - Asking questions that may reveal insights, gaps, or opportunities that could be exploited.
+        - Additionally, consider the following:
+            - How could the current trends in the data impact future business decisions or strategies?
+            - What potential future outcomes or projections can be made from this dataset based on existing patterns?
+            - Are there any trends in the data that suggest upcoming risks or opportunities?
+            - Can you identify any correlations or causal relationships that may impact future developments in the business or industry?
 
-        Instructions:
-        - Each question must be short, clear, and directly related to the dataset.
-        - Focus only on specific, meaningful, and data-driven points.
-        - Avoid broad, general, or vague questions.
-        - Focus on questions that can be answered by charts (numerical measures, comparisons, distributions, or categorizations).
-        - Do not include any explanations, examples, or extra commentary.
-        - Only list the questions.
-
-        Format:
-        1. question 1?
-        2. question 2?
-        3. question 3?
-
+        Please formulate questions related to the following aspects:
+        - Patterns or trends observed in the data.
+        - Any relationships between columns or between the data.
+        - Potential opportunities for improving business decisions or strategies based on the data.
+        - Any problems or risks that might arise based on the data analysis.
         """
 
         question_template = PromptTemplate(
@@ -171,7 +172,8 @@ class DataAnalyzer:
                 "num": num,
                 "data_info": data_info,
                 "data_sample": data_sample,
-                "data_description": data_description
+                "data_description": data_description,
+                "user_context":self.user_context
             })
 
             # Ensure the response is properly encoded
