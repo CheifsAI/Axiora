@@ -350,15 +350,25 @@ class MainWindow(QMainWindow):
             feature_table.setAlternatingRowColors(True)
             feature_table.setStyleSheet("""
                 QTableWidget {
-                    background-color: white;
-                    alternate-background-color: #f0f0f0;
-                    gridline-color: #d0d0d0;
-                    border: 1px solid #d0d0d0;
+                    background-color: #2c313c;
+                    alternate-background-color: #1b1e23;
+                    gridline-color: #3d4451;
+                    border: 1px solid #3d4451;
+                    color: #ffffff;
                 }
                 QHeaderView::section {
-                    background-color: #f0f0f0;
+                    background-color: #1b1e23;
+                    color: #00a6fb;
                     padding: 4px;
-                    border: 1px solid #d0d0d0;
+                    border: 1px solid #3d4451;
+                    font-weight: bold;
+                }
+                QTableWidget::item {
+                    padding: 5px;
+                }
+                QTableWidget::item:selected {
+                    background-color: #00a6fb;
+                    color: #ffffff;
                 }
             """)
             
@@ -707,15 +717,25 @@ class MainWindow(QMainWindow):
             feature_table.setAlternatingRowColors(True)
             feature_table.setStyleSheet("""
                 QTableWidget {
-                    background-color: white;
-                    alternate-background-color: #f0f0f0;
-                    gridline-color: #d0d0d0;
-                    border: 1px solid #d0d0d0;
+                    background-color: #2c313c;
+                    alternate-background-color: #1b1e23;
+                    gridline-color: #3d4451;
+                    border: 1px solid #3d4451;
+                    color: #ffffff;
                 }
                 QHeaderView::section {
-                    background-color: #f0f0f0;
+                    background-color: #1b1e23;
+                    color: #00a6fb;
                     padding: 4px;
-                    border: 1px solid #d0d0d0;
+                    border: 1px solid #3d4451;
+                    font-weight: bold;
+                }
+                QTableWidget::item {
+                    padding: 5px;
+                }
+                QTableWidget::item:selected {
+                    background-color: #00a6fb;
+                    color: #ffffff;
                 }
             """)
             
