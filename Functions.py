@@ -181,6 +181,7 @@ class GuiFunctions():
         self.main_window.ui.btn_dashboard.clicked.connect(self.handle_dashboard_click)
         # Add done button connection
         self.main_window.ui.done_btn.clicked.connect(self.process_selected_questions)
+        self.main_window.ui.rec_btn.clicked.connect(self.handle_rec_btn)
 
     def handle_word_btn(self):
         fpath, _ = QFileDialog.getOpenFileName(
@@ -307,6 +308,10 @@ class GuiFunctions():
             for i in range(self.df.shape[0]):
                 for j in range(self.df.shape[1]):
                     self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))
+
+    def handle_rec_btn(self):
+       recos = self.analyzer.generate_recommendations()
+       self.main_window.ui.recommendations_text.setMarkdown(recos)
 
     def handle_sum_btn(self):
         # Show loading overlay

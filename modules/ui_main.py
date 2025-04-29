@@ -727,17 +727,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addWidget(self.btn_predictions)
 
-        self.btn_recommendations = QPushButton(self.topMenu)
-        self.btn_recommendations.setObjectName(u"btn_recommendations")
-        sizePolicy1.setHeightForWidth(self.btn_recommendations.sizePolicy().hasHeightForWidth())
-        self.btn_recommendations.setSizePolicy(sizePolicy1)
-        self.btn_recommendations.setMinimumSize(QSize(0, 45))
-        self.btn_recommendations.setFont(font)
-        self.btn_recommendations.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.btn_recommendations.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.btn_recommendations.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-lightbulb.png);")
-
-        self.verticalLayout_8.addWidget(self.btn_recommendations)
 
         self.btn_new = QPushButton(self.topMenu)
         self.btn_new.setObjectName(u"btn_new")
@@ -1568,7 +1557,7 @@ class Ui_MainWindow(object):
         self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
-        # self.qu_num_list.addItem("")
+        self.qu_num_list.addItem("")
         # self.qu_num_list.addItem("")
         # self.qu_num_list.addItem("")
         # self.qu_num_list.addItem("")
