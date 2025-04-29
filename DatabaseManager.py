@@ -191,5 +191,25 @@ class DatabaseManager:
                                      charts_path=charts_path)
         self.session.add(newForecasting)
         self.session.commit()
-  #  def get_forecasting_charts(self, reportID):
+    def get_forecasting(self, reportID):
+        """Get all forecasting data for a given report ID"""
+        forecasting_data = self.session.query(
+            Forecasting.target_column,
+            Forecasting.predicted_df,
+            Forecasting.rmse,
+            Forecasting.r2,
+            Forecasting.charts_path
+        ).filter(
+            Forecasting.report_id == reportID
+        ).first()
+        
+        if forecasting_data:
+            return {
+                'target_column': forecasting_data[0],
+                'predicted_df': forecasting_data[1],
+                'rmse': forecasting_data[2],
+                'r2': forecasting_data[3],
+                'charts_path': forecasting_data[4]
+            }
+        return None
 

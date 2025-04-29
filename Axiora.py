@@ -311,6 +311,109 @@ class MainWindow(QMainWindow):
             self.app_functions.chart_paths = chart_paths
             self.app_functions.display_current_chart()
 
+        # Load and display forecasting data if it exists
+        forecasting_data = self.app_functions.db.get_forecasting(report_id)
+        if forecasting_data:
+            # Create a container for the predictions page content
+            content_container = QWidget()
+            content_layout = QVBoxLayout(content_container)
+            content_layout.setSpacing(20)
+            content_layout.setContentsMargins(20, 20, 20, 20)
+            
+            # Load the predicted DataFrame
+            predictions_df = read_file(forecasting_data['predicted_df'])
+            
+            # Create and add the feature DataFrame table
+            feature_table = QTableWidget()
+            feature_table.setColumnCount(len(predictions_df.columns))
+            feature_table.setRowCount(len(predictions_df))
+            feature_table.setHorizontalHeaderLabels(predictions_df.columns)
+            
+            # Fill the table with data
+            for i in range(len(predictions_df)):
+                for j in range(len(predictions_df.columns)):
+                    item = QTableWidgetItem(str(predictions_df.iloc[i, j]))
+                    feature_table.setItem(i, j, item)
+            
+            # Set table properties
+            feature_table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            feature_table.setMinimumHeight(200)
+            feature_table.setMaximumHeight(400)
+            feature_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            feature_table.setAlternatingRowColors(True)
+            feature_table.setStyleSheet("""
+                QTableWidget {
+                    background-color: white;
+                    alternate-background-color: #f0f0f0;
+                    gridline-color: #d0d0d0;
+                    border: 1px solid #d0d0d0;
+                }
+                QHeaderView::section {
+                    background-color: #f0f0f0;
+                    padding: 4px;
+                    border: 1px solid #d0d0d0;
+                }
+            """)
+            
+            # Add table to content layout
+            content_layout.addWidget(feature_table)
+            
+            # Create a container for the plots
+            plot_container = QWidget()
+            plot_layout = QGridLayout(plot_container)
+            plot_layout.setSpacing(20)
+            plot_layout.setContentsMargins(20, 20, 20, 20)
+            
+            # Load and display charts from the charts directory
+            charts_dir = forecasting_data['charts_path']
+            if os.path.exists(charts_dir):
+                chart_files = [f for f in os.listdir(charts_dir) if f.endswith('.png')]
+                for i, chart_file in enumerate(chart_files):
+                    chart_path = os.path.join(charts_dir, chart_file)
+                    if os.path.exists(chart_path):
+                        # Create a figure and load the image
+                        fig = plt.figure()
+                        img = plt.imread(chart_path)
+                        plt.imshow(img)
+                        plt.axis('off')
+                        
+                        # Create canvas and add to layout
+                        canvas = FigureCanvas(fig)
+                        canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                        canvas.setMinimumSize(400, 300)
+                        
+                        # Position the plots in the grid
+                        if i == 0:  # Initial plot
+                            plot_layout.addWidget(canvas, 0, 0)
+                        elif i == 1:  # Prediction plot
+                            plot_layout.addWidget(canvas, 0, 1)
+                        elif i == 2:  # Importance figure
+                            plot_layout.addWidget(canvas, 1, 0)
+                        elif i == 3:  # Prediction figure
+                            plot_layout.addWidget(canvas, 1, 1)
+            
+            # Add plot container to content layout
+            content_layout.addWidget(plot_container)
+            
+            # Add the content container to the predictions page
+            if hasattr(widgets, 'predictions_page'):
+                # Get the existing layout
+                existing_layout = widgets.predictions_page.layout()
+                if existing_layout is None:
+                    existing_layout = QVBoxLayout(widgets.predictions_page)
+                    existing_layout.setSpacing(20)
+                    existing_layout.setContentsMargins(20, 20, 20, 20)
+                
+                # Create a scroll area for the entire page
+                scroll_area = QScrollArea()
+                scroll_area.setWidgetResizable(True)
+                scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                scroll_area.setWidget(content_container)
+                
+                # Add the scroll area to the existing layout
+                existing_layout.addWidget(scroll_area)
+
     def _clear_chat_display(self):
         while self.ui.chat_layout.count() > 0:
             item = self.ui.chat_layout.takeAt(0)
