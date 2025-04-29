@@ -2,6 +2,8 @@ import sys
 import os
 import platform
 import ctypes
+import matplotlib.pyplot as plt
+import uuid
 
 # Import Qt modules first
 from PySide6.QtWidgets import (
@@ -39,7 +41,7 @@ widgets = None
 class MainWindow(QMainWindow):
     def __init__(self, user_id):
         QMainWindow.__init__(self)
-        self.user_id = user_id
+        self.user_id = uuid.UUID(user_id)  # Convert string back to UUID
         # SET AS GLOBAL WIDGETS
         # ///////////////////////////////////////////////////////////////
         self.ui = Ui_MainWindow()
@@ -488,6 +490,35 @@ class MainWindow(QMainWindow):
                 target_col=target_col,
                 date_cols=date_cols,
                 forecast_horizon=horizon
+            )
+            
+            # 1. Save predictions DataFrame to CSV
+            forecast_filename = f"forecast_{horizon}_{target_col}.csv"
+            forecast_path = os.path.join(self.app_functions.rname, forecast_filename)
+            predictions.to_csv(forecast_path, index=False)
+            
+            # 2. Create folder for charts and save them as PNG
+            charts_folder = os.path.join(self.app_functions.rname, f"forecast_charts_{horizon}_{target_col}")
+            os.makedirs(charts_folder, exist_ok=True)
+            
+            # Save each plot as PNG
+            chart_paths = []
+            for i, plot in enumerate(plots):
+                if plot is not None:
+                    chart_name = f"chart_{i+1}.png"
+                    chart_path = os.path.join(charts_folder, chart_name)
+                    plot.savefig(chart_path, bbox_inches='tight', dpi=300)
+                    chart_paths.append(chart_path)
+                    plt.close(plot)
+            
+            # 3. Save to database using DatabaseManager
+            self.app_functions.db.saveForecasting(
+                reportID=self.app_functions.reportID,
+                target_column=target_col,
+                predicted_df=forecast_path,
+                rmse=predictions.get('rmse', None),  # Get RMSE if available
+                r2=predictions.get('r2', None),      # Get R2 if available
+                charts_path=charts_folder
             )
             
             # Create a container for the predictions page content

@@ -191,4 +191,5 @@ class DatabaseManager:
                                      charts_path=charts_path)
         self.session.add(newForecasting)
         self.session.commit()
+  #  def get_forecasting_charts(self, reportID):
 
