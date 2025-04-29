@@ -4,6 +4,12 @@ import platform
 import ctypes
 import matplotlib.pyplot as plt
 import uuid
+import markdown
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
 
 # Import Qt modules first
 from PySide6.QtWidgets import (
@@ -116,6 +122,7 @@ class MainWindow(QMainWindow):
         widgets.btn_home.clicked.connect(self.buttonClick)
         widgets.btn_dashboard.clicked.connect(self.buttonClick)
         widgets.btn_predictions.clicked.connect(self.buttonClick)
+        widgets.btn_print.clicked.connect(self.buttonClick)
         
         
         # Set icons for buttons
@@ -519,6 +526,11 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print(f"Error switching to predictions page: {str(e)}")  # Debug print
 
+        elif btnName == "btn_print":
+            self.generate_pdf_report()
+            UIFunctions.resetStyle(self, btnName)
+            btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
+
         elif btnName == "btn_chat":
             widgets.stackedWidget.setCurrentWidget(widgets.home)
             UIFunctions.resetStyle(self, btnName)
@@ -757,6 +769,101 @@ class MainWindow(QMainWindow):
             
         except Exception as e:
             print(f"Error generating predictions: {str(e)}")
+            import traceback
+            traceback.print_exc()
+
+    def generate_pdf_report(self):
+        """Generate a PDF report containing summary, questions, charts, and forecasting data"""
+        try:
+            if not hasattr(self.app_functions, 'reportID'):
+                print("No report loaded!")
+                return
+
+            # Create PDF document
+            report_name = f"{self.app_functions.rname}_report.pdf"
+            doc = SimpleDocTemplate(report_name, pagesize=letter)
+            styles = getSampleStyleSheet()
+            elements = []
+
+            # Add title
+            title_style = ParagraphStyle(
+                'CustomTitle',
+                parent=styles['Heading1'],
+                fontSize=24,
+                spaceAfter=30
+            )
+            elements.append(Paragraph(f"Report: {self.app_functions.rname}", title_style))
+            elements.append(Spacer(1, 20))
+
+            # Add summary section
+            if hasattr(self.ui, 'summary_text'):
+                summary = self.ui.summary_text.toPlainText()
+                if summary:
+                    elements.append(Paragraph("Summary", styles['Heading2']))
+                    elements.append(Spacer(1, 10))
+                    elements.append(Paragraph(summary, styles['Normal']))
+                    elements.append(Spacer(1, 20))
+
+            # Add questions section
+            if hasattr(self.app_functions, 'g_questions') and self.app_functions.g_questions:
+                elements.append(Paragraph("Questions", styles['Heading2']))
+                elements.append(Spacer(1, 10))
+                for i, question in enumerate(self.app_functions.g_questions, 1):
+                    elements.append(Paragraph(f"{i}. {question}", styles['Normal']))
+                elements.append(Spacer(1, 20))
+
+            # Add charts section
+            if hasattr(self.app_functions, 'chart_paths') and self.app_functions.chart_paths:
+                elements.append(Paragraph("Charts", styles['Heading2']))
+                elements.append(Spacer(1, 10))
+                for chart_path in self.app_functions.chart_paths:
+                    if os.path.exists(chart_path):
+                        # Convert HTML chart to PNG if needed
+                        if chart_path.endswith('.html'):
+                            # You might need to use a headless browser to convert HTML to image
+                            # For now, we'll skip HTML charts
+                            continue
+                        try:
+                            img = Image(chart_path, width=6*inch, height=4*inch)
+                            elements.append(img)
+                            elements.append(Spacer(1, 20))
+                        except Exception as e:
+                            print(f"Error adding chart {chart_path}: {str(e)}")
+
+            # Add forecasting section
+            if hasattr(widgets, 'predictions_page'):
+                elements.append(Paragraph("Forecasting", styles['Heading2']))
+                elements.append(Spacer(1, 10))
+                
+                # Get forecasting data from the database
+                forecasting_data = self.app_functions.db.get_forecasting(self.app_functions.reportID)
+                if forecasting_data:
+                    # Add RMSE and R2 scores if available
+                    if 'rmse' in forecasting_data and forecasting_data['rmse']:
+                        elements.append(Paragraph(f"RMSE Score: {forecasting_data['rmse']}", styles['Normal']))
+                    if 'r2' in forecasting_data and forecasting_data['r2']:
+                        elements.append(Paragraph(f"R2 Score: {forecasting_data['r2']}", styles['Normal']))
+                    
+                    # Add forecasting charts
+                    if 'charts_path' in forecasting_data:
+                        charts_dir = forecasting_data['charts_path']
+                        if os.path.exists(charts_dir):
+                            chart_files = [f for f in os.listdir(charts_dir) if f.endswith('.png')]
+                            for chart_file in chart_files:
+                                chart_path = os.path.join(charts_dir, chart_file)
+                                try:
+                                    img = Image(chart_path, width=6*inch, height=4*inch)
+                                    elements.append(img)
+                                    elements.append(Spacer(1, 20))
+                                except Exception as e:
+                                    print(f"Error adding forecasting chart {chart_path}: {str(e)}")
+
+            # Build the PDF
+            doc.build(elements)
+            print(f"PDF report generated: {report_name}")
+
+        except Exception as e:
+            print(f"Error generating PDF report: {str(e)}")
             import traceback
             traceback.print_exc()
 

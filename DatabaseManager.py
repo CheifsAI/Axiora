@@ -88,8 +88,8 @@ class DatabaseManager:
         self.session.flush()
         dashboard_id = newDash.dashboard_id  
         self.session.commit()
-        DashFinalReport = FinalReport(report_id=reportID,dashboard_id=dashboard_id)
-        self.session.add(DashFinalReport)
+       #DashFinalReport = FinalReport(report_id=reportID,dashboard_id=dashboard_id)
+        #self.session.add(DashFinalReport)
         self.session.commit()
 
         return dashboard_id

@@ -1778,7 +1778,7 @@ class Ui_MainWindow(object):
         self.btn_data.setText(QCoreApplication.translate("MainWindow", u"Data", None))
         self.btn_anlysis.setText(QCoreApplication.translate("MainWindow", u"Analysis", None))
         self.btn_dashboard.setText(QCoreApplication.translate("MainWindow", u"Dashboard", None))
-        self.btn_predictions.setText(QCoreApplication.translate("MainWindow", u"Predictions", None))
+        self.btn_predictions.setText(QCoreApplication.translate("MainWindow", u"Forcasting", None))
         self.btn_new.setText(QCoreApplication.translate("MainWindow", u"New Report", None))
         self.toggleLeftBox.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
         self.extraLabel.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
