@@ -1,7 +1,7 @@
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import create_engine
-from Axioradb import engine,Dataset,CleanDataset,Report,Summary,LLM, Questions, Dashboards, Charts, ReportMemory,User
+from Axioradb import engine,Dataset,CleanDataset,Report,Summary,LLM, Questions, Dashboards, Charts, ReportMemory,User, FinalReport
 from sqlalchemy import func
 
 class DatabaseManager:
@@ -88,6 +88,10 @@ class DatabaseManager:
         self.session.flush()
         dashboard_id = newDash.dashboard_id  
         self.session.commit()
+        DashFinalReport = FinalReport(report_id=reportID,dashboard_id=dashboard_id)
+        self.session.add(DashFinalReport)
+        self.session.commit()
+
         return dashboard_id
     
     def saveCharts(self,dashID,path):
@@ -175,3 +179,7 @@ class DatabaseManager:
             .filter(Report.report_id == reportID)\
             .all()
         return [chart[0] for chart in charts] if charts else None
+    def saveRecommendation(self,reportID,recommendation):
+        newRecommendation = FinalReport(report_id=reportID,recommendation=recommendation)
+        self.session.add(newRecommendation)
+        self.session.commit()
