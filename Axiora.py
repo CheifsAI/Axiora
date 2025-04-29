@@ -375,11 +375,78 @@ class MainWindow(QMainWindow):
             # Add table to content layout
             content_layout.addWidget(feature_table)
             
-            # Create a container for the plots
-            plot_container = QWidget()
+            # Create a container for the plots with proper styling
+            plot_container = QFrame()
+            plot_container.setStyleSheet("""
+                QFrame {
+                    background-color: #2c313c;
+                    border: 2px solid #3d4451;
+                    border-radius: 10px;
+                }
+            """)
             plot_layout = QGridLayout(plot_container)
             plot_layout.setSpacing(20)
             plot_layout.setContentsMargins(20, 20, 20, 20)
+            
+            # Create a scroll area for the plots
+            scroll_area = QScrollArea()
+            scroll_area.setWidgetResizable(True)
+            scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+            scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+            scroll_area.setStyleSheet("""
+                QScrollArea {
+                    border: none;
+                    background-color: #2c313c;
+                }
+                QScrollBar:vertical {
+                    border: none;
+                    background: #1b1e23;
+                    width: 14px;
+                    margin: 15px 0 15px 0;
+                    border-radius: 0px;
+                }
+                QScrollBar::handle:vertical {
+                    background-color: #3d4451;
+                    min-height: 30px;
+                    border-radius: 7px;
+                }
+                QScrollBar::handle:vertical:hover {
+                    background-color: #00a6fb;
+                }
+                QScrollBar::sub-line:vertical {
+                    border: none;
+                    background-color: #1b1e23;
+                    height: 15px;
+                    border-top-left-radius: 7px;
+                    border-top-right-radius: 7px;
+                    subcontrol-position: top;
+                    subcontrol-origin: margin;
+                }
+                QScrollBar::add-line:vertical {
+                    border: none;
+                    background-color: #1b1e23;
+                    height: 15px;
+                    border-bottom-left-radius: 7px;
+                    border-bottom-right-radius: 7px;
+                    subcontrol-position: bottom;
+                    subcontrol-origin: margin;
+                }
+                QScrollBar::handle:horizontal {
+                    background-color: #3d4451;
+                    min-width: 30px;
+                    border-radius: 7px;
+                }
+                QScrollBar::handle:horizontal:hover {
+                    background-color: #00a6fb;
+                }
+                QScrollBar:horizontal {
+                    border: none;
+                    background: #1b1e23;
+                    height: 14px;
+                    margin: 0px 15px 0 15px;
+                    border-radius: 0px;
+                }
+            """)
             
             # Load and display charts from the charts directory
             charts_dir = forecasting_data['charts_path']
@@ -388,29 +455,71 @@ class MainWindow(QMainWindow):
                 for i, chart_file in enumerate(chart_files):
                     chart_path = os.path.join(charts_dir, chart_file)
                     if os.path.exists(chart_path):
-                        # Create a figure and load the image
-                        fig = plt.figure()
+                        # Create a frame for each plot
+                        chart_frame = QFrame()
+                        chart_frame.setStyleSheet("""
+                            QFrame {
+                                background-color: #1b1e23;
+                                border: 2px solid #3d4451;
+                                border-radius: 10px;
+                                padding: 10px;
+                            }
+                        """)
+                        chart_layout = QVBoxLayout(chart_frame)
+                        chart_layout.setContentsMargins(10, 10, 10, 10)
+                        
+                        # Add title label
+                        title = QLabel()
+                        if i == 0:
+                            title.setText("Time Series Overview")
+                        elif i == 1:
+                            title.setText("Feature Importance Analysis")
+                        elif i == 2:
+                            title.setText("Actual vs Predicted Values")
+                        elif i == 3:
+                            title.setText("Model Performance (R² Plot)")
+                        
+                        title.setStyleSheet("""
+                            QLabel {
+                                color: #00a6fb;
+                                font-size: 14px;
+                                font-weight: bold;
+                                padding: 5px;
+                                background-color: #2c313c;
+                                border-radius: 5px;
+                                margin-bottom: 5px;
+                            }
+                        """)
+                        title.setAlignment(Qt.AlignCenter)
+                        chart_layout.addWidget(title)
+                        
+                        # Create figure and load image
+                        fig = plt.figure(figsize=(8, 6))
                         img = plt.imread(chart_path)
                         plt.imshow(img)
                         plt.axis('off')
                         
-                        # Create canvas and add to layout
+                        # Add the plot canvas
                         canvas = FigureCanvas(fig)
                         canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                         canvas.setMinimumSize(400, 300)
+                        chart_layout.addWidget(canvas)
                         
-                        # Position the plots in the grid
-                        if i == 0:  # Initial plot
-                            plot_layout.addWidget(canvas, 0, 0)
-                        elif i == 1:  # Prediction plot
-                            plot_layout.addWidget(canvas, 0, 1)
-                        elif i == 2:  # Importance figure
-                            plot_layout.addWidget(canvas, 1, 0)
-                        elif i == 3:  # Prediction figure
-                            plot_layout.addWidget(canvas, 1, 1)
+                        # Position the frames in the grid
+                        if i == 0:  # Time Series Overview
+                            plot_layout.addWidget(chart_frame, 0, 0)
+                        elif i == 1:  # Feature Importance
+                            plot_layout.addWidget(chart_frame, 0, 1)
+                        elif i == 2:  # Actual vs Predicted
+                            plot_layout.addWidget(chart_frame, 1, 0)
+                        elif i == 3:  # R² Plot
+                            plot_layout.addWidget(chart_frame, 1, 1)
             
-            # Add plot container to content layout
-            content_layout.addWidget(plot_container)
+            # Set up the scroll area
+            scroll_area.setWidget(plot_container)
+            
+            # Add the scroll area to the content layout
+            content_layout.addWidget(scroll_area)
             
             # Add the content container to the predictions page
             if hasattr(widgets, 'predictions_page'):
@@ -764,31 +873,151 @@ class MainWindow(QMainWindow):
             # Add table to content layout
             content_layout.addWidget(feature_table)
             
-            # Create a container for the plots
-            plot_container = QWidget()
+            # Create a container for the plots with proper styling
+            plot_container = QFrame()
+            plot_container.setStyleSheet("""
+                QFrame {
+                    background-color: #2c313c;
+                    border: 2px solid #3d4451;
+                    border-radius: 10px;
+                }
+            """)
             plot_layout = QGridLayout(plot_container)
             plot_layout.setSpacing(20)
             plot_layout.setContentsMargins(20, 20, 20, 20)
             
-            # Add plots in specific positions
-            for i, plot in enumerate(plots):
-                if plot is not None:  # Skip None plots
-                    canvas = FigureCanvas(plot)
-                    canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                    canvas.setMinimumSize(400, 300)  # Set minimum size for each plot
-                    
-                    # Position the plots in the grid
-                    if i == 0:  # Initial plot
-                        plot_layout.addWidget(canvas, 0, 0)
-                    elif i == 1:  # Prediction plot
-                        plot_layout.addWidget(canvas, 0, 1)
-                    elif i == 2:  # Importance figure
-                        plot_layout.addWidget(canvas, 1, 0)
-                    elif i == 3:  # Prediction figure
-                        plot_layout.addWidget(canvas, 1, 1)
+            # Create a scroll area for the plots
+            scroll_area = QScrollArea()
+            scroll_area.setWidgetResizable(True)
+            scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+            scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+            scroll_area.setStyleSheet("""
+                QScrollArea {
+                    border: none;
+                    background-color: #2c313c;
+                }
+                QScrollBar:vertical {
+                    border: none;
+                    background: #1b1e23;
+                    width: 14px;
+                    margin: 15px 0 15px 0;
+                    border-radius: 0px;
+                }
+                QScrollBar::handle:vertical {
+                    background-color: #3d4451;
+                    min-height: 30px;
+                    border-radius: 7px;
+                }
+                QScrollBar::handle:vertical:hover {
+                    background-color: #00a6fb;
+                }
+                QScrollBar::sub-line:vertical {
+                    border: none;
+                    background-color: #1b1e23;
+                    height: 15px;
+                    border-top-left-radius: 7px;
+                    border-top-right-radius: 7px;
+                    subcontrol-position: top;
+                    subcontrol-origin: margin;
+                }
+                QScrollBar::add-line:vertical {
+                    border: none;
+                    background-color: #1b1e23;
+                    height: 15px;
+                    border-bottom-left-radius: 7px;
+                    border-bottom-right-radius: 7px;
+                    subcontrol-position: bottom;
+                    subcontrol-origin: margin;
+                }
+                QScrollBar::handle:horizontal {
+                    background-color: #3d4451;
+                    min-width: 30px;
+                    border-radius: 7px;
+                }
+                QScrollBar::handle:horizontal:hover {
+                    background-color: #00a6fb;
+                }
+                QScrollBar:horizontal {
+                    border: none;
+                    background: #1b1e23;
+                    height: 14px;
+                    margin: 0px 15px 0 15px;
+                    border-radius: 0px;
+                }
+            """)
             
-            # Add plot container to content layout
-            content_layout.addWidget(plot_container)
+            # Load and display charts from the charts directory
+            charts_dir = forecasting_data['charts_path']
+            if os.path.exists(charts_dir):
+                chart_files = [f for f in os.listdir(charts_dir) if f.endswith('.png')]
+                for i, chart_file in enumerate(chart_files):
+                    chart_path = os.path.join(charts_dir, chart_file)
+                    if os.path.exists(chart_path):
+                        # Create a frame for each plot
+                        chart_frame = QFrame()
+                        chart_frame.setStyleSheet("""
+                            QFrame {
+                                background-color: #1b1e23;
+                                border: 2px solid #3d4451;
+                                border-radius: 10px;
+                                padding: 10px;
+                            }
+                        """)
+                        chart_layout = QVBoxLayout(chart_frame)
+                        chart_layout.setContentsMargins(10, 10, 10, 10)
+                        
+                        # Add title label
+                        title = QLabel()
+                        if i == 0:
+                            title.setText("Time Series Overview")
+                        elif i == 1:
+                            title.setText("Feature Importance Analysis")
+                        elif i == 2:
+                            title.setText("Actual vs Predicted Values")
+                        elif i == 3:
+                            title.setText("Model Performance (R² Plot)")
+                        
+                        title.setStyleSheet("""
+                            QLabel {
+                                color: #00a6fb;
+                                font-size: 14px;
+                                font-weight: bold;
+                                padding: 5px;
+                                background-color: #2c313c;
+                                border-radius: 5px;
+                                margin-bottom: 5px;
+                            }
+                        """)
+                        title.setAlignment(Qt.AlignCenter)
+                        chart_layout.addWidget(title)
+                        
+                        # Create figure and load image
+                        fig = plt.figure(figsize=(8, 6))
+                        img = plt.imread(chart_path)
+                        plt.imshow(img)
+                        plt.axis('off')
+                        
+                        # Add the plot canvas
+                        canvas = FigureCanvas(fig)
+                        canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                        canvas.setMinimumSize(400, 300)
+                        chart_layout.addWidget(canvas)
+                        
+                        # Position the frames in the grid
+                        if i == 0:  # Time Series Overview
+                            plot_layout.addWidget(chart_frame, 0, 0)
+                        elif i == 1:  # Feature Importance
+                            plot_layout.addWidget(chart_frame, 0, 1)
+                        elif i == 2:  # Actual vs Predicted
+                            plot_layout.addWidget(chart_frame, 1, 0)
+                        elif i == 3:  # R² Plot
+                            plot_layout.addWidget(chart_frame, 1, 1)
+            
+            # Set up the scroll area
+            scroll_area.setWidget(plot_container)
+            
+            # Add the scroll area to the content layout
+            content_layout.addWidget(scroll_area)
             
             # Add the content container to the predictions page
             if hasattr(widgets, 'predictions_page'):
