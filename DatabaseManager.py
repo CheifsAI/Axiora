@@ -1,9 +1,9 @@
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import create_engine
-from Axioradb import engine,Dataset,CleanDataset,Report,Summary,LLM, Questions, Dashboards, Charts, ReportMemory,User, FinalReport
+from Axioradb import (engine,Dataset,CleanDataset,Report,Summary,LLM,Questions,
+                       Dashboards, Charts, ReportMemory,User, FinalReport, Forecasting)
 from sqlalchemy import func
-
 class DatabaseManager:
     def __init__(self):
         SessionLocal = sessionmaker(bind=engine)
@@ -183,3 +183,12 @@ class DatabaseManager:
         newRecommendation = FinalReport(report_id=reportID,recommendation=recommendation)
         self.session.add(newRecommendation)
         self.session.commit()
+    def saveForecasting(self,reportID,target_column,predicted_df,rmse,r2,charts_path):
+        newForecasting = Forecasting(report_id=reportID,target_column=target_column,
+                                     predicted_df=predicted_df,
+                                     rmse=rmse,
+                                     r2=r2,
+                                     charts_path=charts_path)
+        self.session.add(newForecasting)
+        self.session.commit()
+

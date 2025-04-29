@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import (
     create_engine, ForeignKey,
     Column, String, Integer, SmallInteger,
-    Text, DateTime, Boolean
+    Text, DateTime, Boolean, Float
 )
 from sqlalchemy import func
 from sqlalchemy.orm import relationship, declarative_base
@@ -140,6 +140,7 @@ class Report(Base):
     questions = relationship("Questions", back_populates="report", cascade="all, delete-orphan")
     dashboards = relationship("Dashboards", back_populates="report", cascade="all, delete-orphan")
     final_reports = relationship("FinalReport", back_populates="report", cascade="all, delete-orphan")
+    forecasts = relationship("Forecasting", back_populates="report", cascade="all, delete-orphan")
 
     def __init__(self, report_name, user_id, llm_id, dataset_id, clean_dataset_id=None):
         self.user_id = user_id
@@ -288,7 +289,6 @@ class FinalReport(Base):
     recommendation = Column(Text, nullable=False)
     dashboard_id = Column(UUID(as_uuid=True), ForeignKey("dashboards.dashboard_id", ondelete="CASCADE"), nullable=False)
     
-    # Relationships
     report = relationship("Report", back_populates="final_reports")
     dashboard = relationship("Dashboards", back_populates="final_reports")
 
@@ -299,6 +299,32 @@ class FinalReport(Base):
 
     def __repr__(self):
         return f"<FinalReport(final_report_id={self.final_report_id}, report_id={self.report_id})>"
+
+
+# 13. Forecasting Table
+class Forecasting(Base):
+    __tablename__ = "forecasting"
+    forecast_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    report_id = Column(UUID(as_uuid=True), ForeignKey("report.report_id", ondelete="CASCADE"), nullable=False)
+    target_column = Column(String(255), nullable=False)
+    predicted_df = Column(Text, nullable=False)  # Store as JSON string
+    rmse = Column(Float, nullable=True)
+    r2 = Column(Float, nullable=True)
+    charts_path = Column(String(255), nullable=False)
+    created_at = Column(DateTime, default=func.now())
+    
+    report = relationship("Report", back_populates="forecasts")
+
+    def __init__(self, report_id, target_column, predicted_df, rmse=None, r2=None, charts_path=None):
+        self.report_id = report_id
+        self.target_column = target_column
+        self.predicted_df = predicted_df
+        self.rmse = rmse
+        self.r2 = r2
+        self.charts_path = charts_path
+
+    def __repr__(self):
+        return f"<Forecasting(forecast_id={self.forecast_id}, report_id={self.report_id}, target_column='{self.target_column}')>"
 
 Base.metadata.create_all(engine)
 """"
