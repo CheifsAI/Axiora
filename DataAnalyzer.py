@@ -377,3 +377,67 @@ class DataAnalyzer:
         self.db.update_user_context(userID=self.user_id, new_context=new_context)
         return new_context
     
+    def generate_recommendations(self, num_recommendations: int = 5):
+        data_info = self.data_info
+        data_sample = self.data_sample
+        data_description = self.data_description
+        analysis = self.analysis  # التحليل الذي تم عمله سابقاً
+
+        recommendation_prompt = '''
+        You are a world-class business consultant and data analyst.
+
+        You have analyzed the following:
+        - Dataset metadata: {data_info}
+        - Dataset sample: {data_sample}
+        - Dataset summary: {data_description}
+        - Detailed business analysis: {analysis}
+        - User context: {user_context}
+
+        Based on the deep understanding of the data and analysis:
+        Your task is to generate {num_recommendations} **highly actionable, strategic recommendations** for the business.
+
+        Recommendations should:
+        - Be directly based on the analysis and insights.
+        - Address clear business actions (e.g., optimize process, launch new products, reduce risks, target specific segments, etc.)
+        - Be specific, impactful, and feasible.
+        - Cover both short-term quick wins and long-term strategic moves if possible.
+        - Use professional language, sounding like a consultant speaking to executives.
+
+        Format:
+        1. [Recommendation Title]: Short summary
+           - Details: Explain the recommendation clearly and why it matters.
+        '''
+        
+        rec_template = PromptTemplate(
+            input_variables=["data_info", "data_sample", "data_description", "analysis", "user_context", "num_recommendations"],
+            template=recommendation_prompt
+        )
+
+        rec_chain = LLMChain(llm=self.llm, prompt=rec_template)
+
+        rec_response = rec_chain.run(
+            data_info=data_info,
+            data_sample=data_sample,
+            data_description=data_description,
+            analysis=analysis,
+            user_context=self.user_context or "No prior context available",
+            num_recommendations=num_recommendations
+        )
+
+        formatted_rec_prompt = recommendation_prompt.format(
+            data_info=data_info,
+            data_sample=data_sample,
+            data_description=data_description,
+            analysis=analysis,
+            user_context=self.user_context or "No prior context available",
+            num_recommendations=num_recommendations
+        )
+        self.memory.append(HumanMessage(content=formatted_rec_prompt))
+        self.memory.append(AIMessage(content=rec_response))
+        self.db.saveMemory(reportID=self.report_id,
+                        llm=self.db.llm_id_by_name(self.llm.model),
+                        prompet=formatted_rec_prompt,
+                        response=rec_response,
+                        chat=False)
+
+        return rec_response
