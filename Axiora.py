@@ -535,7 +535,52 @@ class MainWindow(QMainWindow):
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
         elif btnName == "btn_new":
-            print("Save BTN clicked!")
+            print("New Report BTN clicked!")
+            # Clear all user output and start fresh
+            self._clear_chat_display()
+            self._clear_questions()
+            
+            # Clear the DataFrame and related attributes
+            self.app_functions.df = None
+            self.app_functions.datasetID = None
+            self.app_functions.dname = None
+            self.app_functions.rname = None
+            self.app_functions.reportID = None
+            
+            # Clear the summary text
+            self.ui.summary_text.setText("")
+            
+            # Clear the table data
+            self.ui.tableData.clear()
+            self.ui.tableData.setRowCount(0)
+            self.ui.tableData.setColumnCount(0)
+            
+            # Clear any existing charts
+            if hasattr(self.app_functions, 'chart_paths'):
+                self.app_functions.chart_paths = []
+            
+            # Clear the predictions page if it exists
+            if hasattr(widgets, 'predictions_page'):
+                # Remove all widgets from the predictions page
+                layout = widgets.predictions_page.layout()
+                if layout:
+                    while layout.count():
+                        item = layout.takeAt(0)
+                        if item.widget():
+                            item.widget().deleteLater()
+            
+            # Clear the analyzer memory
+            if hasattr(self.app_functions, 'analyzer'):
+                self.app_functions.analyzer.memory = []
+            
+            # Clear any stored questions
+            if hasattr(self.app_functions, 'g_questions'):
+                self.app_functions.g_questions = []
+            
+            # Switch to the data page for new report setup
+            widgets.stackedWidget.setCurrentWidget(widgets.data_page)
+            UIFunctions.resetStyle(self, btnName)
+            btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet()))
 
         # PRINT BTN NAME
         print(f'Button "{btnName}" pressed!')
