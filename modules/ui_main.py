@@ -727,6 +727,18 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addWidget(self.btn_predictions)
 
+        self.btn_recommendations = QPushButton(self.topMenu)
+        self.btn_recommendations.setObjectName(u"btn_recommendations")
+        sizePolicy1.setHeightForWidth(self.btn_recommendations.sizePolicy().hasHeightForWidth())
+        self.btn_recommendations.setSizePolicy(sizePolicy1)
+        self.btn_recommendations.setMinimumSize(QSize(0, 45))
+        self.btn_recommendations.setFont(font)
+        self.btn_recommendations.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.btn_recommendations.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.btn_recommendations.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-lightbulb.png);")
+
+        self.verticalLayout_8.addWidget(self.btn_recommendations)
+
         self.btn_new = QPushButton(self.topMenu)
         self.btn_new.setObjectName(u"btn_new")
         sizePolicy1.setHeightForWidth(self.btn_new.sizePolicy().hasHeightForWidth())
@@ -739,11 +751,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addWidget(self.btn_new)
 
-        # Remove recommendations button and tab references
-        if hasattr(self, 'btn_recommendations'):
-            delattr(self, 'btn_recommendations')
-        if hasattr(self, 'Recommendations_tab'):
-            delattr(self, 'Recommendations_tab')
 
         self.verticalMenuLayout.addWidget(self.topMenu)
 
@@ -1811,6 +1818,7 @@ class Ui_MainWindow(object):
         self.btn_anlysis.setText(QCoreApplication.translate("MainWindow", u"Analysis", None))
         self.btn_dashboard.setText(QCoreApplication.translate("MainWindow", u"Dashboard", None))
         self.btn_predictions.setText(QCoreApplication.translate("MainWindow", u"Forcasting", None))
+        self.btn_recommendations.setText(QCoreApplication.translate("MainWindow", u"Recommendations", None))
         self.btn_new.setText(QCoreApplication.translate("MainWindow", u"New Report", None))
         self.toggleLeftBox.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
         self.extraLabel.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
