@@ -638,7 +638,29 @@ class MainWindow(QMainWindow):
             if not hasattr(self.app_functions, 'df'):
                 print("No dataset loaded!")
                 return
-                
+            
+            # Clear previous predictions but keep the controls
+            if hasattr(widgets, 'predictions_page'):
+                existing_layout = widgets.predictions_page.layout()
+                if existing_layout:
+                    # Keep track of the prediction controls
+                    prediction_controls = None
+                    for i in range(existing_layout.count()):
+                        widget = existing_layout.itemAt(i).widget()
+                        if widget and widget.objectName() == "prediction_controls":
+                            prediction_controls = widget
+                            break
+                    
+                    # Clear all widgets
+                    while existing_layout.count():
+                        item = existing_layout.takeAt(0)
+                        if item.widget() and item.widget() != prediction_controls:
+                            item.widget().deleteLater()
+                    
+                    # Add back the prediction controls if they existed
+                    if prediction_controls:
+                        existing_layout.addWidget(prediction_controls)
+            
             df = self.app_functions.df
             target_col = widgets.target_col_combo.currentText()
             

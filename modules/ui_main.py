@@ -1372,12 +1372,12 @@ class Ui_MainWindow(object):
         
         # Add prediction controls
         self.prediction_controls = QFrame(self.predictions_page)
-        self.prediction_controls.setObjectName(u"prediction_controls")
+        self.prediction_controls.setObjectName("prediction_controls")
         self.prediction_controls.setFrameShape(QFrame.Shape.StyledPanel)
         self.prediction_controls.setFrameShadow(QFrame.Shadow.Raised)
-        self.prediction_controls.setMaximumHeight(150)  # Limit height of controls
+        self.prediction_controls.setMaximumHeight(150)
         self.horizontalLayout_13 = QHBoxLayout(self.prediction_controls)
-        self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
+        self.horizontalLayout_13.setObjectName("horizontalLayout_13")
         self.horizontalLayout_13.setContentsMargins(10, 10, 10, 10)
         self.horizontalLayout_13.setSpacing(10)
 
