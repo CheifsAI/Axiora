@@ -908,7 +908,7 @@ class MainWindow(QMainWindow):
             horizon = widgets.horizon_spin.value()
             
             # Generate predictions and get plots
-            predictions, plots = time_series_forecaster(
+            predictions, plots, metrics = time_series_forecaster(
                 dataframe=df,
                 target_col=target_col,
                 date_cols=date_cols,
@@ -934,13 +934,16 @@ class MainWindow(QMainWindow):
                     chart_paths.append(chart_path)
                     plt.close(plot)
             
+            # Extract R² and RMSE scores from metrics
+            r2_score, rmse_score = metrics
+            
             # 3. Save to database using DatabaseManager
             self.app_functions.db.saveForecasting(
                 reportID=self.app_functions.reportID,
                 target_column=target_col,
                 predicted_df=forecast_path,
-                rmse=predictions.get('rmse', None),  # Get RMSE if available
-                r2=predictions.get('r2', None),      # Get R2 if available
+                rmse=rmse_score,  # Use the extracted RMSE score
+                r2=r2_score,     # Use the extracted R² score
                 charts_path=charts_folder
             )
             
@@ -980,7 +983,7 @@ class MainWindow(QMainWindow):
                 }
             """)
             r2_title.setAlignment(Qt.AlignCenter)
-            r2_value = QLabel(f"{predictions.get('r2', 'N/A'):.4f}" if isinstance(predictions.get('r2'), (int, float)) else "N/A")
+            r2_value = QLabel(f"{r2_score:.4f}" if isinstance(r2_score, (int, float)) else "N/A")
             r2_value.setStyleSheet("""
                 QLabel {
                     color: #ffffff;
@@ -1004,7 +1007,7 @@ class MainWindow(QMainWindow):
                 }
             """)
             rmse_title.setAlignment(Qt.AlignCenter)
-            rmse_value = QLabel(f"{predictions.get('rmse', 'N/A'):.2f}" if isinstance(predictions.get('rmse'), (int, float)) else "N/A")
+            rmse_value = QLabel(f"{rmse_score:.2f}" if isinstance(rmse_score, (int, float)) else "N/A")
             rmse_value.setStyleSheet("""
                 QLabel {
                     color: #ffffff;
