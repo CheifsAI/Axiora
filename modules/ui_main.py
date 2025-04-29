@@ -727,6 +727,18 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addWidget(self.btn_predictions)
 
+        self.btn_recommendations = QPushButton(self.topMenu)
+        self.btn_recommendations.setObjectName(u"btn_recommendations")
+        sizePolicy1.setHeightForWidth(self.btn_recommendations.sizePolicy().hasHeightForWidth())
+        self.btn_recommendations.setSizePolicy(sizePolicy1)
+        self.btn_recommendations.setMinimumSize(QSize(0, 45))
+        self.btn_recommendations.setFont(font)
+        self.btn_recommendations.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.btn_recommendations.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+        self.btn_recommendations.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-lightbulb.png);")
+
+        self.verticalLayout_8.addWidget(self.btn_recommendations)
+
         self.btn_new = QPushButton(self.topMenu)
         self.btn_new.setObjectName(u"btn_new")
         sizePolicy1.setHeightForWidth(self.btn_new.sizePolicy().hasHeightForWidth())
@@ -1556,11 +1568,11 @@ class Ui_MainWindow(object):
         self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
+        # self.qu_num_list.addItem("")
+        # self.qu_num_list.addItem("")
+        # self.qu_num_list.addItem("")
+        # self.qu_num_list.addItem("")
+        # self.qu_num_list.addItem("")
         self.qu_num_list.setObjectName(u"qu_num_list")
         self.qu_num_list.setAutoFillBackground(False)
         self.qu_num_list.setEditable(True)
@@ -1611,6 +1623,33 @@ class Ui_MainWindow(object):
         self.gridLayout_5.addWidget(self.sum_widget, 0, 0, 1, 1)
 
         self.tabWidget.addTab(self.Summerize_tab, "")
+
+        # Add Recommendations tab
+        self.Recommendations_tab = QWidget()
+        self.Recommendations_tab.setObjectName(u"Recommendations_tab")
+        self.gridLayout_7 = QGridLayout(self.Recommendations_tab)
+        self.gridLayout_7.setObjectName(u"gridLayout_7")
+        
+        self.rec_widget = QWidget(self.Recommendations_tab)
+        self.rec_widget.setObjectName(u"rec_widget")
+        self.gridLayout_8 = QGridLayout(self.rec_widget)
+        self.gridLayout_8.setObjectName(u"gridLayout_8")
+        
+        self.rec_btn = QPushButton(self.rec_widget)
+        self.rec_btn.setObjectName(u"rec_btn")
+        self.rec_btn.setText("Generate Recommendations")
+        
+        self.gridLayout_8.addWidget(self.rec_btn, 0, 0, 1, 1)
+        
+        self.recommendations_text = QTextEdit(self.rec_widget)
+        self.recommendations_text.setObjectName(u"recommendations_text")
+        self.recommendations_text.setReadOnly(True)
+        
+        self.gridLayout_8.addWidget(self.recommendations_text, 1, 0, 1, 1)
+        
+        self.gridLayout_7.addWidget(self.rec_widget, 0, 0, 1, 1)
+        
+        self.tabWidget.addTab(self.Recommendations_tab, "")
 
         self.verticalLayout_20.addWidget(self.tabWidget)
 
@@ -1779,6 +1818,7 @@ class Ui_MainWindow(object):
         self.btn_anlysis.setText(QCoreApplication.translate("MainWindow", u"Analysis", None))
         self.btn_dashboard.setText(QCoreApplication.translate("MainWindow", u"Dashboard", None))
         self.btn_predictions.setText(QCoreApplication.translate("MainWindow", u"Forcasting", None))
+        self.btn_recommendations.setText(QCoreApplication.translate("MainWindow", u"Recommendations", None))
         self.btn_new.setText(QCoreApplication.translate("MainWindow", u"New Report", None))
         self.toggleLeftBox.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
         self.extraLabel.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
@@ -1853,6 +1893,7 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Questions_tap), QCoreApplication.translate("MainWindow", u"Questions", None))
         self.sum_btn.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Summerize_tab), QCoreApplication.translate("MainWindow", u"Summerize", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.Recommendations_tab), QCoreApplication.translate("MainWindow", u"Recommendations", None))
       #  self.btn_message.setText(QCoreApplication.translate("MainWindow", u"Message", None))
         self.btn_print.setText(QCoreApplication.translate("MainWindow", u"Print", None))
         #self.btn_logout.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
