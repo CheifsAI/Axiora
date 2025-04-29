@@ -393,20 +393,47 @@ class DataAnalyzer:
         - Detailed business analysis: {analysis}
         - User context: {user_context}
 
-        Based on the deep understanding of the data and analysis:
-        Your task is to generate {num_recommendations} **highly actionable, strategic recommendations** for the business.
+        Based on your deep understanding of the data and analysis:
+        Your task is to generate {num_recommendations} highly actionable, strategic recommendations for the business.
 
-        Recommendations should:
+        Your recommendations must:
         - Be directly based on the analysis and insights.
-        - Address clear business actions (e.g., optimize process, launch new products, reduce risks, target specific segments, etc.)
+        - Address clear business actions (e.g., optimize processes, launch new products, reduce risks, target specific segments, etc.)
         - Be specific, impactful, and feasible.
-        - Cover both short-term quick wins and long-term strategic moves if possible.
-        - Use professional language, sounding like a consultant speaking to executives.
+        - Cover both short-term quick wins and long-term strategic moves.
+        - Include estimated expected outcome in percentage (%) where appropriate.
+        - Include any potential risks or challenges for each recommendation.
+        - Reference relevant metrics or insights from the analysis if possible.
+        - Use professional, executive-level language.
+        - Add an appropriate emoji based on risk level:
+            - ✅ for Low risk
+            - ⚠️ for Medium risk
+            - ❗for High risk
 
-        Format:
-        1. [Recommendation Title]: Short summary
-           - Details: Explain the recommendation clearly and why it matters.
+        Output Format:
+
+        ### 📋 Recommendations Table
+
+        | # | Recommendation Title | Expected Impact (%) | Potential Risk (with Emoji) |
+        |---|-----------------------|---------------------|-----------------------------|
+        | 1 | [Title] | [Estimated Impact %] | [Emoji] [Main risk] |
+        | 2 | [Title] | [Estimated Impact %] | [Emoji] [Main risk] |
+        | ... | ... | ... | ... |
+
+        ---
+
+        ### 📋 Full Recommendation Details
+
+        1. **[Recommendation Title]** [Emoji]
+        - **Details:** Explain clearly what should be done and why.
+        - **Expected Impact:** [e.g., Increase attendance by 10%]
+        - **Metrics Reference:** [Reference specific metric if available, e.g., matches with <50% attendance]
+        - **Potential Risks:** [Possible challenges or risks involved]
+        - **Timeline:** [Short-term or Long-term]
+
+        Repeat similarly for each recommendation.
         '''
+
         
         rec_template = PromptTemplate(
             input_variables=["data_info", "data_sample", "data_description", "analysis", "user_context", "num_recommendations"],
