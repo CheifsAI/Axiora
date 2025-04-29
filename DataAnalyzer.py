@@ -25,14 +25,7 @@ class DataAnalyzer:
         self.db = DatabaseManager()
         self.report_id = None
         self.memory = []
-        
-        if user_id:
-            self.user_id = user_id
-            self.user_context = self.db.get_user_context(user_id)
-            if self.user_context:
-                self.memory.append(HumanMessage(content=f"User Context: {self.user_context}"))
-        else:
-            self.user_context = None
+        self.user_id = user_id
 
     def analysis_data(self):
         data_info = self.data_info
@@ -44,7 +37,6 @@ class DataAnalyzer:
         1. Dataset metadata: {data_info}
         2. Dataset sample: {data_sample}
         3. Dataset summary: {data_description}
-        4. User_context: {user_context}
 
         You are a highly skilled professional data analyst specialized in business data analysis.
 
@@ -66,7 +58,7 @@ class DataAnalyzer:
         - Think like a business consultant, not just a data scientist.
         '''
         analysis_prompt = PromptTemplate(
-            input_variables=["data_info", "data_sample", "data_description", "user_context"],
+            input_variables=["data_info", "data_sample", "data_description"],
             template=analysis_template
         )
         
@@ -75,13 +67,11 @@ class DataAnalyzer:
         self.analysis = analysis_chain.invoke({
             "data_info": data_info,
             "data_sample": data_sample,
-            "data_description": data_description,
-            "user_context":self.user_context or "No prior context available"
+            "data_description": data_description
         })
 
         formatted_analysis_prompt = analysis_template.format(data_info=data_info,data_sample=data_sample,
-                                                             data_description=data_description,
-                                                             user_context=self.user_context)
+                                                             data_description=data_description)
         self.memory.append(HumanMessage(content=formatted_analysis_prompt))
         self.memory.append(AIMessage(content=self.analysis))
         self.db.saveMemory(reportID=self.report_id,
@@ -89,7 +79,6 @@ class DataAnalyzer:
                            prompet=formatted_analysis_prompt,
                            response=self.analysis,
                            chat=False)
-        self.generate_user_context()
         return self.analysis        
 
     def questions_gen(self, num):
@@ -103,7 +92,6 @@ class DataAnalyzer:
         1. Dataset Overview: {data_info}
         2. Dataset Sample: {data_sample}
         3. Data Summary: {data_description}
-        4. Business Context: {self.user_context}
 
         Your task is to generate strategic investigative questions based on:
         - Your deep understanding of the data and its type.
@@ -134,8 +122,7 @@ class DataAnalyzer:
                 "num": num,
                 "data_info": data_info,
                 "data_sample": data_sample,
-                "data_description": data_description,
-                "user_context":self.user_context
+                "data_description": data_description
             })
 
             # Ensure the response is properly encoded
@@ -302,42 +289,7 @@ class DataAnalyzer:
         columns = self.select_columns(question)
         return chart_type, columns
     
-    def generate_user_context(self):
-        if not self.user_id:
-            return "No user ID provided"
-            
-        context_template = """
-        You are tasked with generating a concise user profile based on the following information:
-        - Existing user context: {existing_context}
-        - Current analysis content: {current_analysis}
-        - Recent conversation summary: {conversation_summary}
 
-        Instructions:
-        - Identify the user's top analysis interests.
-        - Highlight any metrics the user frequently asks about.
-        - Note the primary data domains the user is interested in.
-        - Prioritize the most recent and most frequently mentioned themes.
-        - Only include clear, factual insights. Avoid assumptions or generic statements.
-        - Format the output as 3 to 5 bullet points. Keep each bullet point brief and specific.
-
-        Output ONLY the bullet points. Do not add any explanations, headings, or introductions.
-        """
-
-        conversation = "\n".join([msg.content for msg in self.memory[-4:]])
-        
-        context_prompt = PromptTemplate(
-            template=context_template,
-            input_variables=["existing_context", "current_analysis", "conversation_summary"]
-        )
-        
-        new_context = (context_prompt | self.llm).invoke({
-            "existing_context": self.user_context or "No prior context available",
-            "current_analysis": self.analysis,
-            "conversation_summary": conversation
-        })
-        
-        self.db.update_user_context(userID=self.user_id, new_context=new_context)
-        return new_context
     
     def generate_recommendations(self, num_recommendations: int = 5):
         data_info = self.data_info
@@ -353,7 +305,6 @@ class DataAnalyzer:
         - Dataset sample: {data_sample}
         - Dataset summary: {data_description}
         - Detailed business analysis: {analysis}
-        - User context: {user_context}
 
         Based on your deep understanding of the data and analysis:
         Your task is to generate {num_recommendations} highly actionable, strategic recommendations for the business.
@@ -398,7 +349,7 @@ class DataAnalyzer:
 
         
         rec_template = PromptTemplate(
-            input_variables=["data_info", "data_sample", "data_description", "analysis", "user_context", "num_recommendations"],
+            input_variables=["data_info", "data_sample", "data_description", "analysis", "num_recommendations"],
             template=recommendation_prompt
         )
 
@@ -409,7 +360,6 @@ class DataAnalyzer:
             data_sample=data_sample,
             data_description=data_description,
             analysis=analysis,
-            user_context=self.user_context or "No prior context available",
             num_recommendations=num_recommendations
         )
 
@@ -418,7 +368,6 @@ class DataAnalyzer:
             data_sample=data_sample,
             data_description=data_description,
             analysis=analysis,
-            user_context=self.user_context or "No prior context available",
             num_recommendations=num_recommendations
         )
         self.memory.append(HumanMessage(content=formatted_rec_prompt))

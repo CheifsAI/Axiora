@@ -160,18 +160,6 @@ class DatabaseManager:
         user_name = self.session.query(User.username).filter(User.user_id == userID).first()
         return user_name if user_name else None
 
-    def get_user_context(self, userID):
-        user = self.session.query(User).filter(User.user_id == userID).first()
-        return user.user_context if user else None
-
-    def update_user_context(self, userID, new_context):
-        user = self.session.query(User).filter(User.user_id == userID).first()
-        if user:
-            user.user_context = new_context
-            self.session.commit()
-            return True
-        return False
-
     def get_report_charts(self, reportID):
         charts = self.session.query(Charts.chart_path)\
             .join(Dashboards, Charts.dashboard_id == Dashboards.dashboard_id)\
