@@ -14,7 +14,7 @@ from reportlab.lib.units import inch
 # Import Qt modules first
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QHeaderView, QLabel, 
-    QVBoxLayout, QSizePolicy, QPushButton, QGridLayout, QWidget, QFrame, QCheckBox, QTableWidget, QTableWidgetItem, QScrollArea
+    QVBoxLayout, QSizePolicy, QPushButton, QGridLayout, QWidget, QFrame, QCheckBox, QTableWidget, QTableWidgetItem, QScrollArea, QHBoxLayout
 )
 from PySide6.QtGui import QIcon, QFont, QPixmap, QCursor
 from PySide6.QtCore import Qt, QSize
@@ -388,12 +388,256 @@ class MainWindow(QMainWindow):
             plot_layout.setSpacing(20)
             plot_layout.setContentsMargins(20, 20, 20, 20)
             
-            # Create a scroll area for the plots
-            scroll_area = QScrollArea()
-            scroll_area.setWidgetResizable(True)
-            scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-            scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-            scroll_area.setStyleSheet("""
+            # Get forecasting data from database
+            if hasattr(self.app_functions, 'reportID'):
+                forecasting_data = self.app_functions.db.get_forecasting(self.app_functions.reportID)
+                if forecasting_data and 'charts_path' in forecasting_data:
+                    # Load and display charts from the charts directory
+                    charts_dir = forecasting_data['charts_path']
+                    if os.path.exists(charts_dir):
+                        chart_files = [f for f in os.listdir(charts_dir) if f.endswith('.png')]
+                        for i, chart_file in enumerate(chart_files):
+                            chart_path = os.path.join(charts_dir, chart_file)
+                            if os.path.exists(chart_path):
+                                # Create a frame for each chart section
+                                chart_section = QFrame()
+                                chart_section.setStyleSheet("""
+                                    QFrame {
+                                        background-color: #1b1e23;
+                                        border: 2px solid #3d4451;
+                                        border-radius: 10px;
+                                    }
+                                """)
+                                # Set size policy to make charts fill their containers
+                                chart_section.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                                chart_section.setMinimumSize(600, 500)
+                                chart_section_layout = QVBoxLayout(chart_section)
+                                chart_section_layout.setContentsMargins(0, 0, 0, 0)
+                                chart_section_layout.setSpacing(0)
+
+                                # Add title label
+                                title = QLabel()
+                                if i == 0:
+                                    title.setText("Time Series Overview")
+                                elif i == 1:
+                                    title.setText("Feature Importance Analysis")
+                                elif i == 2:
+                                    title.setText("Actual vs Predicted Values")
+                                elif i == 3:
+                                    title.setText("Model Performance (R² Plot)")
+                                
+                                title.setStyleSheet("""
+                                    QLabel {
+                                        color: #00a6fb;
+                                        font-size: 16px;
+                                        font-weight: bold;
+                                        padding: 15px;
+                                        background-color: #2c313c;
+                                        border-top-left-radius: 8px;
+                                        border-top-right-radius: 8px;
+                                        border-bottom: 2px solid #3d4451;
+                                    }
+                                """)
+                                title.setAlignment(Qt.AlignCenter)
+                                title.setFixedHeight(50)
+                                chart_section_layout.addWidget(title)
+
+                                # Create chart content widget with dark background
+                                chart_content = QWidget()
+                                chart_content.setStyleSheet("background-color: #1b1e23;")
+                                chart_content.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                                chart_content_layout = QVBoxLayout(chart_content)
+                                chart_content_layout.setContentsMargins(0, 0, 0, 0)
+                                chart_content_layout.setSpacing(0)
+
+                                # Create figure and load image with proper sizing
+                                dpi = 100  # Set DPI for better resolution
+                                fig_width = 580 / dpi  # Calculate figure width in inches
+                                fig_height = 430 / dpi  # Calculate figure height in inches
+                                fig = plt.figure(figsize=(fig_width, fig_height), dpi=dpi, tight_layout=True)
+                                fig.patch.set_facecolor('#1b1e23')
+                                ax = plt.gca()
+                                ax.set_facecolor('#1b1e23')
+                                
+                                img = plt.imread(chart_path)
+                                plt.imshow(img)
+                                plt.axis('off')
+                                
+                                # Add the plot canvas with proper sizing
+                                canvas = FigureCanvas(fig)
+                                canvas.setStyleSheet("background-color: #1b1e23;")
+                                canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                                chart_content_layout.addWidget(canvas)
+
+                                # Add metrics labels if they exist
+                                if 'rmse' in forecasting_data and 'r2' in forecasting_data:
+                                    metrics_frame = QFrame()
+                                    metrics_frame.setStyleSheet("""
+                                        QFrame {
+                                            background-color: #2c313c;
+                                            border-radius: 5px;
+                                            padding: 5px;
+                                        }
+                                    """)
+                                    metrics_layout = QVBoxLayout(metrics_frame)  # Changed to vertical layout
+                                    metrics_layout.setContentsMargins(10, 5, 10, 5)
+                                    metrics_layout.setSpacing(5)  # Reduced spacing between labels
+
+                                    # R² Score Label with None handling
+                                    r2_value = forecasting_data['r2']
+                                    r2_text = f"R² Score on Test set: {r2_value:.4f}" if r2_value is not None else "R² Score on Test set: N/A"
+                                    r2_label = QLabel(r2_text)
+                                    r2_label.setStyleSheet("""
+                                        QLabel {
+                                            color: #00a6fb;
+                                            font-size: 14px;
+                                            font-weight: bold;
+                                            padding: 5px;
+                                        }
+                                    """)
+                                    metrics_layout.addWidget(r2_label)
+
+                                    # RMSE Score Label with None handling
+                                    rmse_value = forecasting_data['rmse']
+                                    rmse_text = f"RMSE Score on Test set: {rmse_value:.2f}" if rmse_value is not None else "RMSE Score on Test set: N/A"
+                                    rmse_label = QLabel(rmse_text)
+                                    rmse_label.setStyleSheet("""
+                                        QLabel {
+                                            color: #00a6fb;
+                                            font-size: 14px;
+                                            font-weight: bold;
+                                            padding: 5px;
+                                        }
+                                    """)
+                                    metrics_layout.addWidget(rmse_label)
+
+                                    chart_content_layout.addWidget(metrics_frame)
+
+                                # Create scroll area with proper sizing
+                                chart_scroll = QScrollArea()
+                                chart_scroll.setStyleSheet("""
+                                    QScrollArea {
+                                        border: none;
+                                        background-color: #1b1e23;
+                                    }
+                                    QScrollBar:vertical {
+                                        border: none;
+                                        background: #1b1e23;
+                                        width: 8px;
+                                        margin: 0;
+                                    }
+                                    QScrollBar::handle:vertical {
+                                        background-color: #3d4451;
+                                        min-height: 30px;
+                                        border-radius: 4px;
+                                    }
+                                    QScrollBar::handle:vertical:hover {
+                                        background-color: #00a6fb;
+                                    }
+                                    QScrollBar:horizontal {
+                                        border: none;
+                                        background: #1b1e23;
+                                        height: 8px;
+                                        margin: 0;
+                                    }
+                                    QScrollBar::handle:horizontal {
+                                        background-color: #3d4451;
+                                        min-width: 30px;
+                                        border-radius: 4px;
+                                    }
+                                    QScrollBar::handle:horizontal:hover {
+                                        background-color: #00a6fb;
+                                    }
+                                """)
+                                chart_scroll.setWidget(chart_content)
+                                chart_scroll.setWidgetResizable(True)
+                                chart_scroll.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                                chart_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                                chart_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                                chart_section_layout.addWidget(chart_scroll)
+
+                                # Position the chart sections in the grid with proper spacing
+                                plot_layout.setSpacing(10)
+                                plot_layout.setContentsMargins(10, 10, 10, 10)
+                                if i == 0:  # Time Series Overview
+                                    plot_layout.addWidget(chart_section, 0, 0)
+                                elif i == 1:  # Feature Importance
+                                    plot_layout.addWidget(chart_section, 0, 1)
+                                elif i == 2:  # Actual vs Predicted
+                                    plot_layout.addWidget(chart_section, 1, 0)
+                                elif i == 3:  # R² Plot
+                                    plot_layout.addWidget(chart_section, 1, 1)
+
+            # Add final metrics section below all charts
+            if hasattr(self.app_functions, 'reportID'):
+                forecasting_data = self.app_functions.db.get_forecasting(self.app_functions.reportID)
+                if forecasting_data and 'rmse' in forecasting_data and 'r2' in forecasting_data:
+                    metrics_frame = QFrame()
+                    metrics_frame.setStyleSheet("""
+                        QFrame {
+                            background-color: #2c313c;
+                            border: 2px solid #3d4451;
+                            border-radius: 10px;
+                            margin-top: 10px;
+                        }
+                    """)
+                    metrics_layout = QVBoxLayout(metrics_frame)
+                    metrics_layout.setContentsMargins(20, 15, 20, 15)
+                    metrics_layout.setSpacing(10)
+
+                    # Title for metrics section
+                    metrics_title = QLabel("Final Model Performance Metrics")
+                    metrics_title.setStyleSheet("""
+                        QLabel {
+                            color: #00a6fb;
+                            font-size: 18px;
+                            font-weight: bold;
+                            padding: 5px;
+                        }
+                    """)
+                    metrics_title.setAlignment(Qt.AlignCenter)
+                    metrics_layout.addWidget(metrics_title)
+
+                    # R² Score Label with None handling
+                    r2_value = forecasting_data['r2']
+                    r2_text = f"R² Score on Test set: {r2_value:.4f}" if r2_value is not None else "R² Score on Test set: N/A"
+                    r2_label = QLabel(r2_text)
+                    r2_label.setStyleSheet("""
+                        QLabel {
+                            color: #ffffff;
+                            font-size: 16px;
+                            font-weight: bold;
+                            padding: 5px;
+                        }
+                    """)
+                    r2_label.setAlignment(Qt.AlignCenter)
+                    metrics_layout.addWidget(r2_label)
+
+                    # RMSE Score Label with None handling
+                    rmse_value = forecasting_data['rmse']
+                    rmse_text = f"RMSE Score on Test set: {rmse_value:.2f}" if rmse_value is not None else "RMSE Score on Test set: N/A"
+                    rmse_label = QLabel(rmse_text)
+                    rmse_label.setStyleSheet("""
+                        QLabel {
+                            color: #ffffff;
+                            font-size: 16px;
+                            font-weight: bold;
+                            padding: 5px;
+                        }
+                    """)
+                    rmse_label.setAlignment(Qt.AlignCenter)
+                    metrics_layout.addWidget(rmse_label)
+
+                    # Add metrics frame to the main layout in a new row
+                    plot_layout.addWidget(metrics_frame, 2, 0, 1, 2)  # Span across both columns
+
+            # Create main scroll area for all charts
+            main_scroll = QScrollArea()
+            main_scroll.setWidget(plot_container)
+            main_scroll.setWidgetResizable(True)
+            main_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+            main_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+            main_scroll.setStyleSheet("""
                 QScrollArea {
                     border: none;
                     background-color: #2c313c;
@@ -413,23 +657,12 @@ class MainWindow(QMainWindow):
                 QScrollBar::handle:vertical:hover {
                     background-color: #00a6fb;
                 }
-                QScrollBar::sub-line:vertical {
+                QScrollBar:horizontal {
                     border: none;
-                    background-color: #1b1e23;
-                    height: 15px;
-                    border-top-left-radius: 7px;
-                    border-top-right-radius: 7px;
-                    subcontrol-position: top;
-                    subcontrol-origin: margin;
-                }
-                QScrollBar::add-line:vertical {
-                    border: none;
-                    background-color: #1b1e23;
-                    height: 15px;
-                    border-bottom-left-radius: 7px;
-                    border-bottom-right-radius: 7px;
-                    subcontrol-position: bottom;
-                    subcontrol-origin: margin;
+                    background: #1b1e23;
+                    height: 14px;
+                    margin: 0px 15px 0 15px;
+                    border-radius: 0px;
                 }
                 QScrollBar::handle:horizontal {
                     background-color: #3d4451;
@@ -439,87 +672,10 @@ class MainWindow(QMainWindow):
                 QScrollBar::handle:horizontal:hover {
                     background-color: #00a6fb;
                 }
-                QScrollBar:horizontal {
-                    border: none;
-                    background: #1b1e23;
-                    height: 14px;
-                    margin: 0px 15px 0 15px;
-                    border-radius: 0px;
-                }
             """)
             
-            # Load and display charts from the charts directory
-            charts_dir = forecasting_data['charts_path']
-            if os.path.exists(charts_dir):
-                chart_files = [f for f in os.listdir(charts_dir) if f.endswith('.png')]
-                for i, chart_file in enumerate(chart_files):
-                    chart_path = os.path.join(charts_dir, chart_file)
-                    if os.path.exists(chart_path):
-                        # Create a frame for each plot
-                        chart_frame = QFrame()
-                        chart_frame.setStyleSheet("""
-                            QFrame {
-                                background-color: #1b1e23;
-                                border: 2px solid #3d4451;
-                                border-radius: 10px;
-                                padding: 10px;
-                            }
-                        """)
-                        chart_layout = QVBoxLayout(chart_frame)
-                        chart_layout.setContentsMargins(10, 10, 10, 10)
-                        
-                        # Add title label
-                        title = QLabel()
-                        if i == 0:
-                            title.setText("Time Series Overview")
-                        elif i == 1:
-                            title.setText("Feature Importance Analysis")
-                        elif i == 2:
-                            title.setText("Actual vs Predicted Values")
-                        elif i == 3:
-                            title.setText("Model Performance (R² Plot)")
-                        
-                        title.setStyleSheet("""
-                            QLabel {
-                                color: #00a6fb;
-                                font-size: 14px;
-                                font-weight: bold;
-                                padding: 5px;
-                                background-color: #2c313c;
-                                border-radius: 5px;
-                                margin-bottom: 5px;
-                            }
-                        """)
-                        title.setAlignment(Qt.AlignCenter)
-                        chart_layout.addWidget(title)
-                        
-                        # Create figure and load image
-                        fig = plt.figure(figsize=(8, 6))
-                        img = plt.imread(chart_path)
-                        plt.imshow(img)
-                        plt.axis('off')
-                        
-                        # Add the plot canvas
-                        canvas = FigureCanvas(fig)
-                        canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                        canvas.setMinimumSize(400, 300)
-                        chart_layout.addWidget(canvas)
-                        
-                        # Position the frames in the grid
-                        if i == 0:  # Time Series Overview
-                            plot_layout.addWidget(chart_frame, 0, 0)
-                        elif i == 1:  # Feature Importance
-                            plot_layout.addWidget(chart_frame, 0, 1)
-                        elif i == 2:  # Actual vs Predicted
-                            plot_layout.addWidget(chart_frame, 1, 0)
-                        elif i == 3:  # R² Plot
-                            plot_layout.addWidget(chart_frame, 1, 1)
-            
-            # Set up the scroll area
-            scroll_area.setWidget(plot_container)
-            
-            # Add the scroll area to the content layout
-            content_layout.addWidget(scroll_area)
+            # Add the main scroll area to the content layout
+            content_layout.addWidget(main_scroll)
             
             # Add the content container to the predictions page
             if hasattr(widgets, 'predictions_page'):
@@ -886,12 +1042,193 @@ class MainWindow(QMainWindow):
             plot_layout.setSpacing(20)
             plot_layout.setContentsMargins(20, 20, 20, 20)
             
-            # Create a scroll area for the plots
-            scroll_area = QScrollArea()
-            scroll_area.setWidgetResizable(True)
-            scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-            scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-            scroll_area.setStyleSheet("""
+            # Get forecasting data from database
+            if hasattr(self.app_functions, 'reportID'):
+                forecasting_data = self.app_functions.db.get_forecasting(self.app_functions.reportID)
+                if forecasting_data and 'charts_path' in forecasting_data:
+                    # Load and display charts from the charts directory
+                    charts_dir = forecasting_data['charts_path']
+                    if os.path.exists(charts_dir):
+                        chart_files = [f for f in os.listdir(charts_dir) if f.endswith('.png')]
+                        for i, chart_file in enumerate(chart_files):
+                            chart_path = os.path.join(charts_dir, chart_file)
+                            if os.path.exists(chart_path):
+                                # Create a frame for each chart section
+                                chart_section = QFrame()
+                                chart_section.setStyleSheet("""
+                                    QFrame {
+                                        background-color: #1b1e23;
+                                        border: 2px solid #3d4451;
+                                        border-radius: 10px;
+                                    }
+                                """)
+                                # Set size policy to make charts fill their containers
+                                chart_section.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                                chart_section.setMinimumSize(600, 500)
+                                chart_section_layout = QVBoxLayout(chart_section)
+                                chart_section_layout.setContentsMargins(0, 0, 0, 0)
+                                chart_section_layout.setSpacing(0)
+
+                                # Add title label
+                                title = QLabel()
+                                if i == 0:
+                                    title.setText("Time Series Overview")
+                                elif i == 1:
+                                    title.setText("Feature Importance Analysis")
+                                elif i == 2:
+                                    title.setText("Actual vs Predicted Values")
+                                elif i == 3:
+                                    title.setText("Model Performance (R² Plot)")
+                                
+                                title.setStyleSheet("""
+                                    QLabel {
+                                        color: #00a6fb;
+                                        font-size: 16px;
+                                        font-weight: bold;
+                                        padding: 15px;
+                                        background-color: #2c313c;
+                                        border-top-left-radius: 8px;
+                                        border-top-right-radius: 8px;
+                                        border-bottom: 2px solid #3d4451;
+                                    }
+                                """)
+                                title.setAlignment(Qt.AlignCenter)
+                                title.setFixedHeight(50)
+                                chart_section_layout.addWidget(title)
+
+                                # Create chart content widget with dark background
+                                chart_content = QWidget()
+                                chart_content.setStyleSheet("background-color: #1b1e23;")
+                                chart_content.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                                chart_content_layout = QVBoxLayout(chart_content)
+                                chart_content_layout.setContentsMargins(0, 0, 0, 0)
+                                chart_content_layout.setSpacing(0)
+
+                                # Create figure and load image with proper sizing
+                                dpi = 100  # Set DPI for better resolution
+                                fig_width = 580 / dpi  # Calculate figure width in inches
+                                fig_height = 430 / dpi  # Calculate figure height in inches
+                                fig = plt.figure(figsize=(fig_width, fig_height), dpi=dpi, tight_layout=True)
+                                fig.patch.set_facecolor('#1b1e23')
+                                ax = plt.gca()
+                                ax.set_facecolor('#1b1e23')
+                                
+                                img = plt.imread(chart_path)
+                                plt.imshow(img)
+                                plt.axis('off')
+                                
+                                # Add the plot canvas with proper sizing
+                                canvas = FigureCanvas(fig)
+                                canvas.setStyleSheet("background-color: #1b1e23;")
+                                canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                                chart_content_layout.addWidget(canvas)
+
+                                # Add metrics labels if they exist
+                                if 'rmse' in forecasting_data and 'r2' in forecasting_data:
+                                    metrics_frame = QFrame()
+                                    metrics_frame.setStyleSheet("""
+                                        QFrame {
+                                            background-color: #2c313c;
+                                            border-radius: 5px;
+                                            padding: 5px;
+                                        }
+                                    """)
+                                    metrics_layout = QVBoxLayout(metrics_frame)  # Changed to vertical layout
+                                    metrics_layout.setContentsMargins(10, 5, 10, 5)
+                                    metrics_layout.setSpacing(5)  # Reduced spacing between labels
+
+                                    # R² Score Label with None handling
+                                    r2_value = forecasting_data['r2']
+                                    r2_text = f"R² Score on Test set: {r2_value:.4f}" if r2_value is not None else "R² Score on Test set: N/A"
+                                    r2_label = QLabel(r2_text)
+                                    r2_label.setStyleSheet("""
+                                        QLabel {
+                                            color: #00a6fb;
+                                            font-size: 14px;
+                                            font-weight: bold;
+                                            padding: 5px;
+                                        }
+                                    """)
+                                    metrics_layout.addWidget(r2_label)
+
+                                    # RMSE Score Label with None handling
+                                    rmse_value = forecasting_data['rmse']
+                                    rmse_text = f"RMSE Score on Test set: {rmse_value:.2f}" if rmse_value is not None else "RMSE Score on Test set: N/A"
+                                    rmse_label = QLabel(rmse_text)
+                                    rmse_label.setStyleSheet("""
+                                        QLabel {
+                                            color: #00a6fb;
+                                            font-size: 14px;
+                                            font-weight: bold;
+                                            padding: 5px;
+                                        }
+                                    """)
+                                    metrics_layout.addWidget(rmse_label)
+
+                                    chart_content_layout.addWidget(metrics_frame)
+
+                                # Create scroll area with proper sizing
+                                chart_scroll = QScrollArea()
+                                chart_scroll.setStyleSheet("""
+                                    QScrollArea {
+                                        border: none;
+                                        background-color: #1b1e23;
+                                    }
+                                    QScrollBar:vertical {
+                                        border: none;
+                                        background: #1b1e23;
+                                        width: 8px;
+                                        margin: 0;
+                                    }
+                                    QScrollBar::handle:vertical {
+                                        background-color: #3d4451;
+                                        min-height: 30px;
+                                        border-radius: 4px;
+                                    }
+                                    QScrollBar::handle:vertical:hover {
+                                        background-color: #00a6fb;
+                                    }
+                                    QScrollBar:horizontal {
+                                        border: none;
+                                        background: #1b1e23;
+                                        height: 8px;
+                                        margin: 0;
+                                    }
+                                    QScrollBar::handle:horizontal {
+                                        background-color: #3d4451;
+                                        min-width: 30px;
+                                        border-radius: 4px;
+                                    }
+                                    QScrollBar::handle:horizontal:hover {
+                                        background-color: #00a6fb;
+                                    }
+                                """)
+                                chart_scroll.setWidget(chart_content)
+                                chart_scroll.setWidgetResizable(True)
+                                chart_scroll.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                                chart_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                                chart_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                                chart_section_layout.addWidget(chart_scroll)
+
+                                # Position the chart sections in the grid with proper spacing
+                                plot_layout.setSpacing(10)
+                                plot_layout.setContentsMargins(10, 10, 10, 10)
+                                if i == 0:  # Time Series Overview
+                                    plot_layout.addWidget(chart_section, 0, 0)
+                                elif i == 1:  # Feature Importance
+                                    plot_layout.addWidget(chart_section, 0, 1)
+                                elif i == 2:  # Actual vs Predicted
+                                    plot_layout.addWidget(chart_section, 1, 0)
+                                elif i == 3:  # R² Plot
+                                    plot_layout.addWidget(chart_section, 1, 1)
+
+            # Create main scroll area for all charts
+            main_scroll = QScrollArea()
+            main_scroll.setWidget(plot_container)
+            main_scroll.setWidgetResizable(True)
+            main_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+            main_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+            main_scroll.setStyleSheet("""
                 QScrollArea {
                     border: none;
                     background-color: #2c313c;
@@ -911,23 +1248,12 @@ class MainWindow(QMainWindow):
                 QScrollBar::handle:vertical:hover {
                     background-color: #00a6fb;
                 }
-                QScrollBar::sub-line:vertical {
+                QScrollBar:horizontal {
                     border: none;
-                    background-color: #1b1e23;
-                    height: 15px;
-                    border-top-left-radius: 7px;
-                    border-top-right-radius: 7px;
-                    subcontrol-position: top;
-                    subcontrol-origin: margin;
-                }
-                QScrollBar::add-line:vertical {
-                    border: none;
-                    background-color: #1b1e23;
-                    height: 15px;
-                    border-bottom-left-radius: 7px;
-                    border-bottom-right-radius: 7px;
-                    subcontrol-position: bottom;
-                    subcontrol-origin: margin;
+                    background: #1b1e23;
+                    height: 14px;
+                    margin: 0px 15px 0 15px;
+                    border-radius: 0px;
                 }
                 QScrollBar::handle:horizontal {
                     background-color: #3d4451;
@@ -937,87 +1263,10 @@ class MainWindow(QMainWindow):
                 QScrollBar::handle:horizontal:hover {
                     background-color: #00a6fb;
                 }
-                QScrollBar:horizontal {
-                    border: none;
-                    background: #1b1e23;
-                    height: 14px;
-                    margin: 0px 15px 0 15px;
-                    border-radius: 0px;
-                }
             """)
             
-            # Load and display charts from the charts directory
-            charts_dir = forecasting_data['charts_path']
-            if os.path.exists(charts_dir):
-                chart_files = [f for f in os.listdir(charts_dir) if f.endswith('.png')]
-                for i, chart_file in enumerate(chart_files):
-                    chart_path = os.path.join(charts_dir, chart_file)
-                    if os.path.exists(chart_path):
-                        # Create a frame for each plot
-                        chart_frame = QFrame()
-                        chart_frame.setStyleSheet("""
-                            QFrame {
-                                background-color: #1b1e23;
-                                border: 2px solid #3d4451;
-                                border-radius: 10px;
-                                padding: 10px;
-                            }
-                        """)
-                        chart_layout = QVBoxLayout(chart_frame)
-                        chart_layout.setContentsMargins(10, 10, 10, 10)
-                        
-                        # Add title label
-                        title = QLabel()
-                        if i == 0:
-                            title.setText("Time Series Overview")
-                        elif i == 1:
-                            title.setText("Feature Importance Analysis")
-                        elif i == 2:
-                            title.setText("Actual vs Predicted Values")
-                        elif i == 3:
-                            title.setText("Model Performance (R² Plot)")
-                        
-                        title.setStyleSheet("""
-                            QLabel {
-                                color: #00a6fb;
-                                font-size: 14px;
-                                font-weight: bold;
-                                padding: 5px;
-                                background-color: #2c313c;
-                                border-radius: 5px;
-                                margin-bottom: 5px;
-                            }
-                        """)
-                        title.setAlignment(Qt.AlignCenter)
-                        chart_layout.addWidget(title)
-                        
-                        # Create figure and load image
-                        fig = plt.figure(figsize=(8, 6))
-                        img = plt.imread(chart_path)
-                        plt.imshow(img)
-                        plt.axis('off')
-                        
-                        # Add the plot canvas
-                        canvas = FigureCanvas(fig)
-                        canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                        canvas.setMinimumSize(400, 300)
-                        chart_layout.addWidget(canvas)
-                        
-                        # Position the frames in the grid
-                        if i == 0:  # Time Series Overview
-                            plot_layout.addWidget(chart_frame, 0, 0)
-                        elif i == 1:  # Feature Importance
-                            plot_layout.addWidget(chart_frame, 0, 1)
-                        elif i == 2:  # Actual vs Predicted
-                            plot_layout.addWidget(chart_frame, 1, 0)
-                        elif i == 3:  # R² Plot
-                            plot_layout.addWidget(chart_frame, 1, 1)
-            
-            # Set up the scroll area
-            scroll_area.setWidget(plot_container)
-            
-            # Add the scroll area to the content layout
-            content_layout.addWidget(scroll_area)
+            # Add the main scroll area to the content layout
+            content_layout.addWidget(main_scroll)
             
             # Add the content container to the predictions page
             if hasattr(widgets, 'predictions_page'):
