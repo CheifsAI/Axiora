@@ -273,6 +273,7 @@ class MainWindow(QMainWindow):
         self._clear_questions()
         self.app_functions.reportID = report_id
         report_dataset = self.app_functions.db.get_report_dataset(report_id)
+        self.app_functions.datasetID = report_dataset
         self.app_functions.dname = os.path.basename(report_dataset)
         self.app_functions.rname = os.path.splitext(os.path.basename(report_dataset))[0]
         self.app_functions.df = read_file(report_dataset)
