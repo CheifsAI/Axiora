@@ -524,69 +524,6 @@ class MainWindow(QMainWindow):
                                 elif i == 3:  # R² Plot
                                     plot_layout.addWidget(chart_section, 1, 1)
 
-            # Add final metrics section below all charts
-            if hasattr(self.app_functions, 'reportID'):
-                forecasting_data = self.app_functions.db.get_forecasting(self.app_functions.reportID)
-                if forecasting_data and 'rmse' in forecasting_data and 'r2' in forecasting_data:
-                    metrics_frame = QFrame()
-                    metrics_frame.setStyleSheet("""
-                        QFrame {
-                            background-color: #2c313c;
-                            border: 2px solid #3d4451;
-                            border-radius: 10px;
-                            margin-top: 10px;
-                        }
-                    """)
-                    metrics_layout = QVBoxLayout(metrics_frame)
-                    metrics_layout.setContentsMargins(20, 15, 20, 15)
-                    metrics_layout.setSpacing(10)
-
-                    # Title for metrics section
-                    metrics_title = QLabel("Final Model Performance Metrics")
-                    metrics_title.setStyleSheet("""
-                        QLabel {
-                            color: #00a6fb;
-                            font-size: 18px;
-                            font-weight: bold;
-                            padding: 5px;
-                        }
-                    """)
-                    metrics_title.setAlignment(Qt.AlignCenter)
-                    metrics_layout.addWidget(metrics_title)
-
-                    # R² Score Label with None handling
-                    r2_value = forecasting_data['r2']
-                    r2_text = f"R² Score on Test set: {r2_value:.4f}" if r2_value is not None else "R² Score on Test set: N/A"
-                    r2_label = QLabel(r2_text)
-                    r2_label.setStyleSheet("""
-                        QLabel {
-                            color: #ffffff;
-                            font-size: 16px;
-                            font-weight: bold;
-                            padding: 5px;
-                        }
-                    """)
-                    r2_label.setAlignment(Qt.AlignCenter)
-                    metrics_layout.addWidget(r2_label)
-
-                    # RMSE Score Label with None handling
-                    rmse_value = forecasting_data['rmse']
-                    rmse_text = f"RMSE Score on Test set: {rmse_value:.2f}" if rmse_value is not None else "RMSE Score on Test set: N/A"
-                    rmse_label = QLabel(rmse_text)
-                    rmse_label.setStyleSheet("""
-                        QLabel {
-                            color: #ffffff;
-                            font-size: 16px;
-                            font-weight: bold;
-                            padding: 5px;
-                        }
-                    """)
-                    rmse_label.setAlignment(Qt.AlignCenter)
-                    metrics_layout.addWidget(rmse_label)
-
-                    # Add metrics frame to the main layout in a new row
-                    plot_layout.addWidget(metrics_frame, 2, 0, 1, 2)  # Span across both columns
-
             # Create main scroll area for all charts
             main_scroll = QScrollArea()
             main_scroll.setWidget(plot_container)
@@ -1179,65 +1116,6 @@ class MainWindow(QMainWindow):
             
             # Add the main scroll area to the content layout
             content_layout.addWidget(main_scroll)
-            
-            # Add the final metrics section
-            final_metrics_frame = QFrame()
-            final_metrics_frame.setStyleSheet("""
-                QFrame {
-                    background-color: #2c313c;
-                    border: 2px solid #3d4451;
-                    border-radius: 10px;
-                    padding: 10px;
-                }
-            """)
-            final_metrics_layout = QVBoxLayout(final_metrics_frame)
-            final_metrics_layout.setContentsMargins(20, 20, 20, 20)
-            final_metrics_layout.setSpacing(10)
-            
-            # Add title
-            final_metrics_title = QLabel("Final Model Performance Metrics")
-            final_metrics_title.setStyleSheet("""
-                QLabel {
-                    color: #00a6fb;
-                    font-size: 18px;
-                    font-weight: bold;
-                    padding: 10px;
-                }
-            """)
-            final_metrics_layout.addWidget(final_metrics_title)
-            
-            # Add R² Score
-            r2_value = forecasting_data.get('r2', None)
-            r2_text = f"R² Score on Test set: {r2_value:.4f}" if r2_value is not None else "R² Score on Test set: N/A"
-            r2_label = QLabel(r2_text)
-            r2_label.setStyleSheet("""
-                QLabel {
-                    color: #ffffff;
-                    font-size: 16px;
-                    font-weight: bold;
-                    padding: 5px;
-                }
-            """)
-            r2_label.setAlignment(Qt.AlignCenter)
-            final_metrics_layout.addWidget(r2_label)
-            
-            # Add RMSE Score
-            rmse_value = forecasting_data.get('rmse', None)
-            rmse_text = f"RMSE Score on Test set: {rmse_value:.2f}" if rmse_value is not None else "RMSE Score on Test set: N/A"
-            rmse_label = QLabel(rmse_text)
-            rmse_label.setStyleSheet("""
-                QLabel {
-                    color: #ffffff;
-                    font-size: 16px;
-                    font-weight: bold;
-                    padding: 5px;
-                }
-            """)
-            rmse_label.setAlignment(Qt.AlignCenter)
-            final_metrics_layout.addWidget(rmse_label)
-            
-            # Add the final metrics frame to the content layout
-            content_layout.addWidget(final_metrics_frame)
             
             # Add the content container to the predictions page
             if hasattr(widgets, 'predictions_page'):
