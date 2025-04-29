@@ -398,7 +398,7 @@ class MainWindow(QMainWindow):
                         chart_files = [f for f in os.listdir(charts_dir) if f.endswith('.png')]
                         for i, chart_file in enumerate(chart_files):
                             chart_path = os.path.join(charts_dir, chart_file)
-                            if os.path.exists(chart_path):
+                    if os.path.exists(chart_path):
                                 # Create a frame for each chart section
                                 chart_section = QFrame()
                                 chart_section.setStyleSheet("""
@@ -418,13 +418,13 @@ class MainWindow(QMainWindow):
                                 # Add title label
                                 title = QLabel()
                                 if i == 0:
-                                    title.setText("Time Series Overview")
+                                    title.setText("1. Time Series Overview")
                                 elif i == 1:
-                                    title.setText("Feature Importance Analysis")
+                                    title.setText("2. Feature Importance Analysis")
                                 elif i == 2:
-                                    title.setText("Actual vs Predicted Values")
+                                    title.setText("3. Actual vs Predicted Values")
                                 elif i == 3:
-                                    title.setText("Model Performance (R² Plot)")
+                                    title.setText("4. Model Performance (R² Plot)")
                                 
                                 title.setStyleSheet("""
                                     QLabel {
@@ -468,50 +468,6 @@ class MainWindow(QMainWindow):
                                 canvas.setStyleSheet("background-color: #1b1e23;")
                                 canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                                 chart_content_layout.addWidget(canvas)
-
-                                # Add metrics labels if they exist
-                                if 'rmse' in forecasting_data and 'r2' in forecasting_data:
-                                    metrics_frame = QFrame()
-                                    metrics_frame.setStyleSheet("""
-                                        QFrame {
-                                            background-color: #2c313c;
-                                            border-radius: 5px;
-                                            padding: 5px;
-                                        }
-                                    """)
-                                    metrics_layout = QVBoxLayout(metrics_frame)  # Changed to vertical layout
-                                    metrics_layout.setContentsMargins(10, 5, 10, 5)
-                                    metrics_layout.setSpacing(5)  # Reduced spacing between labels
-
-                                    # R² Score Label with None handling
-                                    r2_value = forecasting_data['r2']
-                                    r2_text = f"R² Score on Test set: {r2_value:.4f}" if r2_value is not None else "R² Score on Test set: N/A"
-                                    r2_label = QLabel(r2_text)
-                                    r2_label.setStyleSheet("""
-                                        QLabel {
-                                            color: #00a6fb;
-                                            font-size: 14px;
-                                            font-weight: bold;
-                                            padding: 5px;
-                                        }
-                                    """)
-                                    metrics_layout.addWidget(r2_label)
-
-                                    # RMSE Score Label with None handling
-                                    rmse_value = forecasting_data['rmse']
-                                    rmse_text = f"RMSE Score on Test set: {rmse_value:.2f}" if rmse_value is not None else "RMSE Score on Test set: N/A"
-                                    rmse_label = QLabel(rmse_text)
-                                    rmse_label.setStyleSheet("""
-                                        QLabel {
-                                            color: #00a6fb;
-                                            font-size: 14px;
-                                            font-weight: bold;
-                                            padding: 5px;
-                                        }
-                                    """)
-                                    metrics_layout.addWidget(rmse_label)
-
-                                    chart_content_layout.addWidget(metrics_frame)
 
                                 # Create scroll area with proper sizing
                                 chart_scroll = QScrollArea()
@@ -903,7 +859,7 @@ class MainWindow(QMainWindow):
             if not hasattr(self.app_functions, 'df'):
                 print("No dataset loaded!")
                 return
-            
+                
             # Clear previous predictions but keep the controls
             if hasattr(widgets, 'predictions_page'):
                 existing_layout = widgets.predictions_page.layout()
@@ -1072,13 +1028,13 @@ class MainWindow(QMainWindow):
                                 # Add title label
                                 title = QLabel()
                                 if i == 0:
-                                    title.setText("Time Series Overview")
+                                    title.setText("1. Time Series Overview")
                                 elif i == 1:
-                                    title.setText("Feature Importance Analysis")
+                                    title.setText("2. Feature Importance Analysis")
                                 elif i == 2:
-                                    title.setText("Actual vs Predicted Values")
+                                    title.setText("3. Actual vs Predicted Values")
                                 elif i == 3:
-                                    title.setText("Model Performance (R² Plot)")
+                                    title.setText("4. Model Performance (R² Plot)")
                                 
                                 title.setStyleSheet("""
                                     QLabel {
@@ -1123,50 +1079,6 @@ class MainWindow(QMainWindow):
                                 canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                                 chart_content_layout.addWidget(canvas)
 
-                                # Add metrics labels if they exist
-                                if 'rmse' in forecasting_data and 'r2' in forecasting_data:
-                                    metrics_frame = QFrame()
-                                    metrics_frame.setStyleSheet("""
-                                        QFrame {
-                                            background-color: #2c313c;
-                                            border-radius: 5px;
-                                            padding: 5px;
-                                        }
-                                    """)
-                                    metrics_layout = QVBoxLayout(metrics_frame)  # Changed to vertical layout
-                                    metrics_layout.setContentsMargins(10, 5, 10, 5)
-                                    metrics_layout.setSpacing(5)  # Reduced spacing between labels
-
-                                    # R² Score Label with None handling
-                                    r2_value = forecasting_data['r2']
-                                    r2_text = f"R² Score on Test set: {r2_value:.4f}" if r2_value is not None else "R² Score on Test set: N/A"
-                                    r2_label = QLabel(r2_text)
-                                    r2_label.setStyleSheet("""
-                                        QLabel {
-                                            color: #00a6fb;
-                                            font-size: 14px;
-                                            font-weight: bold;
-                                            padding: 5px;
-                                        }
-                                    """)
-                                    metrics_layout.addWidget(r2_label)
-
-                                    # RMSE Score Label with None handling
-                                    rmse_value = forecasting_data['rmse']
-                                    rmse_text = f"RMSE Score on Test set: {rmse_value:.2f}" if rmse_value is not None else "RMSE Score on Test set: N/A"
-                                    rmse_label = QLabel(rmse_text)
-                                    rmse_label.setStyleSheet("""
-                                        QLabel {
-                                            color: #00a6fb;
-                                            font-size: 14px;
-                                            font-weight: bold;
-                                            padding: 5px;
-                                        }
-                                    """)
-                                    metrics_layout.addWidget(rmse_label)
-
-                                    chart_content_layout.addWidget(metrics_frame)
-
                                 # Create scroll area with proper sizing
                                 chart_scroll = QScrollArea()
                                 chart_scroll.setStyleSheet("""
@@ -1205,9 +1117,9 @@ class MainWindow(QMainWindow):
                                 """)
                                 chart_scroll.setWidget(chart_content)
                                 chart_scroll.setWidgetResizable(True)
-                                chart_scroll.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                                 chart_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
                                 chart_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                                chart_scroll.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                                 chart_section_layout.addWidget(chart_scroll)
 
                                 # Position the chart sections in the grid with proper spacing
@@ -1267,6 +1179,65 @@ class MainWindow(QMainWindow):
             
             # Add the main scroll area to the content layout
             content_layout.addWidget(main_scroll)
+            
+            # Add the final metrics section
+            final_metrics_frame = QFrame()
+            final_metrics_frame.setStyleSheet("""
+                QFrame {
+                    background-color: #2c313c;
+                    border: 2px solid #3d4451;
+                    border-radius: 10px;
+                    padding: 10px;
+                }
+            """)
+            final_metrics_layout = QVBoxLayout(final_metrics_frame)
+            final_metrics_layout.setContentsMargins(20, 20, 20, 20)
+            final_metrics_layout.setSpacing(10)
+            
+            # Add title
+            final_metrics_title = QLabel("Final Model Performance Metrics")
+            final_metrics_title.setStyleSheet("""
+                QLabel {
+                    color: #00a6fb;
+                    font-size: 18px;
+                    font-weight: bold;
+                    padding: 10px;
+                }
+            """)
+            final_metrics_layout.addWidget(final_metrics_title)
+            
+            # Add R² Score
+            r2_value = forecasting_data.get('r2', None)
+            r2_text = f"R² Score on Test set: {r2_value:.4f}" if r2_value is not None else "R² Score on Test set: N/A"
+            r2_label = QLabel(r2_text)
+            r2_label.setStyleSheet("""
+                QLabel {
+                    color: #ffffff;
+                    font-size: 16px;
+                    font-weight: bold;
+                    padding: 5px;
+                }
+            """)
+            r2_label.setAlignment(Qt.AlignCenter)
+            final_metrics_layout.addWidget(r2_label)
+            
+            # Add RMSE Score
+            rmse_value = forecasting_data.get('rmse', None)
+            rmse_text = f"RMSE Score on Test set: {rmse_value:.2f}" if rmse_value is not None else "RMSE Score on Test set: N/A"
+            rmse_label = QLabel(rmse_text)
+            rmse_label.setStyleSheet("""
+                QLabel {
+                    color: #ffffff;
+                    font-size: 16px;
+                    font-weight: bold;
+                    padding: 5px;
+                }
+            """)
+            rmse_label.setAlignment(Qt.AlignCenter)
+            final_metrics_layout.addWidget(rmse_label)
+            
+            # Add the final metrics frame to the content layout
+            content_layout.addWidget(final_metrics_frame)
             
             # Add the content container to the predictions page
             if hasattr(widgets, 'predictions_page'):
@@ -1339,10 +1310,8 @@ class MainWindow(QMainWindow):
                 for chart_path in self.app_functions.chart_paths:
                     if os.path.exists(chart_path):
                         # Convert HTML chart to PNG if needed
-                        if chart_path.endswith('.html'):
-                            # You might need to use a headless browser to convert HTML to image
-                            # For now, we'll skip HTML charts
-                            continue
+                        # For now, we'll skip HTML charts
+                        continue
                         try:
                             img = Image(chart_path, width=6*inch, height=4*inch)
                             elements.append(img)
