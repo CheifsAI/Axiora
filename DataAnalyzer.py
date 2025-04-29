@@ -92,44 +92,6 @@ class DataAnalyzer:
         self.generate_user_context()
         return self.analysis        
 
-    # Drop Nulls
-    def drop_nulls(self):
-        data_info = self.data_info
-        
-        
-        drop_nulls_prompt = '''
-        Analyze the dataset's missing values. For each column, provide:
-        1. Total count and percentage of missing values.
-        2. Suggest methods to handle missing values based on data type (categorical or numerical):
-        - For categorical columns: Suggest filling with mode or adding a placeholder.
-        - For numerical columns: Suggest imputation with mean, median, or deletion.
-        3. Identify any columns highly correlated with missing values.
-        4. Provide a recommendation: Drop or impute missing values based on the data and column importance.
-        '''
-        
-        drop_nulls_template = PromptTemplate(
-            input_variables=["data_info"],
-            template=drop_nulls_prompt
-        )
-        
-        drop_nulls_chain = LLMChain(llm=self.llm, prompt=drop_nulls_template)
-        
-        
-        drop_nulls_code = extract_code(drop_nulls_chain.run(data_info=data_info,))
-        
-        
-        print("Code for dropping nulls:\n", drop_nulls_code)
-
-        self.memory.append(HumanMessage(content=drop_nulls_prompt))
-        self.memory.append(AIMessage(content=drop_nulls_code))
-        
-        
-        exec_env = {"df": self.dataframe}
-        exec(drop_nulls_code, exec_env)
-        updated_df = exec_env["df"]
-        return updated_df
-
-
     def questions_gen(self, num):
         data_info = self.data_info
         data_sample = self.data_sample
