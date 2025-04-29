@@ -173,7 +173,7 @@ class GuiFunctions():
         self.main_window.ui.qu_num_list.currentIndexChanged.connect(self.handle_qu_num)
         self.main_window.ui.qu_btn.clicked.connect(self.handle_qu_btn)
         self.main_window.ui.save_qu_btn.clicked.connect(self.handle_save_qu_btn)
-        self.main_window.ui.chat_data_btn.clicked.connect(self.handle_chat_data_btn)
+       # self.main_window.ui.chat_data_btn.clicked.connect(self.handle_chat_data_btn)
         self.main_window.ui.send_btn.clicked.connect(self.send_message)
         self.lineEdit_chat = self.main_window.ui.lineEdit_message
         self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
@@ -567,15 +567,15 @@ class GuiFunctions():
         self.qu_saved = True
 
 #
-    def handle_chat_data_btn(self):
-        cfpath, _ = QFileDialog.getOpenFileName(
-            self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)"
-        )
-        if cfpath:
-            chat_df = read_file()
-            chat_analyzer = DataAnalyzer(dataframe=chat_df, llm=self.llm)
-            chat_df_anlysis = chat_analyzer.analysis_data()
-            return chat_df_anlysis
+    # def handle_chat_data_btn(self):
+    #     cfpath, _ = QFileDialog.getOpenFileName(
+    #         self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)"
+    #     )
+    #     if cfpath:
+    #         chat_df = read_file()
+    #         chat_analyzer = DataAnalyzer(dataframe=chat_df, llm=self.llm)
+    #         chat_df_anlysis = chat_analyzer.analysis_data()
+    #         return chat_df_anlysis
 
     def enter_return_release(self, event):
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
