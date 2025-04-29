@@ -327,6 +327,79 @@ class MainWindow(QMainWindow):
             content_layout.setSpacing(20)
             content_layout.setContentsMargins(20, 20, 20, 20)
             
+            # Add metrics section
+            metrics_frame = QFrame()
+            metrics_frame.setObjectName("metrics_frame")
+            metrics_frame.setStyleSheet("""
+                QFrame {
+                    background-color: #2c313c;
+                    border: 2px solid #3d4451;
+                    border-radius: 10px;
+                    padding: 10px;
+                    margin-top: 10px;
+                    margin-bottom: 10px;
+                }
+            """)
+            metrics_frame.setMaximumHeight(100)
+            metrics_layout = QHBoxLayout(metrics_frame)
+            metrics_layout.setContentsMargins(20, 10, 20, 10)
+            metrics_layout.setSpacing(40)
+            
+            # Add R² Score
+            r2_container = QFrame()
+            r2_layout = QVBoxLayout(r2_container)
+            r2_title = QLabel("R² Score")
+            r2_title.setStyleSheet("""
+                QLabel {
+                    color: #00a6fb;
+                    font-size: 16px;
+                    font-weight: bold;
+                }
+            """)
+            r2_title.setAlignment(Qt.AlignCenter)
+            r2_value = QLabel(f"{forecasting_data.get('r2', 'N/A'):.4f}" if isinstance(forecasting_data.get('r2'), (int, float)) else "N/A")
+            r2_value.setStyleSheet("""
+                QLabel {
+                    color: #ffffff;
+                    font-size: 24px;
+                    font-weight: bold;
+                }
+            """)
+            r2_value.setAlignment(Qt.AlignCenter)
+            r2_layout.addWidget(r2_title)
+            r2_layout.addWidget(r2_value)
+            
+            # Add RMSE Score
+            rmse_container = QFrame()
+            rmse_layout = QVBoxLayout(rmse_container)
+            rmse_title = QLabel("RMSE Score")
+            rmse_title.setStyleSheet("""
+                QLabel {
+                    color: #00a6fb;
+                    font-size: 16px;
+                    font-weight: bold;
+                }
+            """)
+            rmse_title.setAlignment(Qt.AlignCenter)
+            rmse_value = QLabel(f"{forecasting_data.get('rmse', 'N/A'):.2f}" if isinstance(forecasting_data.get('rmse'), (int, float)) else "N/A")
+            rmse_value.setStyleSheet("""
+                QLabel {
+                    color: #ffffff;
+                    font-size: 24px;
+                    font-weight: bold;
+                }
+            """)
+            rmse_value.setAlignment(Qt.AlignCenter)
+            rmse_layout.addWidget(rmse_title)
+            rmse_layout.addWidget(rmse_value)
+            
+            # Add containers to metrics frame
+            metrics_layout.addWidget(r2_container)
+            metrics_layout.addWidget(rmse_container)
+            
+            # Add metrics frame to content layout
+            content_layout.addWidget(metrics_frame)
+            
             # Load the predicted DataFrame
             predictions_df = read_file(forecasting_data['predicted_df'])
             
@@ -507,9 +580,9 @@ class MainWindow(QMainWindow):
                                 """)
                                 chart_scroll.setWidget(chart_content)
                                 chart_scroll.setWidgetResizable(True)
-                                chart_scroll.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                                 chart_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
                                 chart_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+                                chart_scroll.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                                 chart_section_layout.addWidget(chart_scroll)
 
                                 # Position the chart sections in the grid with proper spacing
@@ -876,6 +949,79 @@ class MainWindow(QMainWindow):
             content_layout = QVBoxLayout(content_container)
             content_layout.setSpacing(20)
             content_layout.setContentsMargins(20, 20, 20, 20)
+            
+            # Add metrics section
+            metrics_frame = QFrame()
+            metrics_frame.setObjectName("metrics_frame")
+            metrics_frame.setStyleSheet("""
+                QFrame {
+                    background-color: #2c313c;
+                    border: 2px solid #3d4451;
+                    border-radius: 10px;
+                    padding: 10px;
+                    margin-top: 10px;
+                    margin-bottom: 10px;
+                }
+            """)
+            metrics_frame.setMaximumHeight(100)
+            metrics_layout = QHBoxLayout(metrics_frame)
+            metrics_layout.setContentsMargins(20, 10, 20, 10)
+            metrics_layout.setSpacing(40)
+            
+            # Add R² Score
+            r2_container = QFrame()
+            r2_layout = QVBoxLayout(r2_container)
+            r2_title = QLabel("R² Score")
+            r2_title.setStyleSheet("""
+                QLabel {
+                    color: #00a6fb;
+                    font-size: 16px;
+                    font-weight: bold;
+                }
+            """)
+            r2_title.setAlignment(Qt.AlignCenter)
+            r2_value = QLabel(f"{predictions.get('r2', 'N/A'):.4f}" if isinstance(predictions.get('r2'), (int, float)) else "N/A")
+            r2_value.setStyleSheet("""
+                QLabel {
+                    color: #ffffff;
+                    font-size: 24px;
+                    font-weight: bold;
+                }
+            """)
+            r2_value.setAlignment(Qt.AlignCenter)
+            r2_layout.addWidget(r2_title)
+            r2_layout.addWidget(r2_value)
+            
+            # Add RMSE Score
+            rmse_container = QFrame()
+            rmse_layout = QVBoxLayout(rmse_container)
+            rmse_title = QLabel("RMSE Score")
+            rmse_title.setStyleSheet("""
+                QLabel {
+                    color: #00a6fb;
+                    font-size: 16px;
+                    font-weight: bold;
+                }
+            """)
+            rmse_title.setAlignment(Qt.AlignCenter)
+            rmse_value = QLabel(f"{predictions.get('rmse', 'N/A'):.2f}" if isinstance(predictions.get('rmse'), (int, float)) else "N/A")
+            rmse_value.setStyleSheet("""
+                QLabel {
+                    color: #ffffff;
+                    font-size: 24px;
+                    font-weight: bold;
+                }
+            """)
+            rmse_value.setAlignment(Qt.AlignCenter)
+            rmse_layout.addWidget(rmse_title)
+            rmse_layout.addWidget(rmse_value)
+            
+            # Add containers to metrics frame
+            metrics_layout.addWidget(r2_container)
+            metrics_layout.addWidget(rmse_container)
+            
+            # Add metrics frame to content layout
+            content_layout.addWidget(metrics_frame)
             
             # Create and add the feature DataFrame table
             feature_table = QTableWidget()
