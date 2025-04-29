@@ -279,6 +279,6 @@ def time_series_forecaster(dataframe, target_col, date_cols=None, test_size=0.2,
         
         # Make predictions
         future_df['prediction'] = reg.predict(future_df[FEATURES])        
-        return future_df, [initial_plot, importance_fig, prediction_fig, r2_fig]
+        return future_df, [initial_plot, importance_fig, prediction_fig, r2_fig],[r2,rmse]
     
     return test, [initial_plot, importance_fig, prediction_fig, r2_fig]
