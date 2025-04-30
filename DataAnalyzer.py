@@ -137,27 +137,41 @@ class DataAnalyzer:
         
 
         question_prompt = f"""
-        You are a professional data analyst. Based on the following information about the dataset:
+        You are a senior data analyst hired by a company to extract meaningful, high-level, and actionable business insights from the following dataset.
+
+        Your job is to generate advanced **strategic questions** that:
+        - Are deeply rooted in the data structure and semantics.
+        - Reflect important **business objectives**, patterns, risks, or growth opportunities.
+        - Are **strong, insightful, and relevant** to decision-makers like company owners or managers.
+        - Can be **easily visualized** using bar charts, line plots, histograms, scatter plots, or pie charts.
+
+        **DO NOT generate general or surface-level questions. Instead, focus on questions that:**
+        - Quantify change over time or between groups.
+        - Explore distribution, frequency, or correlation.
+        - Investigate trends, seasonality, or anomalies.
+        - Provide guidance for optimizing business performance or identifying risks.
+
+        You MUST generate exactly {num} chartable, insightful questions.
+
+        ### INPUTS:
         1. Dataset Overview: {data_info}
         2. Dataset Sample: {data_sample}
         3. Data Summary: {data_description}
         4. Business Context: {self.user_context}
 
-        Your task is to generate strategic investigative questions based on:
-        - Your deep understanding of the data and its type.
-        - Your interpretation of what the data means in the context of the provided business context.
-        - Asking questions that may reveal insights, gaps, or opportunities that could be exploited.
-        - Additionally, consider the following:
-            - How could the current trends in the data impact future business decisions or strategies?
-            - What potential future outcomes or projections can be made from this dataset based on existing patterns?
-            - Are there any trends in the data that suggest upcoming risks or opportunities?
-            - Can you identify any correlations or causal relationships that may impact future developments in the business or industry?
+        ### OUTPUT FORMAT:
+        Write {num} powerful analytical questions that:
+        - Could be visualized with a chart.
+        - Have clear business relevance.
+        - Reflect advanced reasoning.
 
-        Please formulate questions related to the following aspects:
-        - Patterns or trends observed in the data.
-        - Any relationships between columns or between the data.
-        - Potential opportunities for improving business decisions or strategies based on the data.
-        - Any problems or risks that might arise based on the data analysis.
+        Each question should be written on a separate line.
+
+        Example Questions:
+        - How has the conversion rate changed over time across different marketing channels?
+        - Which regions have shown the fastest growth in revenue over the past year?
+        - What is the correlation between customer satisfaction scores and return frequency?
+        - How does the average transaction value vary by customer segment?
         """
 
         question_template = PromptTemplate(
