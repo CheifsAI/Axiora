@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QIcon, QFont, QPixmap, QCursor
 from PySide6.QtCore import Qt, QSize
+import selenium
 
 # Import our modules
 from modules.app_settings import Settings
@@ -1336,10 +1337,23 @@ class MainWindow(QMainWindow):
                 elements.append(Spacer(1, 10))
                 for chart_path in self.app_functions.chart_paths:
                     if os.path.exists(chart_path):
-                        # Convert HTML chart to PNG if needed
-                        # For now, we'll skip HTML charts
-                        continue
                         try:
+                            # Convert HTML chart to PNG if needed
+                            if chart_path.endswith('.html'):
+                                # Create a temporary PNG file
+                                temp_png = chart_path.replace('.html', '.png')
+                                # Use a headless browser to capture the chart
+                                from selenium import webdriver
+                                from selenium.webdriver.chrome.options import Options
+                                options = Options()
+                                options.add_argument('--headless')
+                                options.add_argument('--disable-gpu')
+                                driver = webdriver.Chrome(options=options)
+                                driver.get(f'file://{os.path.abspath(chart_path)}')
+                                driver.save_screenshot(temp_png)
+                                driver.quit()
+                                chart_path = temp_png
+                            
                             img = Image(chart_path, width=6*inch, height=4*inch)
                             elements.append(img)
                             elements.append(Spacer(1, 20))
@@ -1360,6 +1374,31 @@ class MainWindow(QMainWindow):
                     if 'r2' in forecasting_data and forecasting_data['r2']:
                         elements.append(Paragraph(f"R2 Score: {forecasting_data['r2']}", styles['Normal']))
                     
+                    # Add predicted DataFrame
+                    if 'predicted_df' in forecasting_data and forecasting_data['predicted_df']:
+                        try:
+                            predicted_df = read_file(forecasting_data['predicted_df'])
+                            # Create a table for the predicted DataFrame
+                            table_data = [predicted_df.columns.tolist()] + predicted_df.values.tolist()
+                            table = Table(table_data)
+                            table.setStyle(TableStyle([
+                                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                                ('FONTSIZE', (0, 0), (-1, 0), 14),
+                                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                                ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+                                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                                ('FONTSIZE', (0, 1), (-1, -1), 12),
+                                ('GRID', (0, 0), (-1, -1), 1, colors.black)
+                            ]))
+                            elements.append(table)
+                            elements.append(Spacer(1, 20))
+                        except Exception as e:
+                            print(f"Error adding predicted DataFrame: {str(e)}")
+                    
                     # Add forecasting charts
                     if 'charts_path' in forecasting_data:
                         charts_dir = forecasting_data['charts_path']
@@ -1373,6 +1412,15 @@ class MainWindow(QMainWindow):
                                     elements.append(Spacer(1, 20))
                                 except Exception as e:
                                     print(f"Error adding forecasting chart {chart_path}: {str(e)}")
+
+            # Add recommendations section
+            if hasattr(self.ui, 'recommendations_text'):
+                recommendations = self.ui.recommendations_text.toPlainText()
+                if recommendations:
+                    elements.append(Paragraph("Recommendations", styles['Heading2']))
+                    elements.append(Spacer(1, 10))
+                    elements.append(Paragraph(recommendations, styles['Normal']))
+                    elements.append(Spacer(1, 20))
 
             # Build the PDF
             doc.build(elements)
