@@ -25,14 +25,7 @@ class DataAnalyzer:
         self.db = DatabaseManager()
         self.report_id = None
         self.memory = []
-        
-        if user_id:
-            self.user_id = user_id
-            self.user_context = self.db.get_user_context(user_id)
-            if self.user_context:
-                self.memory.append(HumanMessage(content=f"User Context: {self.user_context}"))
-        else:
-            self.user_context = None
+        self.user_id = user_id
 
     def analysis_data(self):
         data_info = self.data_info
@@ -44,14 +37,28 @@ class DataAnalyzer:
         1. Dataset metadata: {data_info}
         2. Dataset sample: {data_sample}
         3. Dataset summary: {data_description}
-        4. User_context: {user_context}
 
-        Please analyze the data and provide insights about:
-        1. Key trends and patterns.
-        3. Recommendations or actionable insights based on the analyzed data.
+        You are a highly skilled professional data analyst specialized in business data analysis.
+
+        Given the following dataset analysis, your tasks are:
+        1. Provide a **deep, comprehensive analysis** of the data.
+        2. **Explain key findings**, trends, patterns, and anomalies in a meaningful way.
+        3. **Interpret** what the numbers and statistics mean for the business context (not just describe them).
+        4. **Identify**:
+        - Critical KPIs (Key Performance Indicators).
+        - Potential risks and problems suggested by the data.
+        - Opportunities for growth, improvement, or efficiency.
+        5. Highlight **hidden insights** that may not be immediately obvious.
+        6. Make sure your analysis tells a **clear, logical story** about the business situation.
+
+        Instructions:
+        - Be detailed but concise.
+        - Avoid listing plain statistics — always explain their implications.
+        - Connect different findings where relevant to create a full picture.
+        - Think like a business consultant, not just a data scientist.
         '''
         analysis_prompt = PromptTemplate(
-            input_variables=["data_info", "data_sample", "data_description", "user_context"],
+            input_variables=["data_info", "data_sample", "data_description"],
             template=analysis_template
         )
         
@@ -60,13 +67,11 @@ class DataAnalyzer:
         self.analysis = analysis_chain.invoke({
             "data_info": data_info,
             "data_sample": data_sample,
-            "data_description": data_description,
-            "user_context":self.user_context or "No prior context available"
+            "data_description": data_description
         })
 
         formatted_analysis_prompt = analysis_template.format(data_info=data_info,data_sample=data_sample,
-                                                             data_description=data_description,
-                                                             user_context=self.user_context)
+                                                             data_description=data_description)
         self.memory.append(HumanMessage(content=formatted_analysis_prompt))
         self.memory.append(AIMessage(content=self.analysis))
         self.db.saveMemory(reportID=self.report_id,
@@ -74,58 +79,35 @@ class DataAnalyzer:
                            prompet=formatted_analysis_prompt,
                            response=self.analysis,
                            chat=False)
-        self.generate_user_context()
         return self.analysis        
-
-    # Drop Nulls
-    def drop_nulls(self):
-        data_info = self.data_info
-        
-        
-        drop_nulls_prompt = '''
-        create a code to drop the nulls from the DataFrame named 'df',
-        only include the dropping part and importing pandas,
-        insure that inplace = True, no extra context or reading the file.
-        '''
-        
-        drop_nulls_template = PromptTemplate(
-            input_variables=["data_info"],
-            template=drop_nulls_prompt
-        )
-        
-        drop_nulls_chain = LLMChain(llm=self.llm, prompt=drop_nulls_template)
-        
-        
-        drop_nulls_code = extract_code(drop_nulls_chain.run(data_info=data_info,))
-        
-        
-        print("Code for dropping nulls:\n", drop_nulls_code)
-
-        self.memory.append(HumanMessage(content=drop_nulls_prompt))
-        self.memory.append(AIMessage(content=drop_nulls_code))
-        
-        
-        exec_env = {"df": self.dataframe}
-        exec(drop_nulls_code, exec_env)
-        updated_df = exec_env["df"]
-        return updated_df
-
 
     def questions_gen(self, num):
         data_info = self.data_info
         data_sample = self.data_sample
         data_description = self.data_description
+        
 
         question_prompt = f"""
-        You are a data analyst. You are provided with:
-        1. Dataset metadata: {data_info}
-        2. Dataset sample: {data_sample}
-        3. Dataset summary: {data_description} 
-        Create {num} analysis questions about the dataset.
+        You are a professional data analyst. Based on the following information about the dataset:
+        1. Dataset Overview: {data_info}
+        2. Dataset Sample: {data_sample}
+        3. Data Summary: {data_description}
 
-        Please format each question on a new line, starting with a number, as in this example:
-        1. question 1?
-        2. question 2?
+        Your task is to generate strategic investigative questions based on:
+        - Your deep understanding of the data and its type.
+        - Your interpretation of what the data means in the context of the provided business context.
+        - Asking questions that may reveal insights, gaps, or opportunities that could be exploited.
+        - Additionally, consider the following:
+            - How could the current trends in the data impact future business decisions or strategies?
+            - What potential future outcomes or projections can be made from this dataset based on existing patterns?
+            - Are there any trends in the data that suggest upcoming risks or opportunities?
+            - Can you identify any correlations or causal relationships that may impact future developments in the business or industry?
+
+        Please formulate questions related to the following aspects:
+        - Patterns or trends observed in the data.
+        - Any relationships between columns or between the data.
+        - Potential opportunities for improving business decisions or strategies based on the data.
+        - Any problems or risks that might arise based on the data analysis.
         """
 
         question_template = PromptTemplate(
@@ -307,36 +289,93 @@ class DataAnalyzer:
         columns = self.select_columns(question)
         return chart_type, columns
     
-    def generate_user_context(self):
-        if not self.user_id:
-            return "No user ID provided"
-            
-        context_template = """
-        Generate a concise user profile context based on:
 
-        User's existing context: {existing_context}
-        Current analysis: {current_analysis}
-        Conversation history: {conversation_summary}
-        Focus on:
-        - Key analysis interests
-        - Frequently asked about metrics
-        - Data domains of interest
+    
+    def generate_recommendations(self, num_recommendations: int = 5):
+        data_info = self.data_info
+        data_sample = self.data_sample
+        data_description = self.data_description
+        analysis = self.analysis  # التحليل الذي تم عمله سابقاً
+
+        recommendation_prompt = '''
+        You are a world-class business consultant and data analyst.
+
+        You have analyzed the following:
+        - Dataset metadata: {data_info}
+        - Dataset sample: {data_sample}
+        - Dataset summary: {data_description}
+        - Detailed business analysis: {analysis}
+
+        Based on your deep understanding of the data and analysis:
+        Your task is to generate {num_recommendations} highly actionable, strategic recommendations for the business.
+
+        Your recommendations must:
+        - Be directly based on the analysis and insights.
+        - Address clear business actions (e.g., optimize processes, launch new products, reduce risks, target specific segments, etc.)
+        - Be specific, impactful, and feasible.
+        - Cover both short-term quick wins and long-term strategic moves.
+        - Include estimated expected outcome in percentage (%) where appropriate.
+        - Include any potential risks or challenges for each recommendation.
+        - Reference relevant metrics or insights from the analysis if possible.
+        - Use professional, executive-level language.
+        - Add an appropriate emoji based on risk level:
+            - ✅ for Low risk
+            - ⚠️ for Medium risk
+            - ❗for High risk
+
+        Output Format:
+
+        ### 📋 Recommendations Table
+
+        | # | Recommendation Title | Expected Impact (%) | Potential Risk (with Emoji) |
+        |---|-----------------------|---------------------|-----------------------------|
+        | 1 | [Title] | [Estimated Impact %] | [Emoji] [Main risk] |
+        | 2 | [Title] | [Estimated Impact %] | [Emoji] [Main risk] |
+        | ... | ... | ... | ... |
+
+        ---
+
+        ### 📋 Full Recommendation Details
+
+        1. **[Recommendation Title]** [Emoji]
+        - **Details:** Explain clearly what should be done and why.
+        - **Expected Impact:** [e.g., Increase attendance by 10%]
+        - **Metrics Reference:** [Reference specific metric if available, e.g., matches with <50% attendance]
+        - **Potential Risks:** [Possible challenges or risks involved]
+        - **Timeline:** [Short-term or Long-term]
+
+        Repeat similarly for each recommendation.
+        '''
+
         
-        Format as bullet points, max 5 items.
-        """
-        
-        conversation = "\n".join([msg.content for msg in self.memory[-4:]])
-        
-        context_prompt = PromptTemplate(
-            template=context_template,
-            input_variables=["existing_context", "current_analysis", "conversation_summary"]
+        rec_template = PromptTemplate(
+            input_variables=["data_info", "data_sample", "data_description", "analysis", "num_recommendations"],
+            template=recommendation_prompt
         )
-        
-        new_context = (context_prompt | self.llm).invoke({
-            "existing_context": self.user_context or "No prior context available",
-            "current_analysis": self.analysis,
-            "conversation_summary": conversation
-        })
-        
-        self.db.update_user_context(userID=self.user_id, new_context=new_context)
-        return new_context
+
+        rec_chain = LLMChain(llm=self.llm, prompt=rec_template)
+
+        rec_response = rec_chain.run(
+            data_info=data_info,
+            data_sample=data_sample,
+            data_description=data_description,
+            analysis=analysis,
+            num_recommendations=num_recommendations
+        )
+
+        formatted_rec_prompt = recommendation_prompt.format(
+            data_info=data_info,
+            data_sample=data_sample,
+            data_description=data_description,
+            analysis=analysis,
+            num_recommendations=num_recommendations
+        )
+        self.memory.append(HumanMessage(content=formatted_rec_prompt))
+        self.memory.append(AIMessage(content=rec_response))
+        self.db.saveMemory(reportID=self.report_id,
+                        llm=self.db.llm_id_by_name(self.llm.model),
+                        prompet=formatted_rec_prompt,
+                        response=rec_response,
+                        chat=False)
+
+        return rec_response

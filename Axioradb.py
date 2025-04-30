@@ -1,31 +1,31 @@
 import bcrypt
+import uuid
 from sqlalchemy import (
- create_engine, ForeignKey,
+    create_engine, ForeignKey,
     Column, String, Integer, SmallInteger,
-    Text, DateTime, Boolean
+    Text, DateTime, Boolean, Float
 )
 from sqlalchemy import func
 from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.dialects.postgresql import UUID
 
 engine = create_engine("sqlite:///axioradb.db")
 Base = declarative_base()
 
 class User(Base):
     __tablename__ = "users"
-    user_id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     username = Column(String, nullable=False, unique=True)
     password_hash = Column(String, nullable=False)
     email = Column(String)
-    preferred_llm = Column(Integer, ForeignKey('llm.llm_id'), nullable=True)
-    user_context = Column(Text)
+    preferred_llm = Column(UUID(as_uuid=True), ForeignKey('llm.llm_id'), nullable=True)
     
     reports = relationship("Report", back_populates="user")
     llm = relationship("LLM", back_populates="users")
 
-    def __init__(self, username, email, password, user_context=None):
+    def __init__(self, username, email, password):
         self.username = username
         self.email = email
-        self.user_context = user_context
         self.set_password(password) 
 
     def set_password(self, password):
@@ -40,7 +40,7 @@ class User(Base):
 # 2. LLM Table
 class LLM(Base):
     __tablename__ = "llm"
-    llm_id = Column(Integer, primary_key=True, autoincrement=True)
+    llm_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     llm_name = Column(String(255), nullable=False)
     parameters = Column(SmallInteger)
     install_llm_code = Column(String)
@@ -62,7 +62,7 @@ class LLM(Base):
 # 3. Dataset Table
 class Dataset(Base):
     __tablename__ = "dataset"
-    dataset_id = Column(Integer, primary_key=True, autoincrement=True)
+    dataset_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     dataset_name = Column(Text, nullable=False)
     raw_data = Column(Text, nullable=False)
     uploaded_at = Column(DateTime, default=func.now())
@@ -90,10 +90,10 @@ class Dataset(Base):
 # 4. CleanDataset Table
 class CleanDataset(Base):
     __tablename__ = "cleanDataset"
-    clean_dataset_id = Column(Integer, primary_key=True, autoincrement=True)
+    clean_dataset_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     dataset_name = Column(Text, nullable=False)
     raw_data = Column(Text, nullable=False)
-    original_dataset_id = Column(Integer, ForeignKey("dataset.dataset_id"))
+    original_dataset_id = Column(UUID(as_uuid=True), ForeignKey("dataset.dataset_id"))
     cleaned_at = Column(DateTime, default=func.now())
     data_info = Column(Text)
     data_description = Column(Text)
@@ -120,12 +120,12 @@ class CleanDataset(Base):
 # 5. Report Table (previously Session)
 class Report(Base):
     __tablename__ = "report"
-    report_id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey("users.user_id"))
-    llm_id = Column(Integer, ForeignKey("llm.llm_id"))
+    report_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.user_id"))
+    llm_id = Column(UUID(as_uuid=True), ForeignKey("llm.llm_id"))
     report_name = Column(Text, nullable=False)
-    dataset_id = Column(Integer, ForeignKey("dataset.dataset_id"))
-    clean_dataset_id = Column(Integer, ForeignKey("cleanDataset.clean_dataset_id"))
+    dataset_id = Column(UUID(as_uuid=True), ForeignKey("dataset.dataset_id"))
+    clean_dataset_id = Column(UUID(as_uuid=True), ForeignKey("cleanDataset.clean_dataset_id"))
     creation_date = Column(DateTime, default=func.now())
     
     # Relationships
@@ -138,6 +138,7 @@ class Report(Base):
     questions = relationship("Questions", back_populates="report", cascade="all, delete-orphan")
     dashboards = relationship("Dashboards", back_populates="report", cascade="all, delete-orphan")
     final_reports = relationship("FinalReport", back_populates="report", cascade="all, delete-orphan")
+    forecasts = relationship("Forecasting", back_populates="report", cascade="all, delete-orphan")
 
     def __init__(self, report_name, user_id, llm_id, dataset_id, clean_dataset_id=None):
         self.user_id = user_id
@@ -153,9 +154,9 @@ class Report(Base):
 # 6. ReportMemory Table (previously SessionMemory)
 class ReportMemory(Base):
     __tablename__ = "report_memory"
-    message_id = Column(Integer, primary_key=True, autoincrement=True)
-    report_id = Column(Integer, ForeignKey("report.report_id", ondelete="CASCADE"))
-    llm_id = Column(Integer, ForeignKey("llm.llm_id"))
+    message_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    report_id = Column(UUID(as_uuid=True), ForeignKey("report.report_id", ondelete="CASCADE"))
+    llm_id = Column(UUID(as_uuid=True), ForeignKey("llm.llm_id"))
     message_date = Column(DateTime, default=func.now(), nullable=False)
     prompt = Column(Text)
     response = Column(Text)
@@ -183,7 +184,7 @@ class ReportMemory(Base):
 # 7. Summary Table
 class Summary(Base):
     __tablename__ = "summary"
-    report_id = Column(Integer, ForeignKey("report.report_id", ondelete="CASCADE"), primary_key=True)
+    report_id = Column(UUID(as_uuid=True), ForeignKey("report.report_id", ondelete="CASCADE"), primary_key=True)
     summary_content = Column(Text)
     
     # Relationship
@@ -200,8 +201,9 @@ class Summary(Base):
 # 8. Questions Table
 class Questions(Base):
     __tablename__ = "questions"
-    question_num = Column(Integer, primary_key=True)
-    report_id = Column(Integer, ForeignKey("report.report_id", ondelete="CASCADE"), primary_key=True)
+    question_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    report_id = Column(UUID(as_uuid=True), ForeignKey("report.report_id", ondelete="CASCADE"))
+    question_num = Column(Integer)
     question = Column(Text)
     answer = Column(Text)
     
@@ -215,14 +217,14 @@ class Questions(Base):
         self.answer = answer
 
     def __repr__(self):
-        return f"<Questions(question_num={self.question_num}, report_id={self.report_id})>"
+        return f"<Questions(question_id={self.question_id}, report_id={self.report_id})>"
 
 
 # 9. Dashboards Table
 class Dashboards(Base):
     __tablename__ = "dashboards"
-    dashboard_id = Column(Integer, primary_key=True, autoincrement=True)
-    report_id = Column(Integer, ForeignKey("report.report_id", ondelete="CASCADE"))
+    dashboard_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    report_id = Column(UUID(as_uuid=True), ForeignKey("report.report_id", ondelete="CASCADE"))
     
     # Relationships
     report = relationship("Report", back_populates="dashboards")
@@ -239,9 +241,9 @@ class Dashboards(Base):
 # 10. Charts Table
 class Charts(Base):
     __tablename__ = "charts"
-    chart_id = Column(Integer, primary_key=True, autoincrement=True)
+    chart_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     chart_path = Column(String(255), nullable=False)
-    dashboard_id = Column(Integer, ForeignKey("dashboards.dashboard_id", ondelete="CASCADE"))
+    dashboard_id = Column(UUID(as_uuid=True), ForeignKey("dashboards.dashboard_id", ondelete="CASCADE"))
     chart_style = Column(Text)
     chart_code = Column(Text)
     
@@ -280,12 +282,11 @@ class Charts(Base):
 # 12. FinalReport Table
 class FinalReport(Base):
     __tablename__ = "final_report"
-    final_report_id = Column(Integer, primary_key=True, autoincrement=True)
-    report_id = Column(Integer, ForeignKey("report.report_id", ondelete="CASCADE"), nullable=False)
+    final_report_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    report_id = Column(UUID(as_uuid=True), ForeignKey("report.report_id", ondelete="CASCADE"), nullable=False)
     recommendation = Column(Text, nullable=False)
-    dashboard_id = Column(Integer, ForeignKey("dashboards.dashboard_id", ondelete="CASCADE"), nullable=False)
+    dashboard_id = Column(UUID(as_uuid=True), ForeignKey("dashboards.dashboard_id", ondelete="CASCADE"), nullable=False)
     
-    # Relationships
     report = relationship("Report", back_populates="final_reports")
     dashboard = relationship("Dashboards", back_populates="final_reports")
 
@@ -296,6 +297,32 @@ class FinalReport(Base):
 
     def __repr__(self):
         return f"<FinalReport(final_report_id={self.final_report_id}, report_id={self.report_id})>"
+
+
+# 13. Forecasting Table
+class Forecasting(Base):
+    __tablename__ = "forecasting"
+    forecast_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    report_id = Column(UUID(as_uuid=True), ForeignKey("report.report_id", ondelete="CASCADE"), nullable=False)
+    target_column = Column(String(255), nullable=False)
+    predicted_df = Column(Text, nullable=False)  # Store as JSON string
+    rmse = Column(Float, nullable=True)
+    r2 = Column(Float, nullable=True)
+    charts_path = Column(String(255), nullable=False)
+    created_at = Column(DateTime, default=func.now())
+    
+    report = relationship("Report", back_populates="forecasts")
+
+    def __init__(self, report_id, target_column, predicted_df, rmse=None, r2=None, charts_path=None):
+        self.report_id = report_id
+        self.target_column = target_column
+        self.predicted_df = predicted_df
+        self.rmse = rmse
+        self.r2 = r2
+        self.charts_path = charts_path
+
+    def __repr__(self):
+        return f"<Forecasting(forecast_id={self.forecast_id}, report_id={self.report_id}, target_column='{self.target_column}')>"
 
 Base.metadata.create_all(engine)
 """"

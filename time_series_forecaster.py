@@ -189,11 +189,19 @@ def time_series_forecaster(dataframe, target_col, date_cols=None, test_size=0.2,
     # Create actual vs predicted plot
     prediction_fig = None
     if has_datetime_index:
-        prediction_fig, ax = plt.subplots(figsize=(15, 5))
-        df[[target_col]].plot(ax=ax)
-        df['prediction'].plot(ax=ax, style='.')
-        plt.legend(['Actual Data', 'Predictions'])
-        ax.set_title('Actual vs Predicted')
+        prediction_fig, ax = plt.subplots(figsize=(15, 5), facecolor='#2c313c')
+        ax.set_facecolor('#2c313c')
+        df[[target_col]].plot(ax=ax, color='#00a6fb')
+        df['prediction'].plot(ax=ax, style='.', color='#ff6b6b')
+        plt.legend(['Actual Data', 'Predictions'], facecolor='#2c313c', labelcolor='white')
+        ax.set_title('Actual vs Predicted', color='white')
+        ax.tick_params(colors='white')
+        ax.spines['bottom'].set_color('white')
+        ax.spines['top'].set_color('white')
+        ax.spines['left'].set_color('white')
+        ax.spines['right'].set_color('white')
+        ax.xaxis.label.set_color('white')
+        ax.yaxis.label.set_color('white')
         plt.tight_layout()
     
     # Evaluation
@@ -203,15 +211,21 @@ def time_series_forecaster(dataframe, target_col, date_cols=None, test_size=0.2,
     print(f'RMSE Score on Test set: {rmse:0.2f}')
     
     # Create R² visualization
-    r2_fig, r2_ax = plt.subplots(figsize=(8, 8))
-    r2_ax.scatter(test[target_col], test['prediction'], alpha=0.5)
+    r2_fig, r2_ax = plt.subplots(figsize=(8, 8), facecolor='#2c313c')
+    r2_ax.set_facecolor('#2c313c')
+    r2_ax.scatter(test[target_col], test['prediction'], alpha=0.5, color='#00a6fb')
     r2_ax.plot([test[target_col].min(), test[target_col].max()], 
              [test[target_col].min(), test[target_col].max()], 
-             'r--', lw=2)
-    r2_ax.set_xlabel('Actual Values')
-    r2_ax.set_ylabel('Predicted Values')
-    r2_ax.set_title(f'Fit line, R² = {r2:0.4f}')
-    r2_ax.grid(True)
+             'r--', lw=2, color='#ff6b6b')
+    r2_ax.set_xlabel('Actual Values', color='white')
+    r2_ax.set_ylabel('Predicted Values', color='white')
+    r2_ax.set_title(f'Fit line, R² = {r2:0.4f}', color='white')
+    r2_ax.grid(True, color='#3d4451')
+    r2_ax.tick_params(colors='white')
+    r2_ax.spines['bottom'].set_color('white')
+    r2_ax.spines['top'].set_color('white')
+    r2_ax.spines['left'].set_color('white')
+    r2_ax.spines['right'].set_color('white')
     plt.tight_layout()
     
     # Future forecasting (if requested)
@@ -265,6 +279,6 @@ def time_series_forecaster(dataframe, target_col, date_cols=None, test_size=0.2,
         
         # Make predictions
         future_df['prediction'] = reg.predict(future_df[FEATURES])        
-        return future_df, [initial_plot, importance_fig, prediction_fig, r2_fig]
+        return future_df, [initial_plot, importance_fig, prediction_fig, r2_fig],[r2,rmse]
     
     return test, [initial_plot, importance_fig, prediction_fig, r2_fig]

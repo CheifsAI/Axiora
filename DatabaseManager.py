@@ -1,9 +1,9 @@
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import create_engine
-from Axioradb import engine,Dataset,CleanDataset,Report,Summary,LLM, Questions, Dashboards, Charts, ReportMemory,User
+from Axioradb import (engine,Dataset,CleanDataset,Report,Summary,LLM,Questions,
+                       Dashboards, Charts, ReportMemory,User, FinalReport, Forecasting)
 from sqlalchemy import func
-
 class DatabaseManager:
     def __init__(self):
         SessionLocal = sessionmaker(bind=engine)
@@ -88,6 +88,10 @@ class DatabaseManager:
         self.session.flush()
         dashboard_id = newDash.dashboard_id  
         self.session.commit()
+       #DashFinalReport = FinalReport(report_id=reportID,dashboard_id=dashboard_id)
+        #self.session.add(DashFinalReport)
+        self.session.commit()
+
         return dashboard_id
     
     def saveCharts(self,dashID,path):
@@ -156,18 +160,6 @@ class DatabaseManager:
         user_name = self.session.query(User.username).filter(User.user_id == userID).first()
         return user_name if user_name else None
 
-    def get_user_context(self, userID):
-        user = self.session.query(User).filter(User.user_id == userID).first()
-        return user.user_context if user else None
-
-    def update_user_context(self, userID, new_context):
-        user = self.session.query(User).filter(User.user_id == userID).first()
-        if user:
-            user.user_context = new_context
-            self.session.commit()
-            return True
-        return False
-
     def get_report_charts(self, reportID):
         charts = self.session.query(Charts.chart_path)\
             .join(Dashboards, Charts.dashboard_id == Dashboards.dashboard_id)\
@@ -175,3 +167,37 @@ class DatabaseManager:
             .filter(Report.report_id == reportID)\
             .all()
         return [chart[0] for chart in charts] if charts else None
+    def saveRecommendation(self,reportID,recommendation):
+        newRecommendation = FinalReport(report_id=reportID,recommendation=recommendation)
+        self.session.add(newRecommendation)
+        self.session.commit()
+    def saveForecasting(self,reportID,target_column,predicted_df,rmse,r2,charts_path):
+        newForecasting = Forecasting(report_id=reportID,target_column=target_column,
+                                     predicted_df=predicted_df,
+                                     rmse=rmse,
+                                     r2=r2,
+                                     charts_path=charts_path)
+        self.session.add(newForecasting)
+        self.session.commit()
+    def get_forecasting(self, reportID):
+        """Get all forecasting data for a given report ID"""
+        forecasting_data = self.session.query(
+            Forecasting.target_column,
+            Forecasting.predicted_df,
+            Forecasting.rmse,
+            Forecasting.r2,
+            Forecasting.charts_path
+        ).filter(
+            Forecasting.report_id == reportID
+        ).first()
+        
+        if forecasting_data:
+            return {
+                'target_column': forecasting_data[0],
+                'predicted_df': forecasting_data[1],
+                'rmse': forecasting_data[2],
+                'r2': forecasting_data[3],
+                'charts_path': forecasting_data[4]
+            }
+        return None
+

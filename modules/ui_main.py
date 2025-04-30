@@ -727,6 +727,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addWidget(self.btn_predictions)
 
+
         self.btn_new = QPushButton(self.topMenu)
         self.btn_new.setObjectName(u"btn_new")
         sizePolicy1.setHeightForWidth(self.btn_new.sizePolicy().hasHeightForWidth())
@@ -1111,13 +1112,13 @@ class Ui_MainWindow(object):
         self.groupBox_8.setSizePolicy(sizePolicy4)
         self.horizontalLayout_11 = QHBoxLayout(self.groupBox_8)
         self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
-        self.chat_data_btn = QPushButton(self.groupBox_8)
-        self.chat_data_btn.setObjectName(u"chat_data_btn")
+       # self.chat_data_btn = QPushButton(self.groupBox_8)
+       # self.chat_data_btn.setObjectName(u"chat_data_btn")
         icon4 = QIcon()
         icon4.addFile(u":/icons/images/icons/cil-link.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
-        self.chat_data_btn.setIcon(icon4)
+      #  self.chat_data_btn.setIcon(icon4)
 
-        self.horizontalLayout_11.addWidget(self.chat_data_btn)
+       # self.horizontalLayout_11.addWidget(self.chat_data_btn)
 
         self.lineEdit_message = QLineEdit(self.groupBox_8)
         self.lineEdit_message.setObjectName(u"lineEdit_message")
@@ -1360,16 +1361,16 @@ class Ui_MainWindow(object):
         
         # Add prediction controls
         self.prediction_controls = QFrame(self.predictions_page)
-        self.prediction_controls.setObjectName(u"prediction_controls")
+        self.prediction_controls.setObjectName("prediction_controls")
         self.prediction_controls.setFrameShape(QFrame.Shape.StyledPanel)
         self.prediction_controls.setFrameShadow(QFrame.Shadow.Raised)
-        self.prediction_controls.setMaximumHeight(150)  # Limit height of controls
+        self.prediction_controls.setMaximumHeight(150)
+        
+        # Create horizontal layout for prediction controls
         self.horizontalLayout_13 = QHBoxLayout(self.prediction_controls)
-        self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
+        self.horizontalLayout_13.setObjectName("horizontalLayout_13")
         self.horizontalLayout_13.setContentsMargins(10, 10, 10, 10)
         self.horizontalLayout_13.setSpacing(10)
-
-        self.horizontalLayout_13.addWidget(self.prediction_controls, alignment=Qt.AlignmentFlag.AlignTop)
 
         # Add target column selection
         self.target_col_label = QLabel(self.prediction_controls)
@@ -1452,11 +1453,6 @@ class Ui_MainWindow(object):
         
         self.date_group_layout.addWidget(self.date_stack)
         
-        # Connect radio buttons to stack switching
-        self.single_date_radio.toggled.connect(lambda checked: 
-            self.date_stack.setCurrentWidget(self.single_date_page if checked 
-            else self.multi_date_page))
-        
         self.horizontalLayout_13.addWidget(self.date_group)
         
         # Add forecast horizon input
@@ -1482,6 +1478,7 @@ class Ui_MainWindow(object):
         self.predict_btn.setMinimumHeight(30)
         self.horizontalLayout_13.addWidget(self.predict_btn)
         
+        # Add the prediction controls to the main layout
         self.verticalLayout_21.addWidget(self.prediction_controls)
         
         # Add prediction results area
@@ -1557,10 +1554,10 @@ class Ui_MainWindow(object):
         self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
         self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
-        self.qu_num_list.addItem("")
+        # self.qu_num_list.addItem("")
+        # self.qu_num_list.addItem("")
+        # self.qu_num_list.addItem("")
+        # self.qu_num_list.addItem("")
         self.qu_num_list.setObjectName(u"qu_num_list")
         self.qu_num_list.setAutoFillBackground(False)
         self.qu_num_list.setEditable(True)
@@ -1612,6 +1609,33 @@ class Ui_MainWindow(object):
 
         self.tabWidget.addTab(self.Summerize_tab, "")
 
+        # Add Recommendations tab
+        self.Recommendations_tab = QWidget()
+        self.Recommendations_tab.setObjectName(u"Recommendations_tab")
+        self.gridLayout_7 = QGridLayout(self.Recommendations_tab)
+        self.gridLayout_7.setObjectName(u"gridLayout_7")
+        
+        self.rec_widget = QWidget(self.Recommendations_tab)
+        self.rec_widget.setObjectName(u"rec_widget")
+        self.gridLayout_8 = QGridLayout(self.rec_widget)
+        self.gridLayout_8.setObjectName(u"gridLayout_8")
+        
+        self.rec_btn = QPushButton(self.rec_widget)
+        self.rec_btn.setObjectName(u"rec_btn")
+        self.rec_btn.setText("Generate Recommendations")
+        
+        self.gridLayout_8.addWidget(self.rec_btn, 0, 0, 1, 1)
+        
+        self.recommendations_text = QTextEdit(self.rec_widget)
+        self.recommendations_text.setObjectName(u"recommendations_text")
+        self.recommendations_text.setReadOnly(True)
+        
+        self.gridLayout_8.addWidget(self.recommendations_text, 1, 0, 1, 1)
+        
+        self.gridLayout_7.addWidget(self.rec_widget, 0, 0, 1, 1)
+        
+        self.tabWidget.addTab(self.Recommendations_tab, "")
+
         self.verticalLayout_20.addWidget(self.tabWidget)
 
         self.stackedWidget.addWidget(self.new_page)
@@ -1655,17 +1679,17 @@ class Ui_MainWindow(object):
         self.verticalLayout_14.setSpacing(0)
         self.verticalLayout_14.setObjectName(u"verticalLayout_14")
         self.verticalLayout_14.setContentsMargins(0, 0, 0, 0)
-        self.btn_message = QPushButton(self.topMenus)
-        self.btn_message.setObjectName(u"btn_message")
-        sizePolicy1.setHeightForWidth(self.btn_message.sizePolicy().hasHeightForWidth())
-        self.btn_message.setSizePolicy(sizePolicy1)
-        self.btn_message.setMinimumSize(QSize(0, 45))
-        self.btn_message.setFont(font)
-        self.btn_message.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.btn_message.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.btn_message.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-envelope-open.png);")
+        #self.btn_message = QPushButton(self.topMenus)
+        #self.btn_message.setObjectName(u"btn_message")
+       # sizePolicy1.setHeightForWidth(self.btn_message.sizePolicy().hasHeightForWidth())
+       # self.btn_message.setSizePolicy(sizePolicy1)
+       # self.btn_message.setMinimumSize(QSize(0, 45))
+       # self.btn_message.setFont(font)
+       # self.btn_message.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+       # self.btn_message.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+      #  self.btn_message.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-envelope-open.png);")
 
-        self.verticalLayout_14.addWidget(self.btn_message)
+       # self.verticalLayout_14.addWidget(self.btn_message)
 
         self.btn_print = QPushButton(self.topMenus)
         self.btn_print.setObjectName(u"btn_print")
@@ -1679,17 +1703,17 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_14.addWidget(self.btn_print)
 
-        self.btn_logout = QPushButton(self.topMenus)
-        self.btn_logout.setObjectName(u"btn_logout")
-        sizePolicy1.setHeightForWidth(self.btn_logout.sizePolicy().hasHeightForWidth())
-        self.btn_logout.setSizePolicy(sizePolicy1)
-        self.btn_logout.setMinimumSize(QSize(0, 45))
-        self.btn_logout.setFont(font)
-        self.btn_logout.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.btn_logout.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
-        self.btn_logout.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-account-logout.png);")
+        #self.btn_logout = QPushButton(self.topMenus)
+        #self.btn_logout.setObjectName(u"btn_logout")
+       # sizePolicy1.setHeightForWidth(self.btn_logout.sizePolicy().hasHeightForWidth())
+       # self.btn_logout.setSizePolicy(sizePolicy1)
+       # self.btn_logout.setMinimumSize(QSize(0, 45))
+       # self.btn_logout.setFont(font)
+       # self.btn_logout.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+       # self.btn_logout.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+       # self.btn_logout.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-account-logout.png);")
 
-        self.verticalLayout_14.addWidget(self.btn_logout)
+       # self.verticalLayout_14.addWidget(self.btn_logout)
 
 
         self.verticalLayout_13.addWidget(self.topMenus, 0, Qt.AlignmentFlag.AlignTop)
@@ -1778,7 +1802,7 @@ class Ui_MainWindow(object):
         self.btn_data.setText(QCoreApplication.translate("MainWindow", u"Data", None))
         self.btn_anlysis.setText(QCoreApplication.translate("MainWindow", u"Analysis", None))
         self.btn_dashboard.setText(QCoreApplication.translate("MainWindow", u"Dashboard", None))
-        self.btn_predictions.setText(QCoreApplication.translate("MainWindow", u"Predictions", None))
+        self.btn_predictions.setText(QCoreApplication.translate("MainWindow", u"Forcasting", None))
         self.btn_new.setText(QCoreApplication.translate("MainWindow", u"New Report", None))
         self.toggleLeftBox.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
         self.extraLabel.setText(QCoreApplication.translate("MainWindow", u"Left Box", None))
@@ -1816,7 +1840,7 @@ class Ui_MainWindow(object):
         self.closeAppBtn.setText("")
         self.groupBox_4.setTitle("")
         self.groupBox_8.setTitle("")
-        self.chat_data_btn.setText("")
+        #self.chat_data_btn.setText("")
         self.lineEdit_message.setText("")
         self.lineEdit_message.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Enter your message here", None))
         self.send_btn.setText(QCoreApplication.translate("MainWindow", u"Send", None))
@@ -1853,9 +1877,10 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Questions_tap), QCoreApplication.translate("MainWindow", u"Questions", None))
         self.sum_btn.setText(QCoreApplication.translate("MainWindow", u"Summerize", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Summerize_tab), QCoreApplication.translate("MainWindow", u"Summerize", None))
-        self.btn_message.setText(QCoreApplication.translate("MainWindow", u"Message", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.Recommendations_tab), QCoreApplication.translate("MainWindow", u"Recommendations", None))
+      #  self.btn_message.setText(QCoreApplication.translate("MainWindow", u"Message", None))
         self.btn_print.setText(QCoreApplication.translate("MainWindow", u"Print", None))
-        self.btn_logout.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
+        #self.btn_logout.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
         self.creditsLabel.setText(QCoreApplication.translate("MainWindow", u"By: Cheifs AI", None))
         self.version.setText(QCoreApplication.translate("MainWindow", u"v1.0", None))
     # retranslateUi

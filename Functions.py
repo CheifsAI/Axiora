@@ -173,7 +173,7 @@ class GuiFunctions():
         self.main_window.ui.qu_num_list.currentIndexChanged.connect(self.handle_qu_num)
         self.main_window.ui.qu_btn.clicked.connect(self.handle_qu_btn)
         self.main_window.ui.save_qu_btn.clicked.connect(self.handle_save_qu_btn)
-        self.main_window.ui.chat_data_btn.clicked.connect(self.handle_chat_data_btn)
+       # self.main_window.ui.chat_data_btn.clicked.connect(self.handle_chat_data_btn)
         self.main_window.ui.send_btn.clicked.connect(self.send_message)
         self.lineEdit_chat = self.main_window.ui.lineEdit_message
         self.main_window.ui.lineEdit_message.keyReleaseEvent = self.enter_return_release
@@ -181,6 +181,7 @@ class GuiFunctions():
         self.main_window.ui.btn_dashboard.clicked.connect(self.handle_dashboard_click)
         # Add done button connection
         self.main_window.ui.done_btn.clicked.connect(self.process_selected_questions)
+        self.main_window.ui.rec_btn.clicked.connect(self.handle_rec_btn)
 
     def handle_word_btn(self):
         fpath, _ = QFileDialog.getOpenFileName(
@@ -308,6 +309,10 @@ class GuiFunctions():
                 for j in range(self.df.shape[1]):
                     self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))
 
+    def handle_rec_btn(self):
+       recos = self.analyzer.generate_recommendations()
+       self.main_window.ui.recommendations_text.setMarkdown(recos)
+
     def handle_sum_btn(self):
         # Show loading overlay
         self.show_loading("Generating Summary...")
@@ -354,8 +359,65 @@ class GuiFunctions():
 
 
     def handle_clean_data_btn(self):
-        clean_dialog = CleanDataDialog(parent=self.main_window, df=self.df)
-        clean_dialog.exec()
+        # Show loading overlay
+        self.show_loading("Cleaning Data...")
+        
+        try:
+            # Check if datasetID exists
+            if not hasattr(self, 'datasetID'):
+                self.main_window.ui.import_data_dialog.setText("Please load a dataset first.")
+                return
+            
+            # Create and show the cleaning dialog
+            clean_dialog = CleanDataDialog(parent=self.main_window, df=self.df)
+            if clean_dialog.exec() == QDialog.Accepted:
+                # Get the cleaned dataframe from the dialog
+                self.cleaned_df = clean_dialog.cleaned_data
+                
+                # Update filename and path
+                self.dname = f"cleaned_{self.dname}"
+                self.cleaned_df_path = os.path.join(self.rname, self.dname)
+                print(f"Saving cleaned data to: {self.cleaned_df_path}")
+                
+                # Save cleaned dataframe to CSV
+                self.cleaned_df.to_csv(self.cleaned_df_path, index=False)
+                
+                # Update current dataframe
+                self.df = self.cleaned_df
+                
+                # Update analyzer attributes with cleaned data
+                self._analyzer_attributes()
+                
+                # Save cleaned dataset to database
+                self.datasetID = self.db.saveCleanDataset(
+                    ogID=self.datasetID,
+                    path=self.cleaned_df_path,
+                    name=self.dname,
+                    info=self.data_info,
+                    description=self.data_description,
+                    sample=self.data_sample,
+                    cols=self.data_cols
+                )
+                
+                # Save clean dataset report
+                self.db.saveCleanDatasetReport(reportId=self.reportID, cleandataset=self.datasetID)
+                
+                # Update table display
+                self._show_df()
+                
+                # Show success message
+                self.main_window.ui.import_data_dialog.setText("Data cleaned successfully!")
+            else:
+                # User cancelled the cleaning operation
+                self.main_window.ui.import_data_dialog.setText("Data cleaning cancelled.")
+            
+        except Exception as e:
+            print(f"Error cleaning data: {str(e)}")
+            self.main_window.ui.import_data_dialog.setText(f"Error cleaning data: {str(e)}")
+            
+        finally:
+            # Hide loading overlay
+            self.hide_loading()
 
     def extract_questions(self, text):
         """Extracts questions from the text by splitting on newlines."""
@@ -510,15 +572,15 @@ class GuiFunctions():
         self.qu_saved = True
 
 #
-    def handle_chat_data_btn(self):
-        cfpath, _ = QFileDialog.getOpenFileName(
-            self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)"
-        )
-        if cfpath:
-            chat_df = read_file()
-            chat_analyzer = DataAnalyzer(dataframe=chat_df, llm=self.llm)
-            chat_df_anlysis = chat_analyzer.analysis_data()
-            return chat_df_anlysis
+    # def handle_chat_data_btn(self):
+    #     cfpath, _ = QFileDialog.getOpenFileName(
+    #         self.main_window, "Open File", "", "CSV Files (*.csv);;Excel Files (*.xls *.xlsx)"
+    #     )
+    #     if cfpath:
+    #         chat_df = read_file()
+    #         chat_analyzer = DataAnalyzer(dataframe=chat_df, llm=self.llm)
+    #         chat_df_anlysis = chat_analyzer.analysis_data()
+    #         return chat_df_anlysis
 
     def enter_return_release(self, event):
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
