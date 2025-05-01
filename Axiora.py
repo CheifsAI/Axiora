@@ -328,92 +328,16 @@ class MainWindow(QMainWindow):
             content_layout.setSpacing(20)
             content_layout.setContentsMargins(20, 20, 20, 20)
             
-            # Add metrics section
-            metrics_frame = QFrame()
-            metrics_frame.setObjectName("metrics_frame")
-            metrics_frame.setStyleSheet("""
-                QFrame {
-                    background-color: #2c313c;
-                    border: 2px solid #3d4451;
-                    border-radius: 10px;
-                    padding: 10px;
-                    margin-top: 10px;
-                    margin-bottom: 10px;
-                }
-            """)
-            metrics_frame.setMaximumHeight(100)
-            metrics_layout = QHBoxLayout(metrics_frame)
-            metrics_layout.setContentsMargins(20, 10, 20, 10)
-            metrics_layout.setSpacing(40)
-            
-            # Add R² Score
-            r2_container = QFrame()
-            r2_layout = QVBoxLayout(r2_container)
-            r2_title = QLabel("R² Score")
-            r2_title.setStyleSheet("""
-                QLabel {
-                    color: #00a6fb;
-                    font-size: 16px;
-                    font-weight: bold;
-                }
-            """)
-            r2_title.setAlignment(Qt.AlignCenter)
-            r2_value = QLabel(f"{forecasting_data.get('r2', 'N/A'):.4f}" if isinstance(forecasting_data.get('r2'), (int, float)) else "N/A")
-            r2_value.setStyleSheet("""
-                QLabel {
-                    color: #ffffff;
-                    font-size: 24px;
-                    font-weight: bold;
-                }
-            """)
-            r2_value.setAlignment(Qt.AlignCenter)
-            r2_layout.addWidget(r2_title)
-            r2_layout.addWidget(r2_value)
-            
-            # Add RMSE Score
-            rmse_container = QFrame()
-            rmse_layout = QVBoxLayout(rmse_container)
-            rmse_title = QLabel("RMSE Score")
-            rmse_title.setStyleSheet("""
-                QLabel {
-                    color: #00a6fb;
-                    font-size: 16px;
-                    font-weight: bold;
-                }
-            """)
-            rmse_title.setAlignment(Qt.AlignCenter)
-            rmse_value = QLabel(f"{forecasting_data.get('rmse', 'N/A'):.2f}" if isinstance(forecasting_data.get('rmse'), (int, float)) else "N/A")
-            rmse_value.setStyleSheet("""
-                QLabel {
-                    color: #ffffff;
-                    font-size: 24px;
-                    font-weight: bold;
-                }
-            """)
-            rmse_value.setAlignment(Qt.AlignCenter)
-            rmse_layout.addWidget(rmse_title)
-            rmse_layout.addWidget(rmse_value)
-            
-            # Add containers to metrics frame
-            metrics_layout.addWidget(r2_container)
-            metrics_layout.addWidget(rmse_container)
-            
-            # Add metrics frame to content layout
-            content_layout.addWidget(metrics_frame)
-            
-            # Load the predicted DataFrame
-            predictions_df = read_file(forecasting_data['predicted_df'])
-            
             # Create and add the feature DataFrame table
             feature_table = QTableWidget()
-            feature_table.setColumnCount(len(predictions_df.columns))
-            feature_table.setRowCount(len(predictions_df))
-            feature_table.setHorizontalHeaderLabels(predictions_df.columns)
+            feature_table.setColumnCount(len(forecasting_data['predicted_df'].columns))
+            feature_table.setRowCount(len(forecasting_data['predicted_df']))
+            feature_table.setHorizontalHeaderLabels(forecasting_data['predicted_df'].columns)
             
             # Fill the table with data
-            for i in range(len(predictions_df)):
-                for j in range(len(predictions_df.columns)):
-                    item = QTableWidgetItem(str(predictions_df.iloc[i, j]))
+            for i in range(len(forecasting_data['predicted_df'])):
+                for j in range(len(forecasting_data['predicted_df'].columns)):
+                    item = QTableWidgetItem(str(forecasting_data['predicted_df'].iloc[i, j]))
                     feature_table.setItem(i, j, item)
             
             # Set table properties
@@ -472,7 +396,7 @@ class MainWindow(QMainWindow):
                         chart_files = [f for f in os.listdir(charts_dir) if f.endswith('.png')]
                         for i, chart_file in enumerate(chart_files):
                             chart_path = os.path.join(charts_dir, chart_file)
-                    if os.path.exists(chart_path):
+                            if os.path.exists(chart_path):
                                 # Create a frame for each chart section
                                 chart_section = QFrame()
                                 chart_section.setStyleSheet("""
@@ -482,7 +406,6 @@ class MainWindow(QMainWindow):
                                         border-radius: 10px;
                                     }
                                 """)
-                                # Set size policy to make charts fill their containers
                                 chart_section.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                                 chart_section.setMinimumSize(600, 500)
                                 chart_section_layout = QVBoxLayout(chart_section)
@@ -524,20 +447,21 @@ class MainWindow(QMainWindow):
                                 chart_content_layout.setContentsMargins(0, 0, 0, 0)
                                 chart_content_layout.setSpacing(0)
 
-                                # Create figure and load image with proper sizing
-                                dpi = 100  # Set DPI for better resolution
-                                fig_width = 580 / dpi  # Calculate figure width in inches
-                                fig_height = 430 / dpi  # Calculate figure height in inches
+                                # Create figure and load image
+                                dpi = 100
+                                fig_width = 580 / dpi
+                                fig_height = 430 / dpi
                                 fig = plt.figure(figsize=(fig_width, fig_height), dpi=dpi, tight_layout=True)
                                 fig.patch.set_facecolor('#1b1e23')
                                 ax = plt.gca()
                                 ax.set_facecolor('#1b1e23')
                                 
+                                # Load and display image
                                 img = plt.imread(chart_path)
                                 plt.imshow(img)
                                 plt.axis('off')
                                 
-                                # Add the plot canvas with proper sizing
+                                # Create canvas
                                 canvas = FigureCanvas(fig)
                                 canvas.setStyleSheet("background-color: #1b1e23;")
                                 canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -597,6 +521,66 @@ class MainWindow(QMainWindow):
                                     plot_layout.addWidget(chart_section, 1, 0)
                                 elif i == 3:  # R² Plot
                                     plot_layout.addWidget(chart_section, 1, 1)
+                                    
+                                    # Add metrics section after the last chart
+                                    metrics_frame = QFrame()
+                                    metrics_frame.setStyleSheet("""
+                                        QFrame {
+                                            background-color: #2c313c;
+                                            border: 2px solid #3d4451;
+                                            border-radius: 10px;
+                                            margin-top: 10px;
+                                        }
+                                    """)
+                                    metrics_layout = QVBoxLayout(metrics_frame)
+                                    metrics_layout.setContentsMargins(20, 15, 20, 15)
+                                    metrics_layout.setSpacing(10)
+
+                                    # Title for metrics section
+                                    metrics_title = QLabel("Final Model Performance Metrics")
+                                    metrics_title.setStyleSheet("""
+                                        QLabel {
+                                            color: #00a6fb;
+                                            font-size: 18px;
+                                            font-weight: bold;
+                                            padding: 5px;
+                                        }
+                                    """)
+                                    metrics_title.setAlignment(Qt.AlignCenter)
+                                    metrics_layout.addWidget(metrics_title)
+
+                                    # R² Score Label
+                                    r2_value = forecasting_data.get('r2')
+                                    r2_text = f"R² Score on Test set: {r2_value:.4f}" if isinstance(r2_value, (int, float)) else "R² Score on Test set: N/A"
+                                    r2_label = QLabel(r2_text)
+                                    r2_label.setStyleSheet("""
+                                        QLabel {
+                                            color: #ffffff;
+                                            font-size: 16px;
+                                            font-weight: bold;
+                                            padding: 5px;
+                                        }
+                                    """)
+                                    r2_label.setAlignment(Qt.AlignCenter)
+                                    metrics_layout.addWidget(r2_label)
+
+                                    # RMSE Score Label
+                                    rmse_value = forecasting_data.get('rmse')
+                                    rmse_text = f"RMSE Score on Test set: {rmse_value:.2f}" if isinstance(rmse_value, (int, float)) else "RMSE Score on Test set: N/A"
+                                    rmse_label = QLabel(rmse_text)
+                                    rmse_label.setStyleSheet("""
+                                        QLabel {
+                                            color: #ffffff;
+                                            font-size: 16px;
+                                            font-weight: bold;
+                                            padding: 5px;
+                                        }
+                                    """)
+                                    rmse_label.setAlignment(Qt.AlignCenter)
+                                    metrics_layout.addWidget(rmse_label)
+
+                                    # Add metrics frame to layout
+                                    plot_layout.addWidget(metrics_frame, 2, 0, 1, 2)
 
             # Create main scroll area for all charts
             main_scroll = QScrollArea()
@@ -892,7 +876,7 @@ class MainWindow(QMainWindow):
                     # Add back the prediction controls if they existed
                     if prediction_controls:
                         existing_layout.addWidget(prediction_controls)
-            
+                
             df = self.app_functions.df
             target_col = widgets.target_col_combo.currentText()
             
@@ -953,79 +937,6 @@ class MainWindow(QMainWindow):
             content_layout = QVBoxLayout(content_container)
             content_layout.setSpacing(20)
             content_layout.setContentsMargins(20, 20, 20, 20)
-            
-            # Add metrics section
-            metrics_frame = QFrame()
-            metrics_frame.setObjectName("metrics_frame")
-            metrics_frame.setStyleSheet("""
-                QFrame {
-                    background-color: #2c313c;
-                    border: 2px solid #3d4451;
-                    border-radius: 10px;
-                    padding: 10px;
-                    margin-top: 10px;
-                    margin-bottom: 10px;
-                }
-            """)
-            metrics_frame.setMaximumHeight(100)
-            metrics_layout = QHBoxLayout(metrics_frame)
-            metrics_layout.setContentsMargins(20, 10, 20, 10)
-            metrics_layout.setSpacing(40)
-            
-            # Add R² Score
-            r2_container = QFrame()
-            r2_layout = QVBoxLayout(r2_container)
-            r2_title = QLabel("R² Score")
-            r2_title.setStyleSheet("""
-                QLabel {
-                    color: #00a6fb;
-                    font-size: 16px;
-                    font-weight: bold;
-                }
-            """)
-            r2_title.setAlignment(Qt.AlignCenter)
-            r2_value = QLabel(f"{r2_score:.4f}" if isinstance(r2_score, (int, float)) else "N/A")
-            r2_value.setStyleSheet("""
-                QLabel {
-                    color: #ffffff;
-                    font-size: 24px;
-                    font-weight: bold;
-                }
-            """)
-            r2_value.setAlignment(Qt.AlignCenter)
-            r2_layout.addWidget(r2_title)
-            r2_layout.addWidget(r2_value)
-            
-            # Add RMSE Score
-            rmse_container = QFrame()
-            rmse_layout = QVBoxLayout(rmse_container)
-            rmse_title = QLabel("RMSE Score")
-            rmse_title.setStyleSheet("""
-                QLabel {
-                    color: #00a6fb;
-                    font-size: 16px;
-                    font-weight: bold;
-                }
-            """)
-            rmse_title.setAlignment(Qt.AlignCenter)
-            rmse_value = QLabel(f"{rmse_score:.2f}" if isinstance(rmse_score, (int, float)) else "N/A")
-            rmse_value.setStyleSheet("""
-                QLabel {
-                    color: #ffffff;
-                    font-size: 24px;
-                    font-weight: bold;
-                }
-            """)
-            rmse_value.setAlignment(Qt.AlignCenter)
-            rmse_layout.addWidget(rmse_title)
-            rmse_layout.addWidget(rmse_value)
-            
-            # Add containers to metrics frame
-            metrics_layout.addWidget(r2_container)
-            metrics_layout.addWidget(rmse_container)
-            
-            # Add metrics frame to content layout
-            content_layout.addWidget(metrics_frame)
             
             # Create and add the feature DataFrame table
             feature_table = QTableWidget()
@@ -1105,7 +1016,6 @@ class MainWindow(QMainWindow):
                                         border-radius: 10px;
                                     }
                                 """)
-                                # Set size policy to make charts fill their containers
                                 chart_section.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
                                 chart_section.setMinimumSize(600, 500)
                                 chart_section_layout = QVBoxLayout(chart_section)
@@ -1147,20 +1057,21 @@ class MainWindow(QMainWindow):
                                 chart_content_layout.setContentsMargins(0, 0, 0, 0)
                                 chart_content_layout.setSpacing(0)
 
-                                # Create figure and load image with proper sizing
-                                dpi = 100  # Set DPI for better resolution
-                                fig_width = 580 / dpi  # Calculate figure width in inches
-                                fig_height = 430 / dpi  # Calculate figure height in inches
+                                # Create figure and load image
+                                dpi = 100
+                                fig_width = 580 / dpi
+                                fig_height = 430 / dpi
                                 fig = plt.figure(figsize=(fig_width, fig_height), dpi=dpi, tight_layout=True)
                                 fig.patch.set_facecolor('#1b1e23')
                                 ax = plt.gca()
                                 ax.set_facecolor('#1b1e23')
                                 
+                                # Load and display image
                                 img = plt.imread(chart_path)
                                 plt.imshow(img)
                                 plt.axis('off')
                                 
-                                # Add the plot canvas with proper sizing
+                                # Create canvas
                                 canvas = FigureCanvas(fig)
                                 canvas.setStyleSheet("background-color: #1b1e23;")
                                 canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -1220,6 +1131,66 @@ class MainWindow(QMainWindow):
                                     plot_layout.addWidget(chart_section, 1, 0)
                                 elif i == 3:  # R² Plot
                                     plot_layout.addWidget(chart_section, 1, 1)
+                                    
+                                    # Add metrics section after the last chart
+                                    metrics_frame = QFrame()
+                                    metrics_frame.setStyleSheet("""
+                                        QFrame {
+                                            background-color: #2c313c;
+                                            border: 2px solid #3d4451;
+                                            border-radius: 10px;
+                                            margin-top: 10px;
+                                        }
+                                    """)
+                                    metrics_layout = QVBoxLayout(metrics_frame)
+                                    metrics_layout.setContentsMargins(20, 15, 20, 15)
+                                    metrics_layout.setSpacing(10)
+
+                                    # Title for metrics section
+                                    metrics_title = QLabel("Final Model Performance Metrics")
+                                    metrics_title.setStyleSheet("""
+                                        QLabel {
+                                            color: #00a6fb;
+                                            font-size: 18px;
+                                            font-weight: bold;
+                                            padding: 5px;
+                                        }
+                                    """)
+                                    metrics_title.setAlignment(Qt.AlignCenter)
+                                    metrics_layout.addWidget(metrics_title)
+
+                                    # R² Score Label
+                                    r2_value = forecasting_data.get('r2')
+                                    r2_text = f"R² Score on Test set: {r2_value:.4f}" if isinstance(r2_value, (int, float)) else "R² Score on Test set: N/A"
+                                    r2_label = QLabel(r2_text)
+                                    r2_label.setStyleSheet("""
+                                        QLabel {
+                                            color: #ffffff;
+                                            font-size: 16px;
+                                            font-weight: bold;
+                                            padding: 5px;
+                                        }
+                                    """)
+                                    r2_label.setAlignment(Qt.AlignCenter)
+                                    metrics_layout.addWidget(r2_label)
+
+                                    # RMSE Score Label
+                                    rmse_value = forecasting_data.get('rmse')
+                                    rmse_text = f"RMSE Score on Test set: {rmse_value:.2f}" if isinstance(rmse_value, (int, float)) else "RMSE Score on Test set: N/A"
+                                    rmse_label = QLabel(rmse_text)
+                                    rmse_label.setStyleSheet("""
+                                        QLabel {
+                                            color: #ffffff;
+                                            font-size: 16px;
+                                            font-weight: bold;
+                                            padding: 5px;
+                                        }
+                                    """)
+                                    rmse_label.setAlignment(Qt.AlignCenter)
+                                    metrics_layout.addWidget(rmse_label)
+
+                                    # Add metrics frame to layout
+                                    plot_layout.addWidget(metrics_frame, 2, 0, 1, 2)
 
             # Create main scroll area for all charts
             main_scroll = QScrollArea()
@@ -1359,6 +1330,7 @@ class MainWindow(QMainWindow):
                             elements.append(Spacer(1, 20))
                         except Exception as e:
                             print(f"Error adding chart {chart_path}: {str(e)}")
+                            continue
 
             # Add forecasting section
             if hasattr(widgets, 'predictions_page'):
