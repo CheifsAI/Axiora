@@ -40,31 +40,89 @@ class DataAnalyzer:
         data_description = self.data_description
 
         analysis_template = '''
-        You are a data analyst. You are provided with:
+        You are a highly skilled professional data analyst specialized in business data analysis.
+
+        You are provided with:
         1. Dataset metadata: {data_info}
         2. Dataset sample: {data_sample}
         3. Dataset summary: {data_description}
-        4. User_context: {user_context}
+        4. User context: {user_context}
 
-        You are a highly skilled professional data analyst specialized in business data analysis.
+        Your task is to provide a structured and insightful business data analysis report.
 
-        Given the following dataset analysis, your tasks are:
-        1. Provide a **deep, comprehensive analysis** of the data.
-        2. **Explain key findings**, trends, patterns, and anomalies in a meaningful way.
-        3. **Interpret** what the numbers and statistics mean for the business context (not just describe them).
-        4. **Identify**:
-        - Critical KPIs (Key Performance Indicators).
-        - Potential risks and problems suggested by the data.
-        - Opportunities for growth, improvement, or efficiency.
-        5. Highlight **hidden insights** that may not be immediately obvious.
-        6. Make sure your analysis tells a **clear, logical story** about the business situation.
+        Your analysis must:
+        - Uncover patterns, trends, and key insights.
+        - Highlight any surprising, concerning, or high-impact findings.
+        - Identify strengths, weaknesses, opportunities, and risks.
+        - Connect findings to business strategy and decision-making.
+        - Use professional, executive-level language.
+        - Be clear, structured, and insightful.
+        - Reference actual metrics and statistics where possible.
 
-        Instructions:
-        - Be detailed but concise.
-        - Avoid listing plain statistics — always explain their implications.
-        - Connect different findings where relevant to create a full picture.
-        - Think like a business consultant, not just a data scientist.
+        ---
+
+        ### 📊 Executive Summary
+
+        - Provide a concise overview of the most important findings and what they mean for the business.
+
+        ---
+
+        ### 📈 Key Patterns & Insights
+
+        1. **🏠 Home Team Goals: A Trend to Build Upon**  
+        The average number of home team goals per match is increasing over time (**mean: 1.811**). This suggests improved performance and presents opportunities for increased revenue via ticket sales, sponsorships, and merchandise.
+
+        2. **🎟️ Attendance: A Correlation Worth Exploring**  
+        A strong positive correlation exists between attendance and home team goals (**R² = 0.75**). More engaged crowds appear to boost home team performance — highlighting the need to enhance the match-day experience.
+
+        3. **⏱️ Half-time Home Goals: A Key Indicator**  
+        The average number of half-time home goals is rising (**mean: 0.708**), signaling strong starts and potentially higher match finishes. This has implications for fantasy sports and sports betting engagement.
+
+        ---
+
+        ### ⚠️ Risks, Challenges & Weaknesses
+
+        1. **📉 Attendance Fluctuations**  
+        A moderate negative correlation between attendance and away team goals (**R² = -0.45**) implies weaker away team performance may deter fans. This could negatively affect revenue, especially in less competitive matchups.
+
+        2. **⚖️ Data Imbalance**  
+        75% of matches are skewed toward teams with higher average goals. This imbalance could bias predictive models. Consider resampling strategies like oversampling or undersampling.
+
+        ---
+
+        ### 🌱 Opportunities for Growth
+
+        1. **🎊 Optimize Match-Day Experience**  
+        Leverage the strong attendance-home goal correlation to invest in fan zones, entertainment, and stadium experiences that drive engagement and revenue.
+
+        2. **🧠 Enhance Fantasy Sports Offerings**  
+        Rising trends in home and half-time goals indicate an opportunity to build more engaging and dynamic fantasy game formats.
+
+        ---
+
+        ### 🔍 Additional Insights
+
+        1. **🔁 Unexpected Correlation**  
+        A **moderate positive correlation** (**R² = 0.25**) exists between attendance and **away team goals** — suggesting fans are also drawn to exciting high-scoring games, regardless of team allegiance. This opens up alternative marketing narratives.
+
+        2. **🔬 Deeper Analytical Paths**  
+        Further investigation into possession, shot accuracy, and team structure can reveal micro-level levers to inform business and coaching strategies.
+
+        ---
+
+        ### 🧠 Strategic Reflection
+
+        - Based on these insights, the organization should prioritize enhancing the fan experience both in-stadium and digitally, while also preparing predictive models with proper data balancing techniques.
+        - Ensure data-driven decision-making incorporates both trends and outliers.
+        - Beware of biases caused by data imbalance and continuously validate models against new seasons or competitions.
+
+        ---
+
+        *Prepared by your Data Analyst Agent*
         '''
+
+
+
         analysis_prompt = PromptTemplate(
             input_variables=["data_info", "data_sample", "data_description", "user_context"],
             template=analysis_template
