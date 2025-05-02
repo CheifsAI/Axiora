@@ -681,28 +681,51 @@ class GuiFunctions():
     def enter_return_release(self, event):
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
             self.send_message()
-    def _add_user_message(self,user_input):
-            user_msg = ChatBubble(user_input, True, "You")
-            self.main_window.ui.chat_layout.addWidget(user_msg)
-            self.lineEdit_chat.clear()
-    def _add_ai_message(self,ai_response):
+    def _add_user_message(self, user_input):
+        user_msg = ChatBubble(user_input, True, "You")
+        self.main_window.ui.chat_layout.addWidget(user_msg)
+        self.lineEdit_chat.clear()
+        
+        # Show loading indicator for AI response
+        loading_msg = ChatBubble("Thinking...", False, "AI")
+        loading_msg.setStyleSheet("color: #666; font-style: italic;")
+        self.main_window.ui.chat_layout.addWidget(loading_msg)
+        return loading_msg
+
+    def _add_ai_message(self, ai_response, loading_msg=None):
+        if loading_msg:
+            self.main_window.ui.chat_layout.removeWidget(loading_msg)
+            loading_msg.deleteLater()
+        
         ai_msg = ChatBubble(ai_response, False, "AI")
         self.main_window.ui.chat_layout.addWidget(ai_msg)
-
 
     def send_message(self):
         print("send_message called")  # Debugging statement
         user_input = self.lineEdit_chat.text()
         if user_input:
-            self._add_user_message(user_input=user_input)
+            loading_msg = self._add_user_message(user_input=user_input)
+            
             if not hasattr(self, 'analyzer') or not self.analyzer:
                 print("Analyzer not initialized!")
-                ai_response = "Upload a dataset first."
-                ai_msg = ChatBubble(ai_response, False, "AI")
-                self.main_window.ui.chat_layout.addWidget(ai_msg)
+                self._add_ai_message("Upload a dataset first.", loading_msg)
             else:
-                ai_response = self.analyzer.chat(user_input)
-                self._add_ai_message(ai_response)
+                # Use QThread to process the message asynchronously
+                class MessageWorker(QThread):
+                    finished = Signal(str)
+                    
+                    def __init__(self, analyzer, message):
+                        super().__init__()
+                        self.analyzer = analyzer
+                        self.message = message
+                    
+                    def run(self):
+                        response = self.analyzer.chat(self.message)
+                        self.finished.emit(response)
+                
+                self.worker = MessageWorker(self.analyzer, user_input)
+                self.worker.finished.connect(lambda response: self._add_ai_message(response, loading_msg))
+                self.worker.start()
 
     def process_selected_questions(self):
         """Process selected questions and generate charts in a grid layout"""
@@ -830,14 +853,28 @@ class GuiFunctions():
             # Create placeholder widgets for each chart
             self.chart_widgets = []
             for i, chart_path in enumerate(self.chart_paths):
-                # Create container
+                # Create container with border
                 chart_container = QFrame()
-                chart_container.setFixedSize(1200, 800)
+                chart_container.setStyleSheet("""
+                    QFrame {
+                        background-color: #1b1e23;
+                        border: 2px solid #3d4451;
+                        border-radius: 10px;
+                    }
+                """)
+                chart_container.setFixedSize(800, 600)  # Reduced from 1200x800
                 chart_layout = QVBoxLayout(chart_container)
                 chart_layout.setContentsMargins(10, 10, 10, 10)
                 
                 # Create loading label
                 loading_label = QLabel("Loading chart...")
+                loading_label.setStyleSheet("""
+                    QLabel {
+                        color: #ffffff;
+                        font-size: 14px;
+                        font-weight: bold;
+                    }
+                """)
                 loading_label.setAlignment(Qt.AlignCenter)
                 chart_layout.addWidget(loading_label)
                 
@@ -922,7 +959,7 @@ class GuiFunctions():
                 settings.setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
                 
                 # Configure web view
-                web_view.setFixedSize(1180, 780)
+                web_view.setFixedSize(780, 580)  # Reduced from 1180x780
                 web_view.page().setBackgroundColor(Qt.transparent)
                 web_view.setAttribute(Qt.WA_TranslucentBackground)
                 web_view.setContextMenuPolicy(Qt.NoContextMenu)

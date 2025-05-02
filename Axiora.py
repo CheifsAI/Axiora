@@ -407,7 +407,7 @@ class MainWindow(QMainWindow):
                                     }
                                 """)
                                 chart_section.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                                chart_section.setMinimumSize(600, 500)
+                                chart_section.setMinimumSize(800, 600)
                                 chart_section_layout = QVBoxLayout(chart_section)
                                 chart_section_layout.setContentsMargins(0, 0, 0, 0)
                                 chart_section_layout.setSpacing(0)
@@ -449,8 +449,8 @@ class MainWindow(QMainWindow):
 
                                 # Create figure and load image
                                 dpi = 100
-                                fig_width = 580 / dpi
-                                fig_height = 430 / dpi
+                                fig_width = 780 / dpi
+                                fig_height = 580 / dpi
                                 fig = plt.figure(figsize=(fig_width, fig_height), dpi=dpi, tight_layout=True)
                                 fig.patch.set_facecolor('#1b1e23')
                                 ax = plt.gca()
@@ -1017,7 +1017,7 @@ class MainWindow(QMainWindow):
                                     }
                                 """)
                                 chart_section.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-                                chart_section.setMinimumSize(600, 500)
+                                chart_section.setMinimumSize(800, 600)
                                 chart_section_layout = QVBoxLayout(chart_section)
                                 chart_section_layout.setContentsMargins(0, 0, 0, 0)
                                 chart_section_layout.setSpacing(0)
@@ -1059,8 +1059,8 @@ class MainWindow(QMainWindow):
 
                                 # Create figure and load image
                                 dpi = 100
-                                fig_width = 580 / dpi
-                                fig_height = 430 / dpi
+                                fig_width = 780 / dpi
+                                fig_height = 580 / dpi
                                 fig = plt.figure(figsize=(fig_width, fig_height), dpi=dpi, tight_layout=True)
                                 fig.patch.set_facecolor('#1b1e23')
                                 ax = plt.gca()
