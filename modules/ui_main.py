@@ -1734,6 +1734,30 @@ class Ui_MainWindow(object):
         self.rec_btn = QPushButton(self.rec_widget)
         self.rec_btn.setObjectName(u"rec_btn")
         self.rec_btn.setText("Generate Recommendations")
+        self.rec_btn.setStyleSheet("""
+            QPushButton {
+                background-color: rgb(52, 59, 72);
+                border: 2px solid rgb(52, 59, 72);
+                border-radius: 5px;
+                color: rgb(255, 255, 255);
+                padding: 10px;
+                margin: 5px;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: rgb(57, 65, 80);
+                border: 2px solid rgb(61, 70, 86);
+            }
+            QPushButton:pressed {
+                background-color: rgb(35, 40, 49);
+                border: 2px solid rgb(43, 50, 61);
+            }
+            QPushButton:disabled {
+                background-color: rgb(35, 35, 35);
+                border: 2px solid rgb(43, 43, 43);
+                color: rgb(150, 150, 150);
+            }
+        """)
         
         self.gridLayout_8.addWidget(self.rec_btn, 0, 0, 1, 1)
         

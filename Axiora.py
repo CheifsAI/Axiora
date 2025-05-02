@@ -14,7 +14,7 @@ from reportlab.lib.units import inch
 # Import Qt modules first
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QHeaderView, QLabel, 
-    QVBoxLayout, QSizePolicy, QPushButton, QGridLayout, QWidget, QFrame, QCheckBox, QTableWidget, QTableWidgetItem, QScrollArea, QHBoxLayout
+    QVBoxLayout, QSizePolicy, QPushButton, QGridLayout, QWidget, QFrame, QCheckBox, QTableWidget, QTableWidgetItem, QScrollArea, QHBoxLayout, QMessageBox
 )
 from PySide6.QtGui import QIcon, QFont, QPixmap, QCursor
 from PySide6.QtCore import Qt, QSize
@@ -1403,12 +1403,28 @@ class MainWindow(QMainWindow):
             import traceback
             traceback.print_exc()
 
+def initialize_app():
+    """Initialize the application and database"""
+    try:
+        # Initialize database
+        from Axioradb import init_db
+        init_db()
+        return True
+    except Exception as e:
+        print(f"Error initializing application: {str(e)}")
+        return False
+
 if __name__ == "__main__":
     # Create QApplication instance
     if not QApplication.instance():
         app = QApplication(sys.argv)
     else:
         app = QApplication.instance()
+    
+    # Initialize application
+    if not initialize_app():
+        print("Failed to initialize application. Exiting...")
+        sys.exit(1)
     
     # Set up the application ID for Windows
     if platform.system() == 'Windows':
@@ -1439,18 +1455,26 @@ if __name__ == "__main__":
     font = QFont("Segoe UI", 12)
     app.setFont(font)
 
-    login_window = LoginWindow()
-    if icon:
-        login_window.setWindowIcon(icon)  # Set icon for login window
-
-    def open_main(user_id):
-        main_window = MainWindow(user_id)
+    try:
+        login_window = LoginWindow()
         if icon:
-            main_window.setWindowIcon(icon)  # Set icon for main window
-        main_window.show()
-        login_window.close()
+            login_window.setWindowIcon(icon)  # Set icon for login window
 
-    login_window.login_accepted.connect(open_main)
+        def open_main(user_id):
+            try:
+                main_window = MainWindow(user_id)
+                if icon:
+                    main_window.setWindowIcon(icon)  # Set icon for main window
+                main_window.show()
+                login_window.close()
+            except Exception as e:
+                print(f"Error opening main window: {str(e)}")
+                QMessageBox.critical(login_window, "Error", 
+                    "Failed to open main window. Please check the application logs.")
 
-    login_window.show()
-    sys.exit(app.exec())
+        login_window.login_accepted.connect(open_main)
+        login_window.show()
+        sys.exit(app.exec())
+    except Exception as e:
+        print(f"Application error: {str(e)}")
+        sys.exit(1)

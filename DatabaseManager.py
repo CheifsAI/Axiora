@@ -1,14 +1,98 @@
 from sqlalchemy.ext.automap import automap_base
-from sqlalchemy.orm import Session, sessionmaker
-from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker, scoped_session
+from sqlalchemy import create_engine, event
+from sqlalchemy.pool import QueuePool
 from Axioradb import (engine,Dataset,CleanDataset,Report,Summary,LLM,Questions,
-                       Dashboards, Charts, ReportMemory,User, FinalReport, Forecasting)
+                       Dashboards, Charts, ReportMemory,User, FinalReport, Forecasting, init_db)
 from sqlalchemy import func
-class DatabaseManager:
-    def __init__(self):
-        SessionLocal = sessionmaker(bind=engine)
-        self.session = SessionLocal()
+import functools
+from typing import Dict, Any, Optional
+from datetime import datetime, timedelta
 
+class DatabaseManager:
+    _instance = None
+    _cache: Dict[str, Dict[str, Any]] = {}
+    _cache_timeout = 300  # 5 minutes
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(DatabaseManager, cls).__new__(cls)
+            # Initialize database
+            init_db()
+            # Configure connection pooling
+            cls._instance.engine = create_engine(
+                "sqlite:///axioradb.db",
+                poolclass=QueuePool,
+                pool_size=5,
+                max_overflow=10,
+                pool_timeout=30,
+                pool_recycle=1800
+            )
+            # Create session factory
+            session_factory = sessionmaker(bind=cls._instance.engine)
+            cls._instance.Session = scoped_session(session_factory)
+        return cls._instance
+
+    def __init__(self):
+        try:
+            self.session = self.Session()
+        except Exception as e:
+            print(f"Error initializing database session: {str(e)}")
+            raise
+    
+    def __del__(self):
+        try:
+            self.Session.remove()
+        except:
+            pass
+
+    def _ensure_session(self):
+        """Ensure we have a valid session"""
+        if not self.session or not self.session.is_active:
+            self.session = self.Session()
+
+    def _handle_error(self, e: Exception, operation: str):
+        """Handle database errors consistently"""
+        print(f"Database error during {operation}: {str(e)}")
+        if self.session:
+            self.session.rollback()
+        raise
+
+    def _cache_key(self, prefix: str, *args) -> str:
+        return f"{prefix}:{'_'.join(str(arg) for arg in args)}"
+    
+    def _get_cache(self, key: str) -> Optional[Any]:
+        if key in self._cache:
+            data, timestamp = self._cache[key]
+            if datetime.now() - timestamp < timedelta(seconds=self._cache_timeout):
+                return data
+            del self._cache[key]
+        return None
+    
+    def _set_cache(self, key: str, value: Any) -> None:
+        self._cache[key] = (value, datetime.now())
+        # Clean old cache entries
+        now = datetime.now()
+        self._cache = {
+            k: (v, t) for k, (v, t) in self._cache.items()
+            if now - t < timedelta(seconds=self._cache_timeout)
+        }
+    
+    def cache_decorator(prefix: str):
+        def decorator(func):
+            @functools.wraps(func)
+            def wrapper(self, *args, **kwargs):
+                cache_key = self._cache_key(prefix, *args)
+                result = self._get_cache(cache_key)
+                if result is not None:
+                    return result
+                result = func(self, *args, **kwargs)
+                self._set_cache(cache_key, result)
+                return result
+            return wrapper
+        return decorator
+
+    @cache_decorator("dataset")
     def saveDataSet(self,path,name,info,description,sample,cols):
         #dataSet = self.Base.classes.dataset
         newDataSet = Dataset(raw_data=path,
@@ -22,6 +106,7 @@ class DatabaseManager:
         dataset_id = newDataSet.dataset_id
         self.session.commit()
         return dataset_id
+    @cache_decorator("clean_dataset")
     def saveCleanDataset(self,ogID,path,name,info,description,sample,cols):
         #cleandataset = self.Base.classes.cleanDataset
         newCleanDataset = CleanDataset(original_dataset_id=ogID,
@@ -38,6 +123,7 @@ class DatabaseManager:
         self.session.commit()
         return clean_dataset_id
 
+    @cache_decorator("report")
     def saveReport(self,rname,user,llm,dataset):
         #sessionTable = self.Base.classes.session
         newReport = Report(user_id=user,
@@ -56,6 +142,10 @@ class DatabaseManager:
         if reportRow:
             reportRow.clean_dataset_id = cleandataset
             self.session.commit()
+            # Invalidate cache
+            cache_key = self._cache_key("report", reportId)
+            if cache_key in self._cache:
+                del self._cache[cache_key]
 
     def saveSummary(self,reportID,summary_content):
         #summary = self.Base.classes.summary
@@ -63,11 +153,13 @@ class DatabaseManager:
         self.session.add(newSummary)
         self.session.commit()
 
+    @cache_decorator("llm_id")
     def llm_id_by_name(self, llmName: str) -> int:
         #llmTable = self.Base.classes.llm 
         result = self.session.query(LLM.llm_id).filter(LLM.llm_name == llmName).first()
         return result[0] if result else None
     
+    @cache_decorator("llm_code")
     def llm_installtion_code(self,llmName: str) -> int:
         llm = self.session.query(LLM).filter_by(llm_name=llmName).first()
         return llm.install_llm_code
@@ -108,10 +200,12 @@ class DatabaseManager:
         self.session.add(newMessage)
         self.session.commit()
 
+    @cache_decorator("user_reports")
     def get_user_reports(self, user_id):
        reports = self.session.query(Report).filter(Report.user_id == user_id).all()
        return [{'id': report.report_id, 'name': report.report_name} for report in reports]
     
+    @cache_decorator("report_dataset")
     def get_report_dataset(self, reportID):
         clean_data_set = self.session.query(CleanDataset.raw_data)\
         .join(Report, Report.clean_dataset_id == CleanDataset.clean_dataset_id)\
@@ -167,10 +261,28 @@ class DatabaseManager:
             .filter(Report.report_id == reportID)\
             .all()
         return [chart[0] for chart in charts] if charts else None
-    def saveRecommendation(self,reportID,recommendation):
-        newRecommendation = FinalReport(report_id=reportID,recommendation=recommendation)
-        self.session.add(newRecommendation)
-        self.session.commit()
+    def saveRecommendation(self, reportID, recommendation, dashboard_id):
+        """Save a recommendation with its associated dashboard."""
+        try:
+            self._ensure_session()
+            
+            # Create new final report
+            new_report = FinalReport(
+                report_id=reportID,
+                recommendation=recommendation,
+                dashboard_id=dashboard_id
+            )
+            
+            self.session.add(new_report)
+            self.session.commit()
+            
+            # Invalidate cache if needed
+            cache_key = self._cache_key("recommendation", reportID)
+            if cache_key in self._cache:
+                del self._cache[cache_key]
+            
+        except Exception as e:
+            self._handle_error(e, "saving recommendation")
     def saveForecasting(self,reportID,target_column,predicted_df,rmse,r2,charts_path):
         newForecasting = Forecasting(report_id=reportID,target_column=target_column,
                                      predicted_df=predicted_df,

@@ -140,6 +140,21 @@ class QuestionWorker(QThread):
         except Exception as e:
             self.error.emit(str(e))
 
+class RecommendationWorker(QThread):
+    finished = Signal(str)
+    error = Signal(str)
+
+    def __init__(self, analyzer):
+        super().__init__()
+        self.analyzer = analyzer
+
+    def run(self):
+        try:
+            recommendations = self.analyzer.generate_recommendations()
+            self.finished.emit(recommendations)
+        except Exception as e:
+            self.error.emit(str(e))
+
 class GuiFunctions():
     def __init__(self, MainWindow, user_id):
         self.main_window = MainWindow
@@ -296,22 +311,103 @@ class GuiFunctions():
             self.data_sample = self.analyzer.data_sample
             self.data_cols = self.analyzer.data_cols
     def _show_df(self):
-            self.analyzer.report_id = self.reportID
-            if "Index" not in self.df.columns:
-                self.df.insert(0, "Index", self.df.index)
-            self.table = self.main_window.ui.tableData
-            self.table.setRowCount(self.df.shape[0])  
-            self.table.setColumnCount(self.df.shape[1])  
-            self.table.setHorizontalHeaderLabels(self.df.columns.astype(str))
-            self.table.horizontalHeader().setVisible(True)
-            self.table.resizeColumnsToContents()
-            for i in range(self.df.shape[0]):
-                for j in range(self.df.shape[1]):
-                    self.table.setItem(i, j, QTableWidgetItem(str(self.df.iat[i, j])))
+        self.analyzer.report_id = self.reportID
+        if "Index" not in self.df.columns:
+            self.df.insert(0, "Index", self.df.index)
+        
+        # Configure table for virtual scrolling
+        self.table = self.main_window.ui.tableData
+        self.table.setRowCount(0)  # Clear existing rows
+        self.table.setSortingEnabled(False)  # Disable sorting temporarily
+        
+        # Set up table dimensions
+        self.table.setRowCount(self.df.shape[0])
+        self.table.setColumnCount(self.df.shape[1])
+        
+        # Set headers
+        self.table.setHorizontalHeaderLabels(self.df.columns.astype(str))
+        self.table.horizontalHeader().setVisible(True)
+        
+        # Batch load data in chunks
+        CHUNK_SIZE = 100
+        total_rows = self.df.shape[0]
+        
+        self.table.setUpdatesEnabled(False)  # Disable updates during batch loading
+        
+        for start_row in range(0, total_rows, CHUNK_SIZE):
+            end_row = min(start_row + CHUNK_SIZE, total_rows)
+            for row in range(start_row, end_row):
+                for col in range(self.df.shape[1]):
+                    item = QTableWidgetItem(str(self.df.iat[row, col]))
+                    self.table.setItem(row, col, item)
+        
+        self.table.setUpdatesEnabled(True)  # Re-enable updates
+        self.table.setSortingEnabled(True)  # Re-enable sorting
+        self.table.resizeColumnsToContents()
 
     def handle_rec_btn(self):
-       recos = self.analyzer.generate_recommendations()
-       self.main_window.ui.recommendations_text.setMarkdown(recos)
+        # Show loading overlay
+        self.show_loading("Generating Recommendations...")
+        
+        # Disable the recommendations button
+        self.main_window.ui.rec_btn.setEnabled(False)
+        
+        try:
+            # Create and start a worker thread for recommendations
+            self.rec_worker = RecommendationWorker(self.analyzer)
+            self.rec_worker.finished.connect(self.handle_rec_complete)
+            self.rec_worker.error.connect(self.handle_rec_error)
+            self.rec_worker.start()
+        except Exception as e:
+            print(f"Error starting recommendations generation: {str(e)}")
+            self.hide_loading()
+            self.main_window.ui.rec_btn.setEnabled(True)
+
+    def handle_rec_complete(self, recommendations):
+        try:
+            # Save to database and update UI
+            if hasattr(self, 'reportID'):
+                # Create a new dashboard for recommendations if needed
+                dashboard_id = self.db.addDashboard(reportID=self.reportID)
+                
+                # Save recommendation with the new dashboard
+                self.db.saveRecommendation(
+                    reportID=self.reportID,
+                    recommendation=recommendations,
+                    dashboard_id=dashboard_id
+                )
+                
+                # Update UI
+                self.main_window.ui.recommendations_text.setMarkdown(recommendations)
+            else:
+                print("Error: No report ID available")
+                self.main_window.ui.recommendations_text.setMarkdown(
+                    "Error: Could not save recommendations. Please make sure a report is loaded."
+                )
+        except Exception as e:
+            print(f"Error handling recommendations completion: {str(e)}")
+            self.main_window.ui.recommendations_text.setMarkdown(
+                f"Error generating recommendations: {str(e)}"
+            )
+        finally:
+            # Reset UI state
+            self.main_window.ui.rec_btn.setEnabled(True)
+            self.hide_loading()
+            if self.rec_worker:
+                self.rec_worker.deleteLater()
+                self.rec_worker = None
+
+    def handle_rec_error(self, error_message):
+        # Hide loading overlay
+        self.hide_loading()
+        
+        # Reset button state
+        self.main_window.ui.rec_btn.setEnabled(True)
+        print(f"Error generating recommendations: {error_message}")
+        
+        if self.rec_worker:
+            self.rec_worker.deleteLater()
+            self.rec_worker = None
 
     def handle_sum_btn(self):
         # Show loading overlay
@@ -686,7 +782,7 @@ class GuiFunctions():
             traceback.print_exc()
 
     def display_current_chart(self):
-        """Display all charts in a scrollable layout"""
+        """Display all charts in a scrollable layout with lazy loading"""
         try:
             # Switch to the visualization page first
             self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
@@ -700,20 +796,20 @@ class GuiFunctions():
             else:
                 page_layout = page_widget.layout()
             
-            # Clear any existing widgets from the page layout
+            # Clear existing widgets
             while page_layout.count():
                 item = page_layout.takeAt(0)
                 if item.widget():
                     item.widget().setParent(None)
                     item.widget().deleteLater()
             
-            # Create a scroll area for the main layout
+            # Create scroll area
             main_scroll = QScrollArea()
             main_scroll.setWidgetResizable(True)
             main_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
             main_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
             
-            # Create main container widget
+            # Create main container
             main_container = QWidget()
             main_layout = QVBoxLayout(main_container)
             main_layout.setSpacing(20)
@@ -724,87 +820,124 @@ class GuiFunctions():
             if num_charts == 0:
                 return
             
-            # Calculate number of rows and columns for the grid
-            if num_charts <= 2:
-                cols = num_charts
-                rows = 1
-            else:
-                cols = 2  # Maximum 2 columns
-                rows = (num_charts + 1) // 2  # Ceiling division
+            cols = 2  # Maximum 2 columns
+            rows = (num_charts + 1) // 2  # Ceiling division
             
-            # Create grid layout for charts
+            # Create grid layout
             grid_layout = QGridLayout()
             grid_layout.setSpacing(20)
             
-            # Create and add web views for each chart
+            # Create placeholder widgets for each chart
+            self.chart_widgets = []
             for i, chart_path in enumerate(self.chart_paths):
-                if os.path.exists(chart_path):
-                    # Create container widget for each chart
-                    chart_container = QWidget()
-                    chart_container.setFixedSize(1200, 800)  # Fixed size for charts
-                    chart_layout = QVBoxLayout(chart_container)
-                    chart_layout.setContentsMargins(10, 10, 10, 10)
-                    
-                    # Create web view for the chart
-                    web_view = QWebEngineView()
-                    
-                    # Enable JavaScript and other settings
-                    settings = web_view.settings()
-                    settings.setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
-                    settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls, True)
-                    settings.setAttribute(QWebEngineSettings.WebAttribute.AllowRunningInsecureContent, True)
-                    settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessFileUrls, True)
-                    settings.setAttribute(QWebEngineSettings.WebAttribute.WebGLEnabled, True)
-                    settings.setAttribute(QWebEngineSettings.WebAttribute.ScrollAnimatorEnabled, True)
-                    settings.setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
-                    
-                    # Configure web view
-                    web_view.setFixedSize(1180, 780)  # Fixed size slightly smaller than container
-                    
-                    # Add interaction settings
-                    web_view.page().setBackgroundColor(Qt.transparent)
-                    web_view.setAttribute(Qt.WA_TranslucentBackground)
-                    web_view.setContextMenuPolicy(Qt.NoContextMenu)
-                    
-                    # Convert to absolute file URL
-                    abs_path = os.path.abspath(chart_path)
-                    file_url = QUrl.fromLocalFile(abs_path)
-                    
-                    # Connect signals
-                    web_view.loadFinished.connect(lambda ok, view=web_view: self._on_chart_load_finished(ok, view))
-                    
-                    # Load the HTML file
-                    web_view.load(file_url)
-                    
-                    # Add web view to container
-                    chart_layout.addWidget(web_view)
-                    
-                    # Add container to grid
-                    row = i // cols
-                    col = i % cols
-                    grid_layout.addWidget(chart_container, row, col)
+                # Create container
+                chart_container = QFrame()
+                chart_container.setFixedSize(1200, 800)
+                chart_layout = QVBoxLayout(chart_container)
+                chart_layout.setContentsMargins(10, 10, 10, 10)
+                
+                # Create loading label
+                loading_label = QLabel("Loading chart...")
+                loading_label.setAlignment(Qt.AlignCenter)
+                chart_layout.addWidget(loading_label)
+                
+                # Add to grid
+                row = i // cols
+                col = i % cols
+                grid_layout.addWidget(chart_container, row, col)
+                
+                # Store for lazy loading
+                self.chart_widgets.append({
+                    'container': chart_container,
+                    'path': chart_path,
+                    'loaded': False
+                })
             
-            # Add grid layout to main layout
+            # Add grid layout
             main_layout.addLayout(grid_layout)
-            
-            # Add stretch to push charts to the top
             main_layout.addStretch()
             
-            # Set the container widget as the scroll area's widget
+            # Set up scroll area
             main_scroll.setWidget(main_container)
-            
-            # Add scroll area to page layout
             page_layout.addWidget(main_scroll)
             
-            # Show everything
-            main_container.show()
-            main_scroll.show()
-            page_widget.show()
-                
+            # Connect scroll signal for lazy loading
+            main_scroll.verticalScrollBar().valueChanged.connect(
+                lambda: self._lazy_load_visible_charts(main_scroll)
+            )
+            
+            # Initial load of visible charts
+            QTimer.singleShot(100, lambda: self._lazy_load_visible_charts(main_scroll))
+            
         except Exception as e:
             print(f"Error displaying charts: {str(e)}")
             import traceback
             traceback.print_exc()
+
+    def _lazy_load_visible_charts(self, scroll_area):
+        """Load charts that are currently visible in the scroll area"""
+        try:
+            viewport = scroll_area.viewport()
+            visible_rect = viewport.rect()
+            visible_rect.translate(0, scroll_area.verticalScrollBar().value())
+            
+            for chart_data in self.chart_widgets:
+                if not chart_data['loaded']:
+                    container = chart_data['container']
+                    container_rect = container.geometry()
+                    
+                    # Check if container is visible
+                    if container_rect.intersects(visible_rect):
+                        self._load_chart(chart_data)
+        except Exception as e:
+            print(f"Error in lazy loading: {str(e)}")
+
+    def _load_chart(self, chart_data):
+        """Load a single chart"""
+        try:
+            if chart_data['loaded']:
+                return
+            
+            container = chart_data['container']
+            chart_path = chart_data['path']
+            
+            # Clear loading label
+            while container.layout().count():
+                item = container.layout().takeAt(0)
+                if item.widget():
+                    item.widget().deleteLater()
+            
+            if os.path.exists(chart_path):
+                # Create web view
+                web_view = QWebEngineView()
+                
+                # Configure settings
+                settings = web_view.settings()
+                settings.setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
+                settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls, True)
+                settings.setAttribute(QWebEngineSettings.WebAttribute.AllowRunningInsecureContent, True)
+                settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessFileUrls, True)
+                settings.setAttribute(QWebEngineSettings.WebAttribute.WebGLEnabled, True)
+                settings.setAttribute(QWebEngineSettings.WebAttribute.ScrollAnimatorEnabled, True)
+                settings.setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
+                
+                # Configure web view
+                web_view.setFixedSize(1180, 780)
+                web_view.page().setBackgroundColor(Qt.transparent)
+                web_view.setAttribute(Qt.WA_TranslucentBackground)
+                web_view.setContextMenuPolicy(Qt.NoContextMenu)
+                
+                # Load chart
+                file_url = QUrl.fromLocalFile(os.path.abspath(chart_path))
+                web_view.loadFinished.connect(lambda ok, v=web_view: self._on_chart_load_finished(ok, v))
+                web_view.load(file_url)
+                
+                # Add to container
+                container.layout().addWidget(web_view)
+                chart_data['loaded'] = True
+                
+        except Exception as e:
+            print(f"Error loading chart: {str(e)}")
 
     def _on_chart_load_finished(self, ok, web_view):
         """Handle chart load finished event"""

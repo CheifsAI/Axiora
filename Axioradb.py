@@ -8,6 +8,7 @@ from sqlalchemy import (
 from sqlalchemy import func
 from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy.dialects.postgresql import UUID
+import os
 
 engine = create_engine("sqlite:///axioradb.db")
 Base = declarative_base()
@@ -324,20 +325,55 @@ class Forecasting(Base):
     def __repr__(self):
         return f"<Forecasting(forecast_id={self.forecast_id}, report_id={self.report_id}, target_column='{self.target_column}')>"
 
-Base.metadata.create_all(engine)
-""""
-Session = sessionmaker(bind=engine)
-session = Session()
+def init_db():
+    """Initialize the database, creating all tables if they don't exist."""
+    try:
+        # Create database file if it doesn't exist
+        db_path = "axioradb.db"
+        if not os.path.exists(db_path):
+            Base.metadata.create_all(engine)
+            
+            # Create a session to add initial data
+            from sqlalchemy.orm import sessionmaker
+            Session = sessionmaker(bind=engine)
+            session = Session()
+            
+            try:
+                # Add default LLM models
+                llama = LLM(
+                    llm_name="llama3b",
+                    parameters=3,
+                    install_llm_code="ollama pull llama2:3b"
+                )
+                phi = LLM(
+                    llm_name="phi35",
+                    parameters=3,
+                    install_llm_code="ollama pull phi"
+                )
+                
+                session.add(llama)
+                session.add(phi)
+                session.commit()
+                
+            except Exception as e:
+                print(f"Error initializing database: {str(e)}")
+                session.rollback()
+            finally:
+                session.close()
+        else:
+            # For existing database, try to update tables
+            try:
+                # Drop the final_report table if it exists
+                Base.metadata.tables['final_report'].drop(engine, checkfirst=True)
+                # Create tables that don't exist
+                Base.metadata.create_all(engine)
+            except Exception as e:
+                print(f"Error updating database schema: {str(e)}")
+                raise
 
-llama = session.query(LLM).filter_by(llm_name="llama3.2:3b").first()
-if not llama:
-    llama = LLM(llm_name="llama3.2:3b", parameters=3, install_llm_code="ollama run llama3.2:3b")
-    session.add(llama)
+    except Exception as e:
+        print(f"Database initialization error: {str(e)}")
+        raise
 
-cheif = session.query(User).filter_by(username="cheif").first()
-if not cheif:
-    cheif = User(username="cheif", password="12345", email="cheif@gmail.com")
-    session.add(cheif)
-
-session.commit()
-session.close()"""
+# Initialize database when module is imported
+init_db()
