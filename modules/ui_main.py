@@ -1356,153 +1356,264 @@ class Ui_MainWindow(object):
         self.predictions_page.setObjectName(u"predictions_page")
         self.verticalLayout_21 = QVBoxLayout(self.predictions_page)
         self.verticalLayout_21.setObjectName(u"verticalLayout_21")
-        self.verticalLayout_21.setContentsMargins(10, 10, 10, 10)
-        self.verticalLayout_21.setSpacing(10)
+        self.verticalLayout_21.setContentsMargins(20, 20, 20, 20)
+        self.verticalLayout_21.setSpacing(15)
         
         # Add prediction controls
         self.prediction_controls = QFrame(self.predictions_page)
         self.prediction_controls.setObjectName("prediction_controls")
         self.prediction_controls.setFrameShape(QFrame.Shape.StyledPanel)
         self.prediction_controls.setFrameShadow(QFrame.Shadow.Raised)
-        self.prediction_controls.setMaximumHeight(150)
+        self.prediction_controls.setStyleSheet("""
+            QFrame {
+                background-color: #1b1e23;
+                border: 2px solid #3d4451;
+                border-radius: 10px;
+                padding: 10px;
+            }
+        """)
+        self.prediction_controls.setMaximumHeight(120)
         
         # Create horizontal layout for prediction controls
         self.horizontalLayout_13 = QHBoxLayout(self.prediction_controls)
         self.horizontalLayout_13.setObjectName("horizontalLayout_13")
-        self.horizontalLayout_13.setContentsMargins(10, 10, 10, 10)
-        self.horizontalLayout_13.setSpacing(10)
+        self.horizontalLayout_13.setContentsMargins(15, 10, 15, 10)
+        self.horizontalLayout_13.setSpacing(20)
 
-        # Add target column selection
-        self.target_col_label = QLabel(self.prediction_controls)
-        self.target_col_label.setObjectName(u"target_col_label")
-        self.target_col_label.setText("Target Column:")
-        self.horizontalLayout_13.addWidget(self.target_col_label)
+        # Add target column selection with label frame
+        target_frame = QFrame()
+        target_frame.setStyleSheet("border: none;")
+        target_layout = QVBoxLayout(target_frame)
+        target_layout.setContentsMargins(0, 0, 0, 0)
+        target_layout.setSpacing(5)
         
-        self.target_col_combo = QComboBox(self.prediction_controls)
-        self.target_col_combo.setObjectName(u"target_col_combo")
-        self.horizontalLayout_13.addWidget(self.target_col_combo)
+        self.target_col_label = QLabel("Target Column")
+        self.target_col_label.setStyleSheet("""
+            QLabel {
+                color: #00a6fb;
+                font-size: 14px;
+                font-weight: bold;
+                margin-bottom: 5px;
+                background-color: transparent;
+            }
+        """)
+        self.target_col_label.setFixedHeight(20)
+        self.target_col_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        target_layout.addWidget(self.target_col_label)
         
-        # Add date columns selection group
-        self.date_group = QGroupBox(self.prediction_controls)
-        self.date_group.setObjectName(u"date_group")
-        self.date_group.setTitle("Date Selection")
-        self.date_group_layout = QVBoxLayout(self.date_group)
-        self.date_group_layout.setContentsMargins(10, 10, 10, 10)
-        self.date_group_layout.setSpacing(5)
+        self.target_col_combo = QComboBox()
+        self.target_col_combo.setStyleSheet("""
+            QComboBox {
+                background-color: #2c313c;
+                border: 1px solid #3d4451;
+                border-radius: 5px;
+                padding: 5px;
+                color: white;
+                min-width: 150px;
+            }
+            QComboBox::drop-down {
+                border: none;
+                padding-right: 10px;
+            }
+            QComboBox::down-arrow {
+                image: url(:/icons/images/icons/cil-arrow-bottom.png);
+                width: 12px;
+                height: 12px;
+            }
+        """)
+        self.target_col_combo.setMinimumHeight(30)
+        target_layout.addWidget(self.target_col_combo)
         
-        # Add mode selection
-        self.date_mode_frame = QFrame(self.date_group)
-        self.date_mode_layout = QHBoxLayout(self.date_mode_frame)
-        self.date_mode_layout.setContentsMargins(0, 0, 0, 0)
-        self.date_mode_layout.setSpacing(10)
+        self.horizontalLayout_13.addWidget(target_frame)
         
-        # Single date column mode
+        # Add date selection group
+        self.date_group = QGroupBox("Date Selection")
+        self.date_group.setStyleSheet("""
+            QGroupBox {
+                color: #00a6fb;
+                font-weight: bold;
+                border: 1px solid #3d4451;
+                border-radius: 5px;
+                margin-top: 10px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px 0 5px;
+            }
+        """)
+        
+        date_layout = QVBoxLayout(self.date_group)
+        date_layout.setContentsMargins(10, 15, 10, 10)
+        date_layout.setSpacing(5)
+        
+        # Add radio buttons in horizontal layout
+        radio_layout = QHBoxLayout()
         self.single_date_radio = QRadioButton("Single Date Column")
         self.single_date_radio.setChecked(True)
-        self.date_mode_layout.addWidget(self.single_date_radio)
+        self.single_date_radio.setStyleSheet("color: white;")
+        self.multi_date_radio = QRadioButton("Year/Month/Day Columns")
+        self.multi_date_radio.setStyleSheet("color: white;")
+        radio_layout.addWidget(self.single_date_radio)
+        radio_layout.addWidget(self.multi_date_radio)
+        date_layout.addLayout(radio_layout)
         
-        # Multiple columns mode
-        self.multi_date_radio = QRadioButton("Separate Year/Month/Day")
-        self.date_mode_layout.addWidget(self.multi_date_radio)
+        # Add stacked widget for date selection modes
+        self.date_stack = QStackedWidget()
         
-        self.date_group_layout.addWidget(self.date_mode_frame)
-        
-        # Stack for different selection modes
-        self.date_stack = QStackedWidget(self.date_group)
-        
-        # Single date column page
-        self.single_date_page = QWidget()
-        self.single_date_layout = QVBoxLayout(self.single_date_page)
-        self.single_date_layout.setContentsMargins(0, 5, 0, 0)
-        self.single_date_layout.setSpacing(5)
-        
-        self.date_col_combo = QComboBox(self.single_date_page)
-        self.date_col_combo.setObjectName(u"date_col_combo")
-        self.date_col_combo.setMinimumHeight(25)
-        self.single_date_layout.addWidget(self.date_col_combo)
-        self.date_stack.addWidget(self.single_date_page)
+        # Single date page
+        single_date_page = QWidget()
+        single_layout = QVBoxLayout(single_date_page)
+        single_layout.setContentsMargins(0, 0, 0, 0)
+        self.date_col_combo = QComboBox()
+        self.date_col_combo.setStyleSheet("""
+            QComboBox {
+                background-color: #2c313c;
+                border: 1px solid #3d4451;
+                border-radius: 5px;
+                padding: 5px;
+                color: white;
+            }
+            QComboBox::drop-down {
+                border: none;
+            }
+            QComboBox::down-arrow {
+                image: url(:/icons/images/icons/cil-arrow-bottom.png);
+                width: 12px;
+                height: 12px;
+            }
+        """)
+        self.date_col_combo.setMinimumHeight(30)
+        single_layout.addWidget(self.date_col_combo)
+        self.date_stack.addWidget(single_date_page)
         
         # Multiple columns page
-        self.multi_date_page = QWidget()
-        self.multi_date_layout = QGridLayout(self.multi_date_page)
-        self.multi_date_layout.setContentsMargins(0, 5, 0, 0)
-        self.multi_date_layout.setSpacing(5)
+        multi_date_page = QWidget()
+        multi_layout = QHBoxLayout(multi_date_page)
+        multi_layout.setContentsMargins(0, 0, 0, 0)
+        multi_layout.setSpacing(10)
         
-        # Year selection
-        self.year_label = QLabel("Year:")
-        self.year_combo = QComboBox()
-        self.year_combo.setMinimumHeight(25)
-        self.multi_date_layout.addWidget(self.year_label, 0, 0)
-        self.multi_date_layout.addWidget(self.year_combo, 0, 1)
+        for col_name in ["Year", "Month", "Day"]:
+            col_frame = QFrame()
+            col_layout = QVBoxLayout(col_frame)
+            col_layout.setContentsMargins(0, 0, 0, 0)
+            col_layout.setSpacing(5)
+            
+            label = QLabel(col_name)
+            label.setStyleSheet("color: white;")
+            col_layout.addWidget(label)
+            
+            combo = QComboBox()
+            combo.setObjectName(f"{col_name.lower()}_combo")
+            combo.setStyleSheet("""
+                QComboBox {
+                    background-color: #2c313c;
+                    border: 1px solid #3d4451;
+                    border-radius: 5px;
+                    padding: 5px;
+                    color: white;
+                }
+                QComboBox::drop-down {
+                    border: none;
+                }
+                QComboBox::down-arrow {
+                    image: url(:/icons/images/icons/cil-arrow-bottom.png);
+                    width: 12px;
+                    height: 12px;
+                }
+            """)
+            combo.setMinimumHeight(30)
+            col_layout.addWidget(combo)
+            
+            multi_layout.addWidget(col_frame)
+            setattr(self, f"{col_name.lower()}_combo", combo)
         
-        # Month selection
-        self.month_label = QLabel("Month:")
-        self.month_combo = QComboBox()
-        self.month_combo.setMinimumHeight(25)
-        self.multi_date_layout.addWidget(self.month_label, 1, 0)
-        self.multi_date_layout.addWidget(self.month_combo, 1, 1)
-        
-        # Day selection
-        self.day_label = QLabel("Day:")
-        self.day_combo = QComboBox()
-        self.day_combo.setMinimumHeight(25)
-        self.multi_date_layout.addWidget(self.day_label, 2, 0)
-        self.multi_date_layout.addWidget(self.day_combo, 2, 1)
-        
-        self.date_stack.addWidget(self.multi_date_page)
-        
-        self.date_group_layout.addWidget(self.date_stack)
+        self.date_stack.addWidget(multi_date_page)
+        date_layout.addWidget(self.date_stack)
         
         self.horizontalLayout_13.addWidget(self.date_group)
         
         # Add forecast horizon input
-        self.horizon_label = QLabel(self.prediction_controls)
-        self.horizon_label.setObjectName(u"horizon_label")
-        self.horizon_label.setText("Forecast Horizon:")
-        self.horizontalLayout_13.addWidget(self.horizon_label)
+        horizon_frame = QFrame()
+        horizon_frame.setStyleSheet("border: none;")
+        horizon_layout = QVBoxLayout(horizon_frame)
+        horizon_layout.setContentsMargins(0, 0, 0, 0)
+        horizon_layout.setSpacing(5)
         
-        self.horizon_spin = QSpinBox(self.prediction_controls)
-        self.horizon_spin.setObjectName(u"horizon_spin")
+        self.horizon_label = QLabel("Forecast Horizon")
+        self.horizon_label.setStyleSheet("""
+            QLabel {
+                color: #00a6fb;
+                font-size: 14px;
+                font-weight: bold;
+                margin-bottom: 5px;
+                background-color: transparent;
+            }
+        """)
+        self.horizon_label.setFixedHeight(20)
+        self.horizon_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        horizon_layout.addWidget(self.horizon_label)
+        
+        self.horizon_spin = QSpinBox()
+        self.horizon_spin.setStyleSheet("""
+            QSpinBox {
+                background-color: #2c313c;
+                border: 1px solid #3d4451;
+                border-radius: 5px;
+                padding: 5px;
+                color: white;
+                min-width: 80px;
+            }
+            QSpinBox::up-button, QSpinBox::down-button {
+                width: 20px;
+                background-color: #3d4451;
+                border: none;
+            }
+            QSpinBox::up-arrow {
+                image: url(:/icons/images/icons/cil-arrow-top.png);
+                width: 12px;
+                height: 12px;
+            }
+            QSpinBox::down-arrow {
+                image: url(:/icons/images/icons/cil-arrow-bottom.png);
+                width: 12px;
+                height: 12px;
+            }
+        """)
         self.horizon_spin.setMinimum(1)
         self.horizon_spin.setMaximum(365)
         self.horizon_spin.setValue(30)
-        self.horizon_spin.setMinimumHeight(25)
-        self.horizontalLayout_13.addWidget(self.horizon_spin)
+        self.horizon_spin.setMinimumHeight(30)
+        horizon_layout.addWidget(self.horizon_spin)
+        
+        self.horizontalLayout_13.addWidget(horizon_frame)
         
         # Add predict button
-        self.predict_btn = QPushButton(self.prediction_controls)
-        self.predict_btn.setObjectName(u"predict_btn")
-        self.predict_btn.setText("Generate Predictions")
-        self.predict_btn.setStyleSheet(u"background-color: rgb(52, 59, 72);")
-        self.predict_btn.setMinimumWidth(120)
+        self.predict_btn = QPushButton("Generate Predictions")
+        self.predict_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #00a6fb;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 8px 15px;
+                font-weight: bold;
+                min-width: 150px;
+            }
+            QPushButton:hover {
+                background-color: #0095e2;
+            }
+            QPushButton:pressed {
+                background-color: #0084c9;
+            }
+        """)
         self.predict_btn.setMinimumHeight(30)
         self.horizontalLayout_13.addWidget(self.predict_btn)
         
         # Add the prediction controls to the main layout
         self.verticalLayout_21.addWidget(self.prediction_controls)
         
-        # Add prediction results area
-       # self.prediction_results = QFrame(self.predictions_page)
-       # self.prediction_results.setObjectName(u"prediction_results")
-       # self.prediction_results.setFrameShape(QFrame.Shape.StyledPanel)
-       # self.prediction_results.setFrameShadow(QFrame.Shadow.Raised)
-       # self.prediction_results.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-       # self.verticalLayout_22 = QVBoxLayout(self.prediction_results)
-       # self.verticalLayout_22.setObjectName(u"verticalLayout_22")
-       # self.verticalLayout_22.setContentsMargins(0, 0, 0, 0)
-        
-        # Add web view for displaying predictions
-       # self.prediction_webview = QWebEngineView(self.prediction_results)
-       # self.prediction_webview.setObjectName(u"prediction_webview")
-       # self.prediction_webview.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-       # self.verticalLayout_22.addWidget(self.prediction_webview)
-        
-        #self.verticalLayout_21.addWidget(self.prediction_results)
-        
-        # Set stretch factors to make the chart take up most of the space
-        self.verticalLayout_21.setStretch(0, 0)  # Controls - no stretch
-        self.verticalLayout_21.setStretch(1, 1)  # Chart - expand to fill space
-        
+        # Add the predictions page to the stacked widget
         self.stackedWidget.addWidget(self.predictions_page)
         
         self.new_page = QWidget()
@@ -1623,6 +1734,30 @@ class Ui_MainWindow(object):
         self.rec_btn = QPushButton(self.rec_widget)
         self.rec_btn.setObjectName(u"rec_btn")
         self.rec_btn.setText("Generate Recommendations")
+        self.rec_btn.setStyleSheet("""
+            QPushButton {
+                background-color: rgb(52, 59, 72);
+                border: 2px solid rgb(52, 59, 72);
+                border-radius: 5px;
+                color: rgb(255, 255, 255);
+                padding: 10px;
+                margin: 5px;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: rgb(57, 65, 80);
+                border: 2px solid rgb(61, 70, 86);
+            }
+            QPushButton:pressed {
+                background-color: rgb(35, 40, 49);
+                border: 2px solid rgb(43, 50, 61);
+            }
+            QPushButton:disabled {
+                background-color: rgb(35, 35, 35);
+                border: 2px solid rgb(43, 43, 43);
+                color: rgb(150, 150, 150);
+            }
+        """)
         
         self.gridLayout_8.addWidget(self.rec_btn, 0, 0, 1, 1)
         
