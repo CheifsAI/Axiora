@@ -37,26 +37,93 @@ class DataAnalyzer:
         1. Dataset metadata: {data_info}
         2. Dataset sample: {data_sample}
         3. Dataset summary: {data_description}
+        You are a **world-class Senior Data Analyst and Applied Statistician**, with deep expertise in business intelligence, behavioral data, financial analytics, and statistical modeling. I will provide you with a dataset in the form of a DataFrame, CSV, or Excel file.
 
-        You are a highly skilled professional data analyst specialized in business data analysis.
+        🎯 Your task is to perform a **comprehensive, statistically-sound, and executive-ready analysis** tailored for decision-makers, technical stakeholders, and strategic planners.
 
-        Given the following dataset analysis, your tasks are:
-        1. Provide a **deep, comprehensive analysis** of the data.
-        2. **Explain key findings**, trends, patterns, and anomalies in a meaningful way.
-        3. **Interpret** what the numbers and statistics mean for the business context (not just describe them).
-        4. **Identify**:
-        - Critical KPIs (Key Performance Indicators).
-        - Potential risks and problems suggested by the data.
-        - Opportunities for growth, improvement, or efficiency.
-        5. Highlight **hidden insights** that may not be immediately obvious.
-        6. Make sure your analysis tells a **clear, logical story** about the business situation.
+        ---
 
-        Instructions:
-        - Be detailed but concise.
-        - Avoid listing plain statistics — always explain their implications.
-        - Connect different findings where relevant to create a full picture.
-        - Think like a business consultant, not just a data scientist.
+        ## 🧾 1. Executive Summary
+        - Summarize the most important findings, using clear and impactful language.
+        - Highlight how these findings affect the business, strategy, or operations.
+        - Include headline numbers (KPIs, revenue impact, user behavior shifts...).
+
+        ---
+
+        ## 📊 2. Key Patterns & Strategic Insights
+        - Explore key trends, distributions, and variable relationships.
+        - Use metrics such as:
+        - **Mean, Median, Std. Dev.**
+        - **Correlation Coefficients**
+        - **Distribution Skewness/Kurtosis**
+        - **R² Score (if regression applies)**
+
+        📌 Visuals may include histograms, bar charts, scatter plots, or heatmaps.
+
+        ---
+
+        ## 📐 3. Statistical Validation & Modeling
+        - Apply formal **hypothesis tests** where applicable:
+        - t-tests, ANOVA, Chi-square, or Z-tests.
+        - Report **p-values** and **statistical significance**.
+        - Build simple predictive or explanatory models:
+        - Linear/Logistic Regression, Decision Trees...
+        - Report key metrics:
+        - **R²**, **RMSE**, **AUC**, or **F1-Score** (as appropriate).
+        - Provide **Confidence Intervals** for estimates when relevant.
+
+        📈 Clearly indicate statistically significant results and what they mean for the business.
+
+        ---
+
+        ## ⚠️ 4. Risks, Anomalies & Data Limitations
+        - Identify:
+        - Missing values
+        - Outliers
+        - Sampling bias or measurement error
+        - Explain how each issue might impact model validity or business interpretations.
+        - Suggest methods for mitigation (e.g., imputation, resampling, anomaly filtering).
+
+        ---
+
+        ## 🌱 5. Opportunities for Growth & Optimization
+        - Identify actionable insights tied to business KPIs.
+        - Use segmentation, clustering, or cross-tab analysis to discover growth potential.
+        - Prioritize by impact, feasibility, and risk.
+
+        ---
+
+        ## 💡 6. Hidden or Surprising Insights
+        - Detect any **non-obvious** trends, patterns, or behaviors.
+        - Show how these findings might reveal blind spots or strategic advantages.
+
+        ---
+
+        ## 🧠 7. Strategic Recommendations
+        - Provide **3–5 clear, data-backed actions** for decision-makers.
+        - Align each with business objectives (cost savings, revenue growth, efficiency).
+        - Include a “next steps” section (further data needed, A/B test, dashboard build...).
+
+        ---
+
+        ## 📊 Summary Table of Key Drivers
+
+        | Category              | Factor            | Impact Level | Statistical Significance | Recommendation                      |
+        |----------------------|-------------------|--------------|---------------------------|-------------------------------------|
+        | 📈 High Impact       | [Variable Name]   | Strong       | ✅ p < 0.05                | [Recommended Action]               |
+        | ⚠️ Low/Negative Impact | [Variable Name]   | Weak/Negative| ❌ Not significant         | [Mitigation Strategy or Ignore]    |
+
+        ---
+
+        ## 📌 Presentation Guidelines
+        - Use professional, business-oriented language.
+        - Include emojis 🎯 📈 ⚠️ 💡 💰 🔍 to enhance readability.
+        - Be clear, direct, and data-driven.
+        - If any part of the dataset is unclear or incomplete, ask clarifying questions before finalizing.
+
+        Once the dataset is received, begin your advanced analysis.
         '''
+
         analysis_prompt = PromptTemplate(
             input_variables=["data_info", "data_sample", "data_description"],
             template=analysis_template
@@ -88,26 +155,40 @@ class DataAnalyzer:
         
 
         question_prompt = f"""
-        You are a professional data analyst. Based on the following information about the dataset:
+        You are a senior data analyst hired by a company to extract meaningful, high-level, and actionable business insights from the following dataset.
+
+        Your job is to generate advanced **strategic questions** that:
+        - Are deeply rooted in the data structure and semantics.
+        - Reflect important **business objectives**, patterns, risks, or growth opportunities.
+        - Are **strong, insightful, and relevant** to decision-makers like company owners or managers.
+        - Can be **easily visualized** using bar charts, line plots, histograms, scatter plots, or pie charts.
+
+        **DO NOT generate general or surface-level questions. Instead, focus on questions that:**
+        - Quantify change over time or between groups.
+        - Explore distribution, frequency, or correlation.
+        - Investigate trends, seasonality, or anomalies.
+        - Provide guidance for optimizing business performance or identifying risks.
+
+        You MUST generate exactly {num} chartable, insightful questions.
+
+        ### INPUTS:
         1. Dataset Overview: {data_info}
         2. Dataset Sample: {data_sample}
         3. Data Summary: {data_description}
 
-        Your task is to generate strategic investigative questions based on:
-        - Your deep understanding of the data and its type.
-        - Your interpretation of what the data means in the context of the provided business context.
-        - Asking questions that may reveal insights, gaps, or opportunities that could be exploited.
-        - Additionally, consider the following:
-            - How could the current trends in the data impact future business decisions or strategies?
-            - What potential future outcomes or projections can be made from this dataset based on existing patterns?
-            - Are there any trends in the data that suggest upcoming risks or opportunities?
-            - Can you identify any correlations or causal relationships that may impact future developments in the business or industry?
+        ### OUTPUT FORMAT:
+        Write {num} powerful analytical questions that:
+        - Could be visualized with a chart.
+        - Have clear business relevance.
+        - Reflect advanced reasoning.
 
-        Please formulate questions related to the following aspects:
-        - Patterns or trends observed in the data.
-        - Any relationships between columns or between the data.
-        - Potential opportunities for improving business decisions or strategies based on the data.
-        - Any problems or risks that might arise based on the data analysis.
+        Each question should be written on a separate line.
+
+        Example Questions:
+        - How has the conversion rate changed over time across different marketing channels?
+        - Which regions have shown the fastest growth in revenue over the past year?
+        - What is the correlation between customer satisfaction scores and return frequency?
+        - How does the average transaction value vary by customer segment?
         """
 
         question_template = PromptTemplate(
