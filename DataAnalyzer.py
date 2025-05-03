@@ -33,14 +33,11 @@ class DataAnalyzer:
         data_description = self.data_description
 
         analysis_template = '''
-<<<<<<< HEAD
         You are a data analyst. You are provided with:
         1. Dataset metadata: {data_info}
         2. Dataset sample: {data_sample}
         3. Dataset summary: {data_description}
-=======
         You are a **world-class Senior Data Analyst and Applied Statistician**, with deep expertise in business intelligence, behavioral data, financial analytics, and statistical modeling. I will provide you with a dataset in the form of a DataFrame, CSV, or Excel file.
->>>>>>> 398993ee53797bc1ed683d64469518607be31234
 
         🎯 Your task is to perform a **comprehensive, statistically-sound, and executive-ready analysis** tailored for decision-makers, technical stakeholders, and strategic planners.
 
