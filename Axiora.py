@@ -163,17 +163,12 @@ class MainWindow(QMainWindow):
         # ///////////////////////////////////////////////////////////////
         widgets.stackedWidget.setCurrentWidget(widgets.home_2)
         username = self.app_functions.db.get_user_name(self.user_id)
-        welcome_label = QLabel(f"Welcome, {username}!")
-        welcome_label.setAlignment(Qt.AlignCenter)
-        welcome_label.setStyleSheet("font-size: 20px; font-weight: bold;")
-        widgets.home_2.layout().addWidget(welcome_label)
         widgets.btn_home.setStyleSheet(UIFunctions.selectMenu(widgets.btn_home.styleSheet()))
 
         # Connect column header click event
         widgets.tableData.horizontalHeader().sectionClicked.connect(self.show_column_dialog)
 
     def load_oldreports(self):
-
         # Create a grid layout for the home page
         if hasattr(self.ui, 'home_2'):
             # Clear existing layout if any
@@ -182,38 +177,208 @@ class MainWindow(QMainWindow):
             
             # Create new grid layout
             grid_layout = QGridLayout(self.ui.home_2)
-            grid_layout.setSpacing(10)
+            grid_layout.setSpacing(20)
             grid_layout.setContentsMargins(20, 20, 20, 20)
 
-            # Create welcome message widget for top left
-            welcome_widget = QWidget()
+            # Create welcome section (top left)
+            welcome_widget = QFrame()
+            welcome_widget.setStyleSheet("""
+                QFrame {
+                    background-color: #2c313c;
+                    border: 2px solid #3d4451;
+                    border-radius: 10px;
+                }
+            """)
             welcome_layout = QVBoxLayout(welcome_widget)
+            welcome_layout.setContentsMargins(20, 20, 20, 20)
+            welcome_layout.setSpacing(15)
+
+            # Add welcome message
+            username = self.app_functions.db.get_user_name(self.user_id)
+            welcome_title = QLabel(f"Welcome back, {username}!")
+            welcome_title.setStyleSheet("""
+                QLabel {
+                    color: #00a6fb;
+                    font-size: 24px;
+                    font-weight: bold;
+                }
+            """)
+            welcome_layout.addWidget(welcome_title)
+
+            # Add date and time
+            from datetime import datetime
+            current_time = datetime.now().strftime("%B %d, %Y %H:%M")
+            time_label = QLabel(current_time)
+            time_label.setStyleSheet("""
+                QLabel {
+                    color: #ffffff;
+                    font-size: 14px;
+                }
+            """)
+            welcome_layout.addWidget(time_label)
+
+            # Add app description
+            description_frame = QFrame()
+            description_frame.setStyleSheet("""
+                QFrame {
+                    background-color: #1b1e23;
+                    border-radius: 8px;
+                    padding: 15px;
+                }
+            """)
+            description_layout = QVBoxLayout(description_frame)
+            description_layout.setSpacing(10)
+
+            # Title
+            desc_title = QLabel("About Axiora")
+            desc_title.setStyleSheet("""
+                QLabel {
+                    color: #00a6fb;
+                    font-size: 18px;
+                    font-weight: bold;
+                }
+            """)
+            desc_title.setAlignment(Qt.AlignCenter)
+            description_layout.addWidget(desc_title)
+
+            # Description text
+            desc_text = QLabel(
+                "Axiora is an advanced Business Intelligence and Analytics platform that helps you:\n\n"
+                "• Analyze and visualize your data with powerful tools\n"
+                "• Generate automated insights and reports\n"
+                "• Create accurate predictions and forecasts\n"
+                "• Make data-driven decisions with confidence\n\n"
+                "Get started by creating a new report or exploring your existing analyses."
+            )
+            desc_text.setStyleSheet("""
+                QLabel {
+                    color: #ffffff;
+                    font-size: 14px;
+                    line-height: 1.5;
+                }
+            """)
+            desc_text.setWordWrap(True)
+            description_layout.addWidget(desc_text)
+
+            welcome_layout.addWidget(description_frame)
+
+            # Add quick stats
+            stats_frame = QFrame()
+            stats_frame.setStyleSheet("""
+                QFrame {
+                    background-color: #1b1e23;
+                    border-radius: 8px;
+                    padding: 10px;
+                }
+            """)
+            stats_layout = QHBoxLayout(stats_frame)
+            stats_layout.setSpacing(20)
+
+            # Get total reports count
+            total_reports = len(self.app_functions.db.get_user_reports(self.user_id))
+            
+            # Create stat boxes
+            stats = [
+                ("Total Reports", str(total_reports), "📊"),
+                ("Active Projects", "3", "📈"),
+                ("Recent Analysis", "5", "📉")
+            ]
+
+            for title, value, icon in stats:
+                stat_box = QFrame()
+                stat_box.setStyleSheet("""
+                    QFrame {
+                        background-color: #2c313c;
+                        border-radius: 8px;
+                        padding: 15px;
+                    }
+                """)
+                stat_layout = QVBoxLayout(stat_box)
+                
+                # Icon and value
+                value_label = QLabel(f"{icon} {value}")
+                value_label.setStyleSheet("""
+                    QLabel {
+                        color: #00a6fb;
+                        font-size: 24px;
+                        font-weight: bold;
+                    }
+                """)
+                value_label.setAlignment(Qt.AlignCenter)
+                stat_layout.addWidget(value_label)
+                
+                # Title
+                title_label = QLabel(title)
+                title_label.setStyleSheet("""
+                    QLabel {
+                        color: #ffffff;
+                        font-size: 14px;
+                    }
+                """)
+                title_label.setAlignment(Qt.AlignCenter)
+                stat_layout.addWidget(title_label)
+                
+                stats_layout.addWidget(stat_box)
+
+            welcome_layout.addWidget(stats_frame)
             welcome_layout.addStretch()
 
             # Add welcome widget to top left
             grid_layout.addWidget(welcome_widget, 0, 0)
 
             # Create reports container for top right
-            reports_container = QWidget()
+            reports_container = QFrame()
+            reports_container.setStyleSheet("""
+                QFrame {
+                    background-color: #2c313c;
+                    border: 2px solid #3d4451;
+                    border-radius: 10px;
+                }
+            """)
             reports_layout = QVBoxLayout(reports_container)
-            reports_layout.setSpacing(5)
-            reports_layout.setContentsMargins(0, 0, 0, 0)
+            reports_layout.setSpacing(15)
+            reports_layout.setContentsMargins(20, 20, 20, 20)
 
             # Add title
             title_label = QLabel("Your Reports")
             title_label.setStyleSheet("""
                 QLabel {
-                    font-size: 16px;
+                    color: #00a6fb;
+                    font-size: 20px;
                     font-weight: bold;
-                    color: white;
-                    padding: 10px;
-                    background-color: rgb(196, 7, 105);
-                    border-radius: 4px;
                 }
             """)
             title_label.setAlignment(Qt.AlignCenter)
             reports_layout.addWidget(title_label)
-            reports_layout.addSpacing(10)
+
+            # Add reports scroll area
+            reports_scroll = QScrollArea()
+            reports_scroll.setWidgetResizable(True)
+            reports_scroll.setStyleSheet("""
+                QScrollArea {
+                    border: none;
+                    background-color: transparent;
+                }
+                QScrollBar:vertical {
+                    border: none;
+                    background: #1b1e23;
+                    width: 8px;
+                    margin: 0;
+                }
+                QScrollBar::handle:vertical {
+                    background-color: #3d4451;
+                    min-height: 30px;
+                    border-radius: 4px;
+                }
+                QScrollBar::handle:vertical:hover {
+                    background-color: #00a6fb;
+                }
+            """)
+            
+            reports_widget = QWidget()
+            reports_widget_layout = QVBoxLayout(reports_widget)
+            reports_widget_layout.setSpacing(10)
+            reports_widget_layout.setContentsMargins(0, 0, 0, 0)
 
             reports = self.app_functions.db.get_user_reports(self.user_id)
             for report in reports:
@@ -225,17 +390,20 @@ class MainWindow(QMainWindow):
                 report_btn.setProperty("report_id", report['id'])
                 report_btn.setProperty("report_name", report['name'])
                 
-                # Set button style
+                # Set button style to match dark theme
                 report_btn.setStyleSheet("""
                     QPushButton {
-                        background-color: rgb(24, 196, 199);
-                        border: 1px solid #ddd;
+                        background-color: #2c313c;
+                        color: #ffffff;
+                        border: 2px solid #3d4451;
                         border-radius: 4px;
                         padding: 5px 10px;
                         text-align: left;
                     }
                     QPushButton:hover {
-                        background-color: rgb(7, 60, 196);
+                        background-color: #1b1e23;
+                        border-color: #00a6fb;
+                        color: #00a6fb;
                     }
                 """)
                 
@@ -248,28 +416,19 @@ class MainWindow(QMainWindow):
                     report_btn.setIconSize(QSize(24, 24))
                 
                 report_btn.clicked.connect(self.report_button_clicked)
-                reports_layout.addWidget(report_btn)
+                reports_widget_layout.addWidget(report_btn)
+
+            reports_widget_layout.addStretch()
+            reports_scroll.setWidget(reports_widget)
+            reports_layout.addWidget(reports_scroll)
 
             # Add reports container to top right
             grid_layout.addWidget(reports_container, 0, 1)
 
-            # Add empty widgets for bottom left and right
-            bottom_left = QWidget()
-            bottom_right = QWidget()
-            grid_layout.addWidget(bottom_left, 1, 0)
-            grid_layout.addWidget(bottom_right, 1, 1)
-
-            # Add horizontal line
-            horizontal_line = QFrame()
-            horizontal_line.setFrameShape(QFrame.Shape.HLine)
-            horizontal_line.setStyleSheet("background-color: #ddd;")
-            grid_layout.addWidget(horizontal_line, 1, 0, 1, 2)
-
-            # Add vertical line
-            vertical_line = QFrame()
-            vertical_line.setFrameShape(QFrame.Shape.VLine)
-            vertical_line.setStyleSheet("background-color: #ddd;")
-            grid_layout.addWidget(vertical_line, 0, 1, 2, 1)
+            # Set row and column stretch factors
+            grid_layout.setRowStretch(0, 1)  # Top row
+            grid_layout.setColumnStretch(0, 1)  # Left column
+            grid_layout.setColumnStretch(1, 1)  # Right column
 
     def report_button_clicked(self):
         btn = self.sender()
