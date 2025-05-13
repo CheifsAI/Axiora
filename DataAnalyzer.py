@@ -102,7 +102,7 @@ class DataAnalyzer:
         ## 🧠 7. Strategic Recommendations
         - Provide **3–5 clear, data-backed actions** for decision-makers.
         - Align each with business objectives (cost savings, revenue growth, efficiency).
-        - Include a “next steps” section (further data needed, A/B test, dashboard build...).
+        - Include a "next steps" section (further data needed, A/B test, dashboard build...).
 
         ---
 
@@ -249,31 +249,72 @@ class DataAnalyzer:
             return []
 
     
-    def chat(self,question):
-        prompt_template = ChatPromptTemplate.from_messages(
-            [
-                (
-                    "system",
-                    "You are a data analyst.",
-                    ),
-                    MessagesPlaceholder(variable_name="memory"),
-                    ("human", "{input}"),
-                    ]
-                    )
-        chain = prompt_template | self.llm
-
-        response = chain.invoke({"input": question, "memory":self.memory})
-        self.db.saveMemory(reportID=self.report_id,
-                           llm=self.db.llm_id_by_name(self.llm.model),
-                           prompet=question,
-                           response=response,
-                           chat=True)
-
-        self.memory.append(HumanMessage(content=question))
-        self.memory.append(AIMessage(content=response))
-        return response
+    def chat(self, question: str) -> str:
+        """
+        Interact with the data analysis system to answer questions about the dataset.
+        
+        Args:
+            question: User's question about the data
+            
+        Returns:
+            The model's response with data-informed insights
+        """
+        # Create enhanced system prompt with context about the dataset
+        system_prompt = f"""
+        You are a data analyst with expertise in analyzing {self.dataframe.shape[1]} variables across {self.dataframe.shape[0]} records.
+        
+        Dataset context:
+        - Type of data: {self.data_info.split('\n')[0] if self.data_info else 'Unknown dataset'}
+        - Key columns: {', '.join(self.dataframe.columns[:5]) if len(self.dataframe.columns) > 5 else self.data_cols}
+        
+        Answer questions directly using facts from the data. If asked about something not in the data:
+        1. Clearly state that the information is not in the dataset
+        2. Suggest alternative questions that could be answered with the available data
+        
+        Provide concise, accurate, data-driven responses based on the dataset and prior analysis.
+        """
+        
+        # Create enhanced chat prompt template
+        prompt_template = ChatPromptTemplate.from_messages([
+            ("system", system_prompt),
+            MessagesPlaceholder(variable_name="memory"),
+            ("human", "{input}")
+        ])
+        
+        try:
+            # Create and execute the chain
+            chain = prompt_template | self.llm
+            
+            # Add contextual info to complex questions
+            enhanced_question = question
+            if len(question.split()) > 10 and not any(keyword in question.lower() for keyword in ['what is', 'show me', 'list']):
+                enhanced_question = f"{question}\n\nPlease refer to the dataset with columns: {self.data_cols}"
+            
+            response = chain.invoke({
+                "input": enhanced_question, 
+                "memory": self.memory
+            })
+            
+            # Save conversation to memory and database
+            self.memory.append(HumanMessage(content=question))
+            self.memory.append(AIMessage(content=response))
+            
+            if self.report_id is not None:
+                self.db.saveMemory(
+                    reportID=self.report_id,
+                    llm=self.db.llm_id_by_name(self.llm.model),
+                    prompet=question,
+                    response=response,
+                    chat=True
+                )
+            
+            return response
+            
+        except Exception as e:
+            error_message = f"Sorry, I encountered an error while processing your question: {str(e)}"
+            print(f"Error in chat function: {str(e)}")
+            return error_message
     
-
     def select_chart_type(self, question: str) -> str:
         self.chart_type_prompt = ChatPromptTemplate.from_messages([
             ("system", """You are an expert at selecting chart types for data visualization. Strictly follow these rules:
@@ -459,4 +500,4 @@ class DataAnalyzer:
                         response=rec_response,
                         chat=False)
 
-        return rec_response
+        return rec_response 
