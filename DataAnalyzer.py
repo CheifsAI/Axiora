@@ -13,6 +13,7 @@ import re
 #from langchain.output_parsers import PydanticOutputParser
 from DatabaseManager import DatabaseManager
 from langchain_experimental.agents import create_pandas_dataframe_agent
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 class DataAnalyzer:
     def __init__(self,dataframe,llm,user_id=None):
@@ -250,70 +251,54 @@ class DataAnalyzer:
 
     
     def chat(self, question: str) -> str:
-        """
-        Interact with the data analysis system to answer questions about the dataset.
-        
-        Args:
-            question: User's question about the data
+            """
+            Interact with the data analysis system to answer questions about the dataset.
             
-        Returns:
-            The model's response with data-informed insights
-        """
-        # Create enhanced system prompt with context about the dataset
-        system_prompt = f"""
-        You are a data analyst with expertise in analyzing {self.dataframe.shape[1]} variables across {self.dataframe.shape[0]} records.
-        
-        Dataset context:
-        - Type of data: {self.data_info.split('\n')[0] if self.data_info else 'Unknown dataset'}
-        - Key columns: {', '.join(self.dataframe.columns[:5]) if len(self.dataframe.columns) > 5 else self.data_cols}
-        
-        Answer questions directly using facts from the data. If asked about something not in the data:
-        1. Clearly state that the information is not in the dataset
-        2. Suggest alternative questions that could be answered with the available data
-        
-        Provide concise, accurate, data-driven responses based on the dataset and prior analysis.
-        """
-        
-        # Create enhanced chat prompt template
-        prompt_template = ChatPromptTemplate.from_messages([
-            ("system", system_prompt),
-            MessagesPlaceholder(variable_name="memory"),
-            ("human", "{input}")
-        ])
-        
-        try:
-            # Create and execute the chain
-            chain = prompt_template | self.llm
-            
-            # Add contextual info to complex questions
-            enhanced_question = question
-            if len(question.split()) > 10 and not any(keyword in question.lower() for keyword in ['what is', 'show me', 'list']):
-                enhanced_question = f"{question}\n\nPlease refer to the dataset with columns: {self.data_cols}"
-            
+            Args:
+                question: User's question about the data
+                
+            Returns:
+                The model's response with data-informed insights
+            """
+
+            system_prompt = f"""
+            You are a data analyst with expertise in analyzing {self.dataframe.shape[1]} variables across {self.dataframe.shape[0]} records.
+
+            Dataset context:
+            - Type of data: {self.data_info.splitlines()[0] if self.data_info else 'Unknown dataset'}
+            - Key columns: {', '.join(self.dataframe.columns[:5]) if len(self.dataframe.columns) > 5 else self.data_cols}
+
+            Instructions:
+            - Answer using ONLY the data available.
+            - If asked about unknown variables, respond transparently.
+            - Prioritize clarity, relevance, and helpfulness.
+            """
+
+            prompt = ChatPromptTemplate.from_messages([
+                ("system", system_prompt),
+                MessagesPlaceholder(variable_name="chat_history"),
+                ("human", "{question}")
+            ])
+
+            chain = prompt | self.llm
+
             response = chain.invoke({
-                "input": enhanced_question, 
-                "memory": self.memory
+                "chat_history": self.memory,
+                "question": question
             })
-            
-            # Save conversation to memory and database
+
             self.memory.append(HumanMessage(content=question))
             self.memory.append(AIMessage(content=response))
-            
-            if self.report_id is not None:
-                self.db.saveMemory(
-                    reportID=self.report_id,
-                    llm=self.db.llm_id_by_name(self.llm.model),
-                    prompet=question,
-                    response=response,
-                    chat=True
-                )
-            
+
+            self.db.saveMemory(
+                reportID=self.report_id,
+                llm=self.db.llm_id_by_name(self.llm.model),
+                prompet=question,
+                response=response,
+                chat=True
+            )
+
             return response
-            
-        except Exception as e:
-            error_message = f"Sorry, I encountered an error while processing your question: {str(e)}"
-            print(f"Error in chat function: {str(e)}")
-            return error_message
     
     def select_chart_type(self, question: str) -> str:
         self.chart_type_prompt = ChatPromptTemplate.from_messages([
