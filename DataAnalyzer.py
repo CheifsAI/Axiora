@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import logging
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union, Any
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from OprFuncs import *
@@ -23,6 +23,22 @@ if not logger.handlers:
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
+
+def ensure_string(content: Any) -> str:
+    """
+    Ensure the content is a string, extracting content from AIMessage if needed.
+    
+    Parameters:
+        content: Content that might be a string, AIMessage, or other object
+        
+    Returns:
+        str: The string content
+    """
+    if isinstance(content, AIMessage):
+        return str(content.content)
+    elif hasattr(content, 'content'):
+        return str(content.content)
+    return str(content)
 
 class DataAnalyzer:
     """
@@ -208,18 +224,22 @@ class DataAnalyzer:
             "data_description": data_description
         })
 
+        # Ensure the analysis is a string
+        analysis_str = ensure_string(self.analysis)
+        self.analysis = analysis_str
+
         formatted_analysis_prompt = analysis_template.format(
             data_info=data_info,
             data_sample=data_sample,
             data_description=data_description
         )
         self.memory.append(HumanMessage(content=formatted_analysis_prompt))
-        self.memory.append(AIMessage(content=self.analysis))
+        self.memory.append(AIMessage(content=analysis_str))
         self.db.saveMemory(
             reportID=self.report_id,
             llm=self.db.llm_id_by_name(self.llm.model),
             prompet=formatted_analysis_prompt,
-            response=self.analysis,
+            response=analysis_str,
             chat=False
         )
         return self.analysis        
@@ -308,6 +328,9 @@ class DataAnalyzer:
                 "data_sample": data_sample,
                 "data_description": data_description
             })
+
+            # Ensure the response is a string
+            generated_questions = ensure_string(generated_questions)
 
             # Ensure the response is properly encoded
             if isinstance(generated_questions, str):
@@ -402,19 +425,22 @@ class DataAnalyzer:
             "chat_history": self.memory,
             "question": question
         })
+        
+        # Ensure response is a string
+        response_str = ensure_string(response)
 
         self.memory.append(HumanMessage(content=question))
-        self.memory.append(AIMessage(content=response))
+        self.memory.append(AIMessage(content=response_str))
 
         self.db.saveMemory(
             reportID=self.report_id,
             llm=self.db.llm_id_by_name(self.llm.model),
             prompet=question,
-            response=response,
+            response=response_str,
             chat=True
         )
 
-        return response
+        return response_str
     
     def select_chart_type(self, question: str) -> str:
         """
@@ -650,6 +676,9 @@ class DataAnalyzer:
             num_recommendations=num_recommendations
         )
 
+        # Ensure response is a string
+        rec_response_str = ensure_string(rec_response)
+
         formatted_rec_prompt = recommendation_prompt.format(
             data_info=data_info,
             data_sample=data_sample,
@@ -658,13 +687,13 @@ class DataAnalyzer:
             num_recommendations=num_recommendations
         )
         self.memory.append(HumanMessage(content=formatted_rec_prompt))
-        self.memory.append(AIMessage(content=rec_response))
+        self.memory.append(AIMessage(content=rec_response_str))
         self.db.saveMemory(
             reportID=self.report_id,
             llm=self.db.llm_id_by_name(self.llm.model),
             prompet=formatted_rec_prompt,
-            response=rec_response,
+            response=rec_response_str,
             chat=False
         )
 
-        return rec_response 
+        return rec_response_str 
