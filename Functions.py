@@ -216,6 +216,12 @@ class GuiFunctions():
             # Extract questions from the Word content
             questions = self.extract_questions(word_content)
             
+            # Store the extracted questions for use by other functions
+            self.g_questions = questions
+            
+            # Clear the selected questions list
+            self.selected_qu_list = []
+            
             # Debug: Print the extracted questions
             print("Extracted questions:")
             print(questions)
@@ -259,7 +265,15 @@ class GuiFunctions():
                     check_box = QCheckBox(question_frame)
                     check_box.setObjectName(f"checkbox_{i}")  # Set unique object name
                     check_box.setProperty("question", question)
-                    check_box.stateChanged.connect(self.handle_question_selection)
+                    
+                    # Create a custom slot for this specific checkbox
+                    def create_slot(q):
+                        return lambda checked: self.handle_question_selection(q, checked)
+                    
+                    # Connect with the custom slot
+                    slot = create_slot(question)
+                    check_box.toggled.connect(slot)
+                    
                     hbox.addWidget(check_box)
 
                     qu_layout.addWidget(question_frame)
