@@ -48,6 +48,8 @@ class DataAnalyzer:
         - **Do not generate code, hypothetical examples, or reference data not present.**
         - Focus only on the real data and its characteristics.
         - Use professional, executive-level language suitable for business decision-makers.
+        
+        follow the Output Format strictly:
 
         ---
 
