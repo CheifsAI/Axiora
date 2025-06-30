@@ -57,14 +57,15 @@ class DataAnalyzer:
         ---
 
         ### 📈 Key Statistics Table
-        | Metric | Value | Description |
-        |--------|-------|-------------|
-        | [Metric 1] | [Value 1] | [What this metric means] |
-        | [Metric 2] | [Value 2] | [What this metric means] |
-        | [Metric 3] | [Value 3] | [What this metric means] |
-        | [Metric 4] | [Value 4] | [What this metric means] |
-        | [Metric 5] | [Value 5] | [What this metric means] |
-        | ...    | ...   | ...         |
+
+        | Metric      | Value      | Description               |
+        |-------------|------------|---------------------------|
+        | [Metric 1]  | [Value 1]  | [What this metric means]  |
+        | [Metric 2]  | [Value 2]  | [What this metric means]  |
+        | [Metric 3]  | [Value 3]  | [What this metric means]  |
+        | [Metric 4]  | [Value 4]  | [What this metric means]  |
+        | [Metric 5]  | [Value 5]  | [What this metric means]  |
+        | ...         | ...        | ...                       |
 
         (Fill in the table with 5–7 of the most relevant statistics or findings from the actual data. Do not invent or assume values.)
 
@@ -96,6 +97,7 @@ class DataAnalyzer:
         ---
 
         ### ⚠️ Limitations or Data Quality Notes
+
         If applicable, briefly mention any limitations, missing data, or quality issues that could affect interpretation.
 
         Respond only with the summary, table, insights, and limitations as described above. Do not include code, hypothetical data, or unrelated examples.
@@ -158,12 +160,6 @@ class DataAnalyzer:
         - Reflect advanced reasoning.
 
         Each question should be written on a separate line.
-
-        Example Questions:
-        - How has the conversion rate changed over time across different marketing channels?
-        - Which regions have shown the fastest growth in revenue over the past year?
-        - What is the correlation between customer satisfaction scores and return frequency?
-        - How does the average transaction value vary by customer segment?
         """
 
         question_template = PromptTemplate(
