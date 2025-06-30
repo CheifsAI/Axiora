@@ -58,7 +58,7 @@ class DataAnalyzer:
 
         ### 📈 Key Statistics Table
 
-        Output the following table in valid Markdown format, with each row on its own line. Do not combine rows.
+        Output the following table in valid Markdown format, with each row on its own line, and a blank line before and after the table.
 
         | Metric      | Value      | Description               |
         |-------------|------------|---------------------------|
@@ -69,7 +69,7 @@ class DataAnalyzer:
         | [Metric 5]  | [Value 5]  | [What this metric means]  |
         | ...         | ...        | ...                       |
 
-        (Fill in the table with 5–7 of the most relevant statistics or findings from the actual data. Do not invent or assume values.)
+        (Replace the example values with those from the actual data.)
 
         ---
 
