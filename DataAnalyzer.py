@@ -29,11 +29,8 @@ class DataAnalyzer:
 
     def analysis_data(self):
         data_info = self.data_info
-        print(data_info)
         data_sample = self.data_sample
-        print(data_sample)
         data_description = self.data_description
-        print(data_description)
 
         analysis_template = '''
         You are a world-class data analyst.
@@ -73,7 +70,6 @@ class DataAnalyzer:
                            prompet=formatted_analysis_prompt,
                            response=self.analysis,
                            chat=False)
-        print(analysis_chain)
         return self.analysis        
 
     def questions_gen(self, num):

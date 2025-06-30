@@ -1384,6 +1384,10 @@ class Ui_MainWindow(object):
         self.summary_text = QTextEdit(self.sum_widget)
         self.summary_text.setObjectName(u"summary_text")
         self.summary_text.setReadOnly(True)
+        font = QFont()
+        font.setPointSize(50)
+        self.summary_text.setFont(font)
+
 
         self.gridLayout_6.addWidget(self.summary_text, 1, 0, 1, 1)
 

@@ -431,7 +431,21 @@ class GuiFunctions():
                 )
                 
                 # Update UI
-                self.main_window.ui.recommendations_text.setMarkdown(recommendations)
+                # Create CSS styling for larger font size
+                css_style = """
+                <style>
+                body { font-size: 20px; }
+                p { font-size: 20px; }
+                h1, h2, h3, h4, h5, h6 { font-size: 20px; }
+                li { font-size: 20px; }
+                table { font-size: 20px; }
+                td, th { font-size: 20px; }
+                </style>
+                """
+                recommendations_md = markdown(recommendations)
+                # Combine CSS with markdown content
+                styled_recommendations = css_style + recommendations_md
+                self.main_window.ui.recommendations_text.setHtml(styled_recommendations)
             else:
                 print("Error: No report ID available")
                 self.main_window.ui.recommendations_text.setMarkdown(
@@ -476,8 +490,21 @@ class GuiFunctions():
         self.summary_worker.start()
 
     def _update_summary_text(self,summary):
+            # Create CSS styling for larger font size
+            css_style = """
+            <style>
+            body { font-size: 20px; }
+            p { font-size: 20px; }
+            h1, h2, h3, h4, h5, h6 { font-size: 20px; }
+            li { font-size: 20px; }
+            table { font-size: 20px; }
+            td, th { font-size: 20px; }
+            </style>
+            """
             summary_md = markdown(summary)
-            self.main_window.ui.summary_text.setMarkdown(summary_md)
+            # Combine CSS with markdown content
+            styled_summary = css_style + summary_md
+            self.main_window.ui.summary_text.setHtml(styled_summary)
 
     def handle_summary_complete(self, summary):
         try:
