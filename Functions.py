@@ -155,6 +155,45 @@ class RecommendationWorker(QThread):
         except Exception as e:
             self.error.emit(str(e))
 
+class ChartGenerationWorker(QThread):
+    finished = Signal(list)
+    error = Signal(str)
+
+    def __init__(self, analyzer, visualizer, questions, rname, db, reportID):
+        super().__init__()
+        self.analyzer = analyzer
+        self.visualizer = visualizer
+        self.questions = questions
+        self.rname = rname
+        self.db = db
+        self.reportID = reportID
+
+    def run(self):
+        try:
+            chart_paths = []
+            dashboardID = self.db.addDashboard(reportID=self.reportID)
+            for question in self.questions:
+                chart_type = self.analyzer.select_chart_type(question)
+                chart_columns = self.analyzer.select_columns(question)
+                chart_title = question[3:6] + str(random.randint(100, 2000))
+                chart_path = f"{self.rname}/{chart_title}.html"
+                self.visualizer.generate_visualization(
+                    question=question,
+                    output_path=chart_path,
+                    columns=chart_columns,
+                    chart_type=chart_type,
+                    width=1200,
+                    height=800
+                )
+                if chart_path and os.path.exists(chart_path):
+                    self.db.saveCharts(dashID=dashboardID, path=chart_path)
+                    chart_paths.append(chart_path)
+            self.finished.emit(chart_paths)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            self.error.emit(str(e))
+
 class GuiFunctions():
     def __init__(self, MainWindow, user_id):
         self.main_window = MainWindow
@@ -742,81 +781,65 @@ class GuiFunctions():
                 self.worker.start()
 
     def process_selected_questions(self):
-        """Process selected questions and generate charts in a grid layout"""
+        """Process selected questions and generate charts in a grid layout (now threaded)"""
         if not self.selected_qu_list:
             print("No questions selected!")
             print("Debug: Current selections:", self.selected_qu_list)
             return
-        
+
         print(f"Processing {len(self.selected_qu_list)} selected questions")
         print(f"Selected questions: {self.selected_qu_list}")
-        
-        try:
-            # Save questions and create dashboard first
-            for qu in self.selected_qu_list:
-                if not hasattr(self, 'saved_questions'):
-                    self.saved_questions = set()
-                if qu not in self.saved_questions:
-                    self.db.saveQuestion(reportID=self.reportID, question=qu)
-                    self.saved_questions.add(qu)
-            
-            # Create dashboard
-            self.dashboardID = self.db.addDashboard(reportID=self.reportID)
-            print(f"Created dashboard with ID: {self.dashboardID}")
-            self.chart_paths = []
 
-            self.visualizer = Visualizer(dataframe=self.df)
-            # Store chart paths for all questions
-            #self.charts =[]
-            #self.charts_columns = []
-            
-            # Process each question and generate charts
-            for question in self.selected_qu_list:
-                # Get chart type and column from the question
-                chart_type = self.analyzer.select_chart_type(question)
-                #self.charts.append(self.analyzer.select_chart_type(question))
-                chart_columns = self.analyzer.select_columns(question)
-                #self.charts_columns.append(self.analyzer.select_columns(question))
-                chart_title = question[3:6] + str(random.randint(100, 2000))
-                chart_path = f"{self.rname}/{chart_title}.html"
-                # Generate visualization
-                self.visualizer.generate_visualization(
-                    question=question,
-                    output_path=chart_path,
-                    columns=chart_columns,  # Optional override
-                    chart_type=chart_type,  # Optional override
-                    width=1200,
-                    height=800 )
-                
-                if chart_path and os.path.exists(chart_path):
-                    print(f"Successfully generated chart at: {chart_path}")
-                    self.db.saveCharts(dashID=self.dashboardID, path=chart_path)
-                    self.chart_paths.append(chart_path)
-            
-            # Configure the page widget
-            page_widget = self.main_window.ui.page
-            if page_widget.layout():
-                QWidget().setLayout(page_widget.layout())
-            page_layout = QVBoxLayout(page_widget)
-            page_layout.setContentsMargins(0, 0, 0, 0)
-            page_layout.setSpacing(0)
-            
-            # Configure widget_3
-            widget_3 = self.main_window.ui.widget_3
-            widget_3.setMinimumSize(800, 600)
-            widget_3.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-            page_layout.addWidget(widget_3)
-            
-            # Switch to the visualization page
-            self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
-            
-            # Display all charts
-            self.display_current_chart()
-            
-        except Exception as e:
-            print(f"Error processing questions: {str(e)}")
-            import traceback
-            traceback.print_exc()
+        # Save questions and create dashboard first (quick, so keep in main thread)
+        for qu in self.selected_qu_list:
+            if not hasattr(self, 'saved_questions'):
+                self.saved_questions = set()
+            if qu not in self.saved_questions:
+                self.db.saveQuestion(reportID=self.reportID, question=qu)
+                self.saved_questions.add(qu)
+
+        # Prepare visualizer if needed
+        self.visualizer = Visualizer(dataframe=self.df)
+
+        # Show loading overlay
+        self.show_loading("Generating charts...")
+
+        # Start chart generation in a thread
+        self.chart_worker = ChartGenerationWorker(
+            analyzer=self.analyzer,
+            visualizer=self.visualizer,
+            questions=self.selected_qu_list,
+            rname=self.rname,
+            db=self.db,
+            reportID=self.reportID
+        )
+        self.chart_worker.finished.connect(self._on_charts_generated)
+        self.chart_worker.error.connect(self._on_charts_error)
+        self.chart_worker.start()
+
+    def _on_charts_generated(self, chart_paths):
+        self.chart_paths = chart_paths
+        self.hide_loading()
+        # Configure the page widget
+        page_widget = self.main_window.ui.page
+        if page_widget.layout():
+            QWidget().setLayout(page_widget.layout())
+        page_layout = QVBoxLayout(page_widget)
+        page_layout.setContentsMargins(0, 0, 0, 0)
+        page_layout.setSpacing(0)
+        # Configure widget_3
+        widget_3 = self.main_window.ui.widget_3
+        widget_3.setMinimumSize(800, 600)
+        widget_3.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        page_layout.addWidget(widget_3)
+        # Switch to the visualization page
+        self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
+        # Display all charts
+        self.display_current_chart()
+
+    def _on_charts_error(self, error_message):
+        print(f"Error processing questions: {error_message}")
+        self.hide_loading()
 
     def display_current_chart(self):
         """Display all charts in a scrollable layout with lazy loading"""
