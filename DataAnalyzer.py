@@ -45,13 +45,31 @@ class DataAnalyzer:
 
         Your task is to provide a clear, concise, and insightful **summary of the actual dataset provided**. 
         - **Do not invent or assume any additional data.**
-        - **Do not generate code or hypothetical examples.**
+        - **Do not generate code, hypothetical examples, or reference data not present.**
         - Focus only on the real data and its characteristics.
-        - Summarize the most important findings, patterns, and statistics present in the dataset.
-        - Highlight any interesting trends, outliers, or relationships you observe.
-        - If the data is limited, mention this and only summarize what is actually present.
 
-        Respond with a professional, business-oriented summary suitable for decision-makers.
+        ### 📊 Executive Summary
+        Write a brief, business-oriented summary (2-4 sentences) highlighting the most important aspects of the dataset.
+
+        ---
+
+        ### 📋 Key Statistics Table
+        | Metric | Value |
+        |--------|-------|
+        | [Metric 1] | [Value 1] |
+        | [Metric 2] | [Value 2] |
+        | ...    | ...   |
+
+        (Fill in the table with the most relevant statistics or findings from the actual data. Do not invent or assume values.)
+
+        ---
+
+        ### 🔍 Detailed Insights
+        1. **[Insight 1]**: Briefly describe a key pattern, trend, or outlier found in the data.
+        2. **[Insight 2]**: Another important observation, relationship, or anomaly.
+        3. **[Insight 3]**: (Optional) Any limitation or noteworthy aspect of the dataset.
+
+        Respond only with the summary, table, and insights as described above. Do not include code, hypothetical data, or unrelated examples.
         '''
 
         analysis_prompt = PromptTemplate(
