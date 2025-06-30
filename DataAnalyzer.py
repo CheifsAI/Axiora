@@ -47,17 +47,23 @@ class DataAnalyzer:
         - **Do not invent or assume any additional data.**
         - **Do not generate code, hypothetical examples, or reference data not present.**
         - Focus only on the real data and its characteristics.
-
-        ### 📊 Executive Summary
-        Write a concise, business-oriented summary (3–5 sentences) highlighting the most important aspects, patterns, and business implications of the dataset. Be specific and insightful.
+        - Use professional, executive-level language suitable for business decision-makers.
 
         ---
 
-        ### 📋 Key Statistics Table
+        ### 📊 Executive Summary
+        Provide a concise, business-oriented summary (2–5 sentences) highlighting the most important aspects, patterns, and business implications of the dataset.
+
+        ---
+
+        ### 📈 Key Statistics Table
         | Metric | Value | Description |
         |--------|-------|-------------|
         | [Metric 1] | [Value 1] | [What this metric means] |
         | [Metric 2] | [Value 2] | [What this metric means] |
+        | [Metric 3] | [Value 3] | [What this metric means] |
+        | [Metric 4] | [Value 4] | [What this metric means] |
+        | [Metric 5] | [Value 5] | [What this metric means] |
         | ...    | ...   | ...         |
 
         (Fill in the table with 5–7 of the most relevant statistics or findings from the actual data. Do not invent or assume values.)
@@ -65,14 +71,34 @@ class DataAnalyzer:
         ---
 
         ### 🔍 Detailed Insights
-        List 3–5 key insights, each with a brief explanation:
-        1. **[Insight 1]**: [Explanation of the pattern, trend, or outlier and its business relevance.]
-        2. **[Insight 2]**: [Another important observation, relationship, or anomaly.]
-        3. **[Insight 3]**: [Further insight, such as a limitation, data quality issue, or noteworthy aspect.]
-        4. **[Optional Insight 4]**: [If applicable.]
-        5. **[Optional Insight 5]**: [If applicable.]
+        For each insight, provide a brief explanation, reference relevant metrics, and describe the business implication.
+        1. **[Insight 1]**
+            - **Explanation:** [Describe the pattern, trend, or outlier.]
+            - **Metric Reference:** [Which metric(s) this relates to.]
+            - **Business Implication:** [Why this matters for decision-makers.]
+        2. **[Insight 2]**
+            - **Explanation:**
+            - **Metric Reference:**
+            - **Business Implication:**
+        3. **[Insight 3]**
+            - **Explanation:**
+            - **Metric Reference:**
+            - **Business Implication:**
+        4. **[Optional Insight 4]**
+            - **Explanation:**
+            - **Metric Reference:**
+            - **Business Implication:**
+        5. **[Optional Insight 5]**
+            - **Explanation:**
+            - **Metric Reference:**
+            - **Business Implication:**
 
-        Respond only with the summary, table, and insights as described above. Do not include code, hypothetical data, or unrelated examples.
+        ---
+
+        ### ⚠️ Limitations or Data Quality Notes
+        If applicable, briefly mention any limitations, missing data, or quality issues that could affect interpretation.
+
+        Respond only with the summary, table, insights, and limitations as described above. Do not include code, hypothetical data, or unrelated examples.
         '''
 
         analysis_prompt = PromptTemplate(
