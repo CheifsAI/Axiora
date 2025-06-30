@@ -134,14 +134,11 @@ class DataAnalyzer:
         
         analysis_chain = analysis_prompt | self.llm
 
-        self.analysis = analysis_chain.invoke({
-            "data_info": data_info,
-            "data_sample": data_sample,
-            "data_description": data_description
-        })
-
         formatted_analysis_prompt = analysis_template.format(data_info=data_info,data_sample=data_sample,
                                                              data_description=data_description)
+
+        self.analysis = self.llm.invoke(formatted_analysis_prompt)
+
         self.memory.append(HumanMessage(content=formatted_analysis_prompt))
         self.memory.append(AIMessage(content=self.analysis))
         self.db.saveMemory(reportID=self.report_id,
