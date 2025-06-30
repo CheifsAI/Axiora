@@ -299,6 +299,10 @@ class GuiFunctions():
                     question_label = QLabel(str(question), question_frame)
                     question_label.setWordWrap(True)
                     question_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    # Set font size for question text
+                    font = question_label.font()
+                    font.setPointSize(20)  # Adjust this value to change font size
+                    question_label.setFont(font)
                     hbox.addWidget(question_label)
 
                     check_box = QCheckBox(question_frame)
@@ -701,6 +705,10 @@ class GuiFunctions():
                 question_label = QLabel(str(question), question_frame)
                 question_label.setWordWrap(True)
                 question_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                # Set font size for question text
+                font = question_label.font()
+                font.setPointSize(20)  # Adjust this value to change font size
+                question_label.setFont(font)
                 hbox.addWidget(question_label)
 
                 # Create checkbox with the question

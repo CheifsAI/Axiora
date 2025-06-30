@@ -324,16 +324,6 @@ class DataAnalyzer:
 
         Output Format:
 
-        ### 📋 Recommendations Table
-
-        | # | Recommendation Title | Expected Impact (%) | Potential Risk (with Emoji) |
-        |---|-----------------------|---------------------|-----------------------------|
-        | 1 | [Title] | [Estimated Impact %] | [Emoji] [Main risk] |
-        | 2 | [Title] | [Estimated Impact %] | [Emoji] [Main risk] |
-        | ... | ... | ... | ... |
-
-        ---
-
         ### 📋 Full Recommendation Details
 
         1. **[Recommendation Title]** [Emoji]
