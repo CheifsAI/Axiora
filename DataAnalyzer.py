@@ -48,15 +48,17 @@ class DataAnalyzer:
         - **Do not generate code, hypothetical examples, or reference data not present.**
         - Focus only on the real data and its characteristics.
         - Use professional, executive-level language suitable for business decision-makers.
-        Output Format:
+
         ---
-        
+
         ### 📊 Executive Summary
         Provide a concise, business-oriented summary (2–5 sentences) highlighting the most important aspects, patterns, and business implications of the dataset.
 
         ---
 
         ### 📈 Key Statistics Table
+
+        Output the following table in valid Markdown format, with each row on its own line. Do not combine rows.
 
         | Metric      | Value      | Description               |
         |-------------|------------|---------------------------|
