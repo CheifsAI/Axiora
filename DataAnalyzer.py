@@ -43,31 +43,34 @@ class DataAnalyzer:
         2. Dataset sample: {data_sample}
         3. Dataset summary: {data_description}
 
-        Your task is to provide a clear, concise, and insightful **summary of the actual dataset provided**. 
+        Your task is to provide a clear, comprehensive, and insightful **summary of the actual dataset provided**. 
         - **Do not invent or assume any additional data.**
         - **Do not generate code, hypothetical examples, or reference data not present.**
         - Focus only on the real data and its characteristics.
 
         ### 📊 Executive Summary
-        Write a brief, business-oriented summary (2-4 sentences) highlighting the most important aspects of the dataset.
+        Write a concise, business-oriented summary (3–5 sentences) highlighting the most important aspects, patterns, and business implications of the dataset. Be specific and insightful.
 
         ---
 
         ### 📋 Key Statistics Table
-        | Metric | Value |
-        |--------|-------|
-        | [Metric 1] | [Value 1] |
-        | [Metric 2] | [Value 2] |
-        | ...    | ...   |
+        | Metric | Value | Description |
+        |--------|-------|-------------|
+        | [Metric 1] | [Value 1] | [What this metric means] |
+        | [Metric 2] | [Value 2] | [What this metric means] |
+        | ...    | ...   | ...         |
 
-        (Fill in the table with the most relevant statistics or findings from the actual data. Do not invent or assume values.)
+        (Fill in the table with 5–7 of the most relevant statistics or findings from the actual data. Do not invent or assume values.)
 
         ---
 
         ### 🔍 Detailed Insights
-        1. **[Insight 1]**: Briefly describe a key pattern, trend, or outlier found in the data.
-        2. **[Insight 2]**: Another important observation, relationship, or anomaly.
-        3. **[Insight 3]**: (Optional) Any limitation or noteworthy aspect of the dataset.
+        List 3–5 key insights, each with a brief explanation:
+        1. **[Insight 1]**: [Explanation of the pattern, trend, or outlier and its business relevance.]
+        2. **[Insight 2]**: [Another important observation, relationship, or anomaly.]
+        3. **[Insight 3]**: [Further insight, such as a limitation, data quality issue, or noteworthy aspect.]
+        4. **[Optional Insight 4]**: [If applicable.]
+        5. **[Optional Insight 5]**: [If applicable.]
 
         Respond only with the summary, table, and insights as described above. Do not include code, hypothetical data, or unrelated examples.
         '''
