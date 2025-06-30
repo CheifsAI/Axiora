@@ -45,66 +45,13 @@ class DataAnalyzer:
 
         Your task is to provide a clear, comprehensive, and insightful **summary of the actual dataset provided**. 
         - **Do not invent or assume any additional data.**
-        - **Do not generate code, hypothetical examples, or reference data not present.**
+        - **Do not generate code , hypothetical examples, or reference data not present.**
         - Focus only on the real data and its characteristics.
-        - Use professional, executive-level language suitable for business decision-makers.
+        - Summarize the most important findings, patterns, and statistics present in the dataset.
+        - Highlight any interesting trends, outliers, or relationships you observe.
+        - If the data is limited, mention this and only summarize what is actually present.
         
-        follow the Output Format strictly:
-
-        ---
-
-        ### 📊 Executive Summary
-        Provide a concise, business-oriented summary (2–5 sentences) highlighting the most important aspects, patterns, and business implications of the dataset.
-
-        ---
-
-        ### 📈 Key Statistics Table
-
-        Output the following table in valid Markdown format, with each row on its own line, and a blank line before and after the table.
-
-        | Metric      | Value      | Description               |
-        |-------------|------------|---------------------------|
-        | [Metric 1]  | [Value 1]  | [What this metric means]  |
-        | [Metric 2]  | [Value 2]  | [What this metric means]  |
-        | [Metric 3]  | [Value 3]  | [What this metric means]  |
-        | [Metric 4]  | [Value 4]  | [What this metric means]  |
-        | [Metric 5]  | [Value 5]  | [What this metric means]  |
-        | ...         | ...        | ...                       |
-
-        (Replace the example values with those from the actual data.)
-
-        ---
-
-        ### 🔍 Detailed Insights
-        For each insight, provide a brief explanation, reference relevant metrics, and describe the business implication.
-        1. **[Insight 1]**
-            - **Explanation:** [Describe the pattern, trend, or outlier.]
-            - **Metric Reference:** [Which metric(s) this relates to.]
-            - **Business Implication:** [Why this matters for decision-makers.]
-        2. **[Insight 2]**
-            - **Explanation:**
-            - **Metric Reference:**
-            - **Business Implication:**
-        3. **[Insight 3]**
-            - **Explanation:**
-            - **Metric Reference:**
-            - **Business Implication:**
-        4. **[Optional Insight 4]**
-            - **Explanation:**
-            - **Metric Reference:**
-            - **Business Implication:**
-        5. **[Optional Insight 5]**
-            - **Explanation:**
-            - **Metric Reference:**
-            - **Business Implication:**
-
-        ---
-
-        ### ⚠️ Limitations or Data Quality Notes
-
-        If applicable, briefly mention any limitations, missing data, or quality issues that could affect interpretation.
-
-        Respond only with the summary, table, insights, and limitations as described above. Do not include code, hypothetical data, or unrelated examples.
+        Respond with a professional, business-oriented summary suitable for decision-makers.
         '''
 
         analysis_prompt = PromptTemplate(
