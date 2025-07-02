@@ -147,11 +147,19 @@ class DatabaseManager:
             if cache_key in self._cache:
                 del self._cache[cache_key]
 
-    def saveSummary(self,reportID,summary_content):
-        #summary = self.Base.classes.summary
-        newSummary = Summary(report_id=reportID,summary_content=summary_content)
-        self.session.add(newSummary)
-        self.session.commit()
+    def saveSummary(self, reportID, summary_content):
+        try:
+            # Check if a summary already exists for this reportID
+            summary = self.session.query(Summary).filter(Summary.report_id == reportID).first()
+            if summary:
+                summary.summary_content = summary_content
+            else:
+                newSummary = Summary(report_id=reportID, summary_content=summary_content)
+                self.session.add(newSummary)
+            self.session.commit()
+        except Exception as e:
+            self.session.rollback()
+            raise
 
     @cache_decorator("llm_id")
     def llm_id_by_name(self, llmName: str) -> int:

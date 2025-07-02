@@ -3,6 +3,8 @@ import pandas as pd
 from typing import List, Dict, Optional, Union
 import re
 import os
+import numpy as np
+import plotly.express as px
 
 class Visualizer:
     def __init__(self, dataframe: pd.DataFrame):
@@ -126,20 +128,35 @@ class Visualizer:
         return fig
 
     def _create_line_chart(self, columns: List[str]) -> go.Figure:
-        """Create a line chart"""
+        """Create a line chart using value_counts for frequency aggregation, like bar/pie charts."""
         fig = go.Figure()
-        for i, col in enumerate(columns):
+        if len(columns) == 1:
+            # Use value_counts on the column
+            data = self.df[columns[0]].value_counts().sort_index()
             fig.add_trace(
                 go.Scatter(
-                    x=self.df.index,
-                    y=self.df[col],
-                    name=col,
+                    x=data.index,
+                    y=data.values,
+                    name=columns[0],
                     mode='lines+markers',
-                    line=dict(
-                        color=self._theme_colors['primary' if i % 2 == 0 else 'secondary']
-                    )
+                    line=dict(color=self._theme_colors['primary'])
                 )
             )
+        elif len(columns) >= 2:
+            # Use value_counts on the x column
+            x_col = columns[0]
+            data = self.df[x_col].value_counts().sort_index()
+            fig.add_trace(
+                go.Scatter(
+                    x=data.index,
+                    y=data.values,
+                    name=x_col,
+                    mode='lines+markers',
+                    line=dict(color=self._theme_colors['primary'])
+                )
+            )
+        else:
+            raise ValueError("Line chart requires at least one column.")
         return fig
 
     def _create_histogram(self, column: str) -> go.Figure:
@@ -169,22 +186,47 @@ class Visualizer:
         return fig
 
     def _create_scatter_plot(self, x_col: str, y_col: str) -> go.Figure:
-        """Create a scatter plot"""
-        fig = go.Figure(data=[
-            go.Scatter(
-                x=self.df[x_col],
-                y=self.df[y_col] if y_col else self.df.index,
-                mode='markers',
-                marker=dict(
-                    color=self._theme_colors['primary'],
-                    size=8,
-                    line=dict(
-                        color=self._theme_colors['accent'],
-                        width=1
-                    )
+        """Create a scatter plot using value_counts for (x, y) frequency aggregation, with color indicating frequency."""
+        if y_col:
+            # Count frequency of each (x, y) pair
+            freq = self.df.groupby([x_col, y_col]).size().reset_index(name='count')
+            fig = go.Figure(data=[
+                go.Scatter(
+                    x=freq[x_col],
+                    y=freq[y_col],
+                    mode='markers',
+                    marker=dict(
+                        size=freq['count'] * 5,  # scale marker size by count
+                        color=freq['count'],     # color by frequency
+                        colorscale='Blues',      # use a blue color scale
+                        showscale=True,
+                        colorbar=dict(title='Frequency'),
+                        line=dict(color=self._theme_colors['accent'], width=1)
+                    ),
+                    text=freq['count'],
+                    name=f"{x_col} vs {y_col} (freq)"
                 )
-            )
-        ])
+            ])
+        else:
+            # Only x_col provided, use value_counts
+            data = self.df[x_col].value_counts().sort_index()
+            fig = go.Figure(data=[
+                go.Scatter(
+                    x=data.index,
+                    y=data.values,
+                    mode='markers',
+                    marker=dict(
+                        size=data.values * 5,
+                        color=data.values,
+                        colorscale='Blues',
+                        showscale=True,
+                        colorbar=dict(title='Frequency'),
+                        line=dict(color=self._theme_colors['accent'], width=1)
+                    ),
+                    text=data.values,
+                    name=f"{x_col} (freq)"
+                )
+            ])
         return fig
 
     def _create_stacked_bar(self, columns: List[str]) -> go.Figure:

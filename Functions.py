@@ -155,6 +155,45 @@ class RecommendationWorker(QThread):
         except Exception as e:
             self.error.emit(str(e))
 
+class ChartGenerationWorker(QThread):
+    finished = Signal(list)
+    error = Signal(str)
+
+    def __init__(self, analyzer, visualizer, questions, rname, db, reportID):
+        super().__init__()
+        self.analyzer = analyzer
+        self.visualizer = visualizer
+        self.questions = questions
+        self.rname = rname
+        self.db = db
+        self.reportID = reportID
+
+    def run(self):
+        try:
+            chart_paths = []
+            dashboardID = self.db.addDashboard(reportID=self.reportID)
+            for question in self.questions:
+                chart_type = self.analyzer.select_chart_type(question)
+                chart_columns = self.analyzer.select_columns(question)
+                chart_title = question[3:6] + str(random.randint(100, 2000))
+                chart_path = f"{self.rname}/{chart_title}.html"
+                self.visualizer.generate_visualization(
+                    question=question,
+                    output_path=chart_path,
+                    columns=chart_columns,
+                    chart_type=chart_type,
+                    width=1200,
+                    height=800
+                )
+                if chart_path and os.path.exists(chart_path):
+                    self.db.saveCharts(dashID=dashboardID, path=chart_path)
+                    chart_paths.append(chart_path)
+            self.finished.emit(chart_paths)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            self.error.emit(str(e))
+
 class GuiFunctions():
     def __init__(self, MainWindow, user_id):
         self.main_window = MainWindow
@@ -216,6 +255,12 @@ class GuiFunctions():
             # Extract questions from the Word content
             questions = self.extract_questions(word_content)
             
+            # Store the extracted questions for use by other functions
+            self.g_questions = questions
+            
+            # Clear the selected questions list
+            self.selected_qu_list = []
+            
             # Debug: Print the extracted questions
             print("Extracted questions:")
             print(questions)
@@ -254,12 +299,24 @@ class GuiFunctions():
                     question_label = QLabel(str(question), question_frame)
                     question_label.setWordWrap(True)
                     question_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    # Set font size for question text
+                    font = question_label.font()
+                    font.setPointSize(20)  # Adjust this value to change font size
+                    question_label.setFont(font)
                     hbox.addWidget(question_label)
 
                     check_box = QCheckBox(question_frame)
                     check_box.setObjectName(f"checkbox_{i}")  # Set unique object name
                     check_box.setProperty("question", question)
-                    check_box.stateChanged.connect(self.handle_question_selection)
+                    
+                    # Create a custom slot for this specific checkbox
+                    def create_slot(q):
+                        return lambda checked: self.handle_question_selection(q, checked)
+                    
+                    # Connect with the custom slot
+                    slot = create_slot(question)
+                    check_box.toggled.connect(slot)
+                    
                     hbox.addWidget(check_box)
 
                     qu_layout.addWidget(question_frame)
@@ -378,7 +435,21 @@ class GuiFunctions():
                 )
                 
                 # Update UI
-                self.main_window.ui.recommendations_text.setMarkdown(recommendations)
+                # Create CSS styling for larger font size
+                css_style = """
+                <style>
+                body { font-size: 20px; }
+                p { font-size: 20px; }
+                h1, h2, h3, h4, h5, h6 { font-size: 20px; }
+                li { font-size: 20px; }
+                table { font-size: 20px; }
+                td, th { font-size: 20px; }
+                </style>
+                """
+                recommendations_md = markdown(recommendations)
+                # Combine CSS with markdown content
+                styled_recommendations = css_style + recommendations_md
+                self.main_window.ui.recommendations_text.setHtml(styled_recommendations)
             else:
                 print("Error: No report ID available")
                 self.main_window.ui.recommendations_text.setMarkdown(
@@ -423,8 +494,21 @@ class GuiFunctions():
         self.summary_worker.start()
 
     def _update_summary_text(self,summary):
+            # Create CSS styling for larger font size
+            css_style = """
+            <style>
+            body { font-size: 20px; }
+            p { font-size: 20px; }
+            h1, h2, h3, h4, h5, h6 { font-size: 20px; }
+            li { font-size: 20px; }
+            table { font-size: 20px; }
+            td, th { font-size: 20px; }
+            </style>
+            """
             summary_md = markdown(summary)
-            self.main_window.ui.summary_text.setMarkdown(summary_md)
+            # Combine CSS with markdown content
+            styled_summary = css_style + summary_md
+            self.main_window.ui.summary_text.setHtml(styled_summary)
 
     def handle_summary_complete(self, summary):
         try:
@@ -621,6 +705,10 @@ class GuiFunctions():
                 question_label = QLabel(str(question), question_frame)
                 question_label.setWordWrap(True)
                 question_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                # Set font size for question text
+                font = question_label.font()
+                font.setPointSize(20)  # Adjust this value to change font size
+                question_label.setFont(font)
                 hbox.addWidget(question_label)
 
                 # Create checkbox with the question
@@ -728,81 +816,65 @@ class GuiFunctions():
                 self.worker.start()
 
     def process_selected_questions(self):
-        """Process selected questions and generate charts in a grid layout"""
+        """Process selected questions and generate charts in a grid layout (now threaded)"""
         if not self.selected_qu_list:
             print("No questions selected!")
             print("Debug: Current selections:", self.selected_qu_list)
             return
-        
+
         print(f"Processing {len(self.selected_qu_list)} selected questions")
         print(f"Selected questions: {self.selected_qu_list}")
-        
-        try:
-            # Save questions and create dashboard first
-            for qu in self.selected_qu_list:
-                if not hasattr(self, 'saved_questions'):
-                    self.saved_questions = set()
-                if qu not in self.saved_questions:
-                    self.db.saveQuestion(reportID=self.reportID, question=qu)
-                    self.saved_questions.add(qu)
-            
-            # Create dashboard
-            self.dashboardID = self.db.addDashboard(reportID=self.reportID)
-            print(f"Created dashboard with ID: {self.dashboardID}")
-            self.chart_paths = []
 
-            self.visualizer = Visualizer(dataframe=self.df)
-            # Store chart paths for all questions
-            #self.charts =[]
-            #self.charts_columns = []
-            
-            # Process each question and generate charts
-            for question in self.selected_qu_list:
-                # Get chart type and column from the question
-                chart_type = self.analyzer.select_chart_type(question)
-                #self.charts.append(self.analyzer.select_chart_type(question))
-                chart_columns = self.analyzer.select_columns(question)
-                #self.charts_columns.append(self.analyzer.select_columns(question))
-                chart_title = question[3:6] + str(random.randint(100, 2000))
-                chart_path = f"{self.rname}/{chart_title}.html"
-                # Generate visualization
-                self.visualizer.generate_visualization(
-                    question=question,
-                    output_path=chart_path,
-                    columns=chart_columns,  # Optional override
-                    chart_type=chart_type,  # Optional override
-                    width=1200,
-                    height=800 )
-                
-                if chart_path and os.path.exists(chart_path):
-                    print(f"Successfully generated chart at: {chart_path}")
-                    self.db.saveCharts(dashID=self.dashboardID, path=chart_path)
-                    self.chart_paths.append(chart_path)
-            
-            # Configure the page widget
-            page_widget = self.main_window.ui.page
-            if page_widget.layout():
-                QWidget().setLayout(page_widget.layout())
-            page_layout = QVBoxLayout(page_widget)
-            page_layout.setContentsMargins(0, 0, 0, 0)
-            page_layout.setSpacing(0)
-            
-            # Configure widget_3
-            widget_3 = self.main_window.ui.widget_3
-            widget_3.setMinimumSize(800, 600)
-            widget_3.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-            page_layout.addWidget(widget_3)
-            
-            # Switch to the visualization page
-            self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
-            
-            # Display all charts
-            self.display_current_chart()
-            
-        except Exception as e:
-            print(f"Error processing questions: {str(e)}")
-            import traceback
-            traceback.print_exc()
+        # Save questions and create dashboard first (quick, so keep in main thread)
+        for qu in self.selected_qu_list:
+            if not hasattr(self, 'saved_questions'):
+                self.saved_questions = set()
+            if qu not in self.saved_questions:
+                self.db.saveQuestion(reportID=self.reportID, question=qu)
+                self.saved_questions.add(qu)
+
+        # Prepare visualizer if needed
+        self.visualizer = Visualizer(dataframe=self.df)
+
+        # Show loading overlay
+        self.show_loading("Generating charts...")
+
+        # Start chart generation in a thread
+        self.chart_worker = ChartGenerationWorker(
+            analyzer=self.analyzer,
+            visualizer=self.visualizer,
+            questions=self.selected_qu_list,
+            rname=self.rname,
+            db=self.db,
+            reportID=self.reportID
+        )
+        self.chart_worker.finished.connect(self._on_charts_generated)
+        self.chart_worker.error.connect(self._on_charts_error)
+        self.chart_worker.start()
+
+    def _on_charts_generated(self, chart_paths):
+        self.chart_paths = chart_paths
+        self.hide_loading()
+        # Configure the page widget
+        page_widget = self.main_window.ui.page
+        if page_widget.layout():
+            QWidget().setLayout(page_widget.layout())
+        page_layout = QVBoxLayout(page_widget)
+        page_layout.setContentsMargins(0, 0, 0, 0)
+        page_layout.setSpacing(0)
+        # Configure widget_3
+        widget_3 = self.main_window.ui.widget_3
+        widget_3.setMinimumSize(800, 600)
+        widget_3.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        page_layout.addWidget(widget_3)
+        # Switch to the visualization page
+        self.main_window.ui.stackedWidget.setCurrentWidget(self.main_window.ui.page)
+        # Display all charts
+        self.display_current_chart()
+
+    def _on_charts_error(self, error_message):
+        print(f"Error processing questions: {error_message}")
+        self.hide_loading()
 
     def display_current_chart(self):
         """Display all charts in a scrollable layout with lazy loading"""

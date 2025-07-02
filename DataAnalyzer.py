@@ -33,95 +33,22 @@ class DataAnalyzer:
         data_description = self.data_description
 
         analysis_template = '''
-        You are a data analyst. You are provided with:
+        You are a world-class data analyst.
+
+        You are provided with:
         1. Dataset metadata: {data_info}
         2. Dataset sample: {data_sample}
         3. Dataset summary: {data_description}
-        You are a **world-class Senior Data Analyst and Applied Statistician**, with deep expertise in business intelligence, behavioral data, financial analytics, and statistical modeling. I will provide you with a dataset in the form of a DataFrame, CSV, or Excel file.
 
-        🎯 Your task is to perform a **comprehensive, statistically-sound, and executive-ready analysis** tailored for decision-makers, technical stakeholders, and strategic planners.
-
-        ---
-
-        ## 🧾 1. Executive Summary
-        - Summarize the most important findings, using clear and impactful language.
-        - Highlight how these findings affect the business, strategy, or operations.
-        - Include headline numbers (KPIs, revenue impact, user behavior shifts...).
-
-        ---
-
-        ## 📊 2. Key Patterns & Strategic Insights
-        - Explore key trends, distributions, and variable relationships.
-        - Use metrics such as:
-        - **Mean, Median, Std. Dev.**
-        - **Correlation Coefficients**
-        - **Distribution Skewness/Kurtosis**
-        - **R² Score (if regression applies)**
-
-        📌 Visuals may include histograms, bar charts, scatter plots, or heatmaps.
-
-        ---
-
-        ## 📐 3. Statistical Validation & Modeling
-        - Apply formal **hypothesis tests** where applicable:
-        - t-tests, ANOVA, Chi-square, or Z-tests.
-        - Report **p-values** and **statistical significance**.
-        - Build simple predictive or explanatory models:
-        - Linear/Logistic Regression, Decision Trees...
-        - Report key metrics:
-        - **R²**, **RMSE**, **AUC**, or **F1-Score** (as appropriate).
-        - Provide **Confidence Intervals** for estimates when relevant.
-
-        📈 Clearly indicate statistically significant results and what they mean for the business.
-
-        ---
-
-        ## ⚠️ 4. Risks, Anomalies & Data Limitations
-        - Identify:
-        - Missing values
-        - Outliers
-        - Sampling bias or measurement error
-        - Explain how each issue might impact model validity or business interpretations.
-        - Suggest methods for mitigation (e.g., imputation, resampling, anomaly filtering).
-
-        ---
-
-        ## 🌱 5. Opportunities for Growth & Optimization
-        - Identify actionable insights tied to business KPIs.
-        - Use segmentation, clustering, or cross-tab analysis to discover growth potential.
-        - Prioritize by impact, feasibility, and risk.
-
-        ---
-
-        ## 💡 6. Hidden or Surprising Insights
-        - Detect any **non-obvious** trends, patterns, or behaviors.
-        - Show how these findings might reveal blind spots or strategic advantages.
-
-        ---
-
-        ## 🧠 7. Strategic Recommendations
-        - Provide **3–5 clear, data-backed actions** for decision-makers.
-        - Align each with business objectives (cost savings, revenue growth, efficiency).
-        - Include a “next steps” section (further data needed, A/B test, dashboard build...).
-
-        ---
-
-        ## 📊 Summary Table of Key Drivers
-
-        | Category              | Factor            | Impact Level | Statistical Significance | Recommendation                      |
-        |----------------------|-------------------|--------------|---------------------------|-------------------------------------|
-        | 📈 High Impact       | [Variable Name]   | Strong       | ✅ p < 0.05                | [Recommended Action]               |
-        | ⚠️ Low/Negative Impact | [Variable Name]   | Weak/Negative| ❌ Not significant         | [Mitigation Strategy or Ignore]    |
-
-        ---
-
-        ## 📌 Presentation Guidelines
-        - Use professional, business-oriented language.
-        - Include emojis 🎯 📈 ⚠️ 💡 💰 🔍 to enhance readability.
-        - Be clear, direct, and data-driven.
-        - If any part of the dataset is unclear or incomplete, ask clarifying questions before finalizing.
-
-        Once the dataset is received, begin your advanced analysis.
+        Your task is to provide a clear, comprehensive, and insightful **summary of the actual dataset provided**. 
+        - **Do not invent or assume any additional data.**
+        - **Do not generate code , hypothetical examples, or reference data not present.**
+        - Focus only on the real data and its characteristics.
+        - Summarize the most important findings, patterns, and statistics present in the dataset.
+        - Highlight any interesting trends, outliers, or relationships you observe.
+        - If the data is limited, mention this and only summarize what is actually present.
+        
+        Respond with a professional, business-oriented summary suitable for decision-makers.
         '''
 
         analysis_prompt = PromptTemplate(
@@ -131,14 +58,11 @@ class DataAnalyzer:
         
         analysis_chain = analysis_prompt | self.llm
 
-        self.analysis = analysis_chain.invoke({
-            "data_info": data_info,
-            "data_sample": data_sample,
-            "data_description": data_description
-        })
-
         formatted_analysis_prompt = analysis_template.format(data_info=data_info,data_sample=data_sample,
                                                              data_description=data_description)
+
+        self.analysis = self.llm.invoke(formatted_analysis_prompt)
+
         self.memory.append(HumanMessage(content=formatted_analysis_prompt))
         self.memory.append(AIMessage(content=self.analysis))
         self.db.saveMemory(reportID=self.report_id,
@@ -183,12 +107,6 @@ class DataAnalyzer:
         - Reflect advanced reasoning.
 
         Each question should be written on a separate line.
-
-        Example Questions:
-        - How has the conversion rate changed over time across different marketing channels?
-        - Which regions have shown the fastest growth in revenue over the past year?
-        - What is the correlation between customer satisfaction scores and return frequency?
-        - How does the average transaction value vary by customer segment?
         """
 
         question_template = PromptTemplate(
@@ -405,16 +323,6 @@ class DataAnalyzer:
             - ❗for High risk
 
         Output Format:
-
-        ### 📋 Recommendations Table
-
-        | # | Recommendation Title | Expected Impact (%) | Potential Risk (with Emoji) |
-        |---|-----------------------|---------------------|-----------------------------|
-        | 1 | [Title] | [Estimated Impact %] | [Emoji] [Main risk] |
-        | 2 | [Title] | [Estimated Impact %] | [Emoji] [Main risk] |
-        | ... | ... | ... | ... |
-
-        ---
 
         ### 📋 Full Recommendation Details
 
