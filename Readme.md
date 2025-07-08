@@ -111,7 +111,7 @@ Database → Model → Controller → UI Layer → Visualization
 
 ## License
 
-[MIT License](LICENSE) (or specify your license here)
+[MIT License](LICENSE)
 
 ## Acknowledgments
 
